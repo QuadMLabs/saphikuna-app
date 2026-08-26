@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main class="admin-content">
+            <h1>Admin Dashboard</h1>
+        </main>
+
+    </div>
+
+    <script th:src="@{/js/admin.js}"></script>
+
+</body>
+
+</html>

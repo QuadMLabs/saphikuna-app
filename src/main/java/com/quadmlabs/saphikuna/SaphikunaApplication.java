@@ -1,4 +1,4 @@
-package com.saphikuna.saphikuna;
+package com.quadmlabs.saphikuna;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
