@@ -1,0 +1,42 @@
+<header class="admin-topbar" th:fragment="topbar">
+
+    <div class="topbar-spacer"></div>
+
+    <div class="topbar-user">
+
+        <button type="button"
+                class="topbar-user-button"
+                title="Cuenta de usuario">
+
+            <span class="topbar-user-icon">
+                <i data-lucide="user"></i>
+            </span>
+
+            <span class="topbar-user-name">
+                Usuario
+            </span>
+
+            <span class="topbar-user-arrow">
+                <i data-lucide="chevron-down"></i>
+            </span>
+
+        </button>
+
+        <div class="topbar-user-menu">
+
+            <a href="#" class="topbar-user-menu-item">
+                <i data-lucide="user"></i>
+                <span>Mi perfil</span>
+            </a>
+
+            <button type="button"
+                    class="topbar-user-menu-item">
+                <i data-lucide="log-out"></i>
+                <span>Cerrar sesión</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
