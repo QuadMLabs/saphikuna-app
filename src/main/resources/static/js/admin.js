@@ -88,4 +88,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
+    /*
+ * Topbar user menu
+ */
+    const userButton =
+        document.querySelector('.topbar-user-button');
+
+    const userMenu =
+        document.querySelector('.topbar-user-menu');
+
+    if (userButton && userMenu) {
+
+        userButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+
+            userMenu.classList.toggle('is-open');
+        });
+
+        userMenu.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', () => {
+            userMenu.classList.remove('is-open');
+        });
+    }
+
 });
