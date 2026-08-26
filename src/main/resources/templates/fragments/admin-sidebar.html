@@ -2,45 +2,207 @@
 
     <div class="sidebar-header">
         <div class="sidebar-brand">
-            <span class="sidebar-logo">M</span>
-            <span class="sidebar-brand-name">MyCommerce</span>
+            <span class="sidebar-logo">
+                <img th:src="@{/images/favicom_saphikuna.png}" alt="Saphikuna">
+            </span>
+            <span class="sidebar-brand-name">Saphikuna</span>
         </div>
 
         <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar">
-            ‹
+            <i data-lucide="menu"></i>
         </button>
     </div>
 
     <nav class="sidebar-navigation">
-
+        <!-- MENU HOME -->
         <div class="sidebar-section">
-            <span class="sidebar-section-title">CATEGORIA</span>
-
-            <a href="#" class="sidebar-item">
-                <span class="sidebar-item-icon">📦</span>
-                <span class="sidebar-item-label">Productos</span>
-            </a>
-
-            <a href="#" class="sidebar-item">
-                <span class="sidebar-item-icon">🧶</span>
-                <span class="sidebar-item-label">Colecciones</span>
+            <span class="sidebar-section-title">HOME</span>
+            <a href="#" class="sidebar-item" title="Home">
+                <span class="sidebar-item-icon">
+                    <i data-lucide="home"></i>
+                </span>
+                <span class="sidebar-item-label">Home</span>
             </a>
         </div>
 
+        <!-- MENU CATALOGO -->
         <div class="sidebar-section">
-            <span class="sidebar-section-title">OTRA CATEGORIA</span>
+            <span class="sidebar-section-title">CATÁLOGO</span>
+            <!-- MENU PRODUCTOS -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Productos">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="shirt"></i>
+                        </span>
+                        <span class="sidebar-item-label">Productos</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU PRODUCTOS -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
 
-            <a href="#" class="sidebar-item">
-                <span class="sidebar-item-icon">🏠</span>
-                <span class="sidebar-item-label">Menú</span>
-            </a>
+            <!-- MENU COLECCIONES -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Colecciones">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="shopping-bag"></i>
+                        </span>
+                        <span class="sidebar-item-label">Colecciones</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU COLECCIONES -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
+            <!-- MENU CATEGORIAS -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Categorías">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="tag"></i>
+                        </span>
+                        <span class="sidebar-item-label">Categorías</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU CATEGORIAS -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
+        </div>
 
-            <a href="#" class="sidebar-item">
-                <span class="sidebar-item-icon">⚙️</span>
+        <!-- MENU ATRIBUTOS -->
+        <div class="sidebar-section">
+            <span class="sidebar-section-title">ATRIBUTOS</span>
+            <!-- MENU COLORES -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Colores">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="palette"></i>
+                        </span>
+                        <span class="sidebar-item-label">Colores</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU PRODUCTOS -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
+
+            <!-- MENU TALLAS -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Tallas">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="ruler-dimension-line"></i>
+                        </span>
+                        <span class="sidebar-item-label">Tallas</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU TALLAS -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
+            <!-- MENU MATERIALES -->
+            <div class="sidebar-menu-group">
+                <button type="button" class="sidebar-item sidebar-item-parent" title="Materiales">
+                    <span class="sidebar-item-main">
+                        <span class="sidebar-item-icon">
+                            <i data-lucide="spool"></i>
+                        </span>
+                        <span class="sidebar-item-label">Materiales</span>
+                    </span>
+                    <span class="sidebar-item-arrow">
+                        <i data-lucide="chevron-right"></i>
+                    </span>
+                </button>
+                <!-- SUB MENU MATERIALES -->
+                <div class="sidebar-submenu">
+                    <a href="#" class="sidebar-submenu-item">
+                        Todos los productos
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Nuevo producto
+                    </a>
+                    <a href="#" class="sidebar-submenu-item">
+                        Inventario
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU CONFIGURACION -->
+        <div class="sidebar-section">
+            <span class="sidebar-section-title">CONFIGURACIÓN</span>
+            <!-- MENU CONFIGURACION -->
+            <a href="#" class="sidebar-item" title="Configuración">
+                <span class="sidebar-item-icon">
+                    <i data-lucide="settings"></i>
+                </span>
                 <span class="sidebar-item-label">Configuración</span>
             </a>
         </div>
-
     </nav>
-
 </aside>
