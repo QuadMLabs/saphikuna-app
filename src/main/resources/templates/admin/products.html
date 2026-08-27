@@ -47,21 +47,69 @@
 
                     <div class="table-header">
 
-                        <div>
-                            <h2 class="table-title" th:text="#{products.table.title}">
-                                Productos
-                            </h2>
+                        <div class="table-controls-left">
+
+                            <div class="table-length">
+                                <label for="pageSize" th:text="#{table.show}">
+                                    Mostrar
+                                </label>
+
+                                <select id="pageSize" class="table-select">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+
+                                <span th:text="#{table.records}">
+                                    registros
+                                </span>
+                            </div>
+
                         </div>
 
-                        <button type="button" class="primary-button">
 
-                            <i data-lucide="plus"></i>
+                        <div class="table-controls-right">
 
-                            <span th:text="#{products.new}">
-                                Nuevo producto
-                            </span>
+                            <div class="table-search">
 
-                        </button>
+                                <label for="tableSearch" th:text="#{table.search}">
+                                    Buscar:
+                                </label>
+
+                                <div class="table-search-input">
+
+                                    <i data-lucide="search"></i>
+
+                                    <input type="search" id="tableSearch" th:placeholder="#{table.search.placeholder}">
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button" class="secondary-button" th:if="${showFilters}">
+
+                                <i data-lucide="filter"></i>
+
+                                <span th:text="#{table.filters}">
+                                    Filtros
+                                </span>
+
+                            </button>
+
+
+                            <button type="button" class="primary-button">
+
+                                <i data-lucide="plus"></i>
+
+                                <span th:text="#{products.new}">
+                                    Nuevo producto
+                                </span>
+
+                            </button>
+
+                        </div>
 
                     </div>
 

@@ -17,6 +17,8 @@ public class AdminController {
     @GetMapping("/products")
     public String products(Model model) {
         model.addAttribute("activeMenu", "products");
+        model.addAttribute("showFilters", true);
+
         return "admin/products";
     }
 }
