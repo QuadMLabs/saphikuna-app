@@ -113,6 +113,56 @@
 
                     </div>
 
+                    <div class="table-filter-panel" th:if="${showFilters}">
+
+                        <div class="table-filter-fields">
+
+                            <div class="table-filter-field">
+
+                                <label for="filterCategory">
+                                    Categoría
+                                </label>
+
+                                <select id="filterCategory" class="table-filter-select">
+
+                                    <option value="">Todas</option>
+                                    <option value="Tejidos">Tejidos</option>
+                                    <option value="Accesorios">Accesorios</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="table-filter-field">
+
+                                <label for="filterStatus">
+                                    Estado
+                                </label>
+
+                                <select id="filterStatus" class="table-filter-select">
+
+                                    <option value="">Todos</option>
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button" id="clearTableFilters" class="secondary-button">
+
+                            <i data-lucide="rotate-ccw"></i>
+
+                            <span>Limpiar</span>
+
+                        </button>
+
+                    </div>
+
 
                     <div class="table-container">
 

@@ -1059,3 +1059,63 @@ body {
     background: var(--primary-color);
     color: #ffffff;
 }
+
+/*
+ * Table filters
+ */
+.table-filter-panel {
+    display: none;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 16px 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.table-filter-panel.is-visible {
+    display: flex;
+}
+
+.table-filter-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.table-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.table-filter-field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6f6b7d;
+}
+
+.table-filter-select {
+    min-width: 170px;
+    height: 36px;
+
+    padding: 0 10px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.table-filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}

@@ -147,6 +147,18 @@ document.addEventListener('DOMContentLoaded', () => {
             '[data-page="next"]'
         );
 
+        const categoryFilter = document.querySelector(
+            '#filterCategory'
+        );
+
+        const statusFilter = document.querySelector(
+            '#filterStatus'
+        );
+
+        const clearFiltersButton = document.querySelector(
+            '#clearTableFilters'
+        );
+
         let currentPage = 1;
 
         function getFilteredRows() {
@@ -154,16 +166,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm =
                 tableSearch.value.toLowerCase().trim();
 
+            const selectedCategory =
+                categoryFilter
+                    ? categoryFilter.value.toLowerCase()
+                    : '';
+
+            const selectedStatus =
+                statusFilter
+                    ? statusFilter.value.toLowerCase()
+                    : '';
+
             return rows.filter(row => {
+
+                const cells = row.querySelectorAll('td');
 
                 const rowText =
                     row.textContent.toLowerCase();
 
-                return rowText.includes(searchTerm);
+                const category =
+                    cells[1]
+                        ? cells[1].textContent.toLowerCase().trim()
+                        : '';
+
+                const status =
+                    cells[3]
+                        ? cells[3].textContent.toLowerCase().trim()
+                        : '';
+
+                const matchesSearch =
+                    rowText.includes(searchTerm);
+
+                const matchesCategory =
+                    !selectedCategory ||
+                    category === selectedCategory;
+
+                const matchesStatus =
+                    !selectedStatus ||
+                    status === selectedStatus;
+
+                return (
+                    matchesSearch &&
+                    matchesCategory &&
+                    matchesStatus
+                );
 
             });
         }
-
         function renderPagination(totalPages) {
 
             paginationPages.innerHTML = '';
@@ -271,6 +319,56 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
 
+        if (categoryFilter) {
+
+            categoryFilter.addEventListener(
+                'change',
+                () => {
+
+                    currentPage = 1;
+
+                    updateTable();
+
+                }
+            );
+        }
+
+        if (statusFilter) {
+
+            statusFilter.addEventListener(
+                'change',
+                () => {
+
+                    currentPage = 1;
+
+                    updateTable();
+
+                }
+            );
+        }
+
+        if (clearFiltersButton) {
+
+            clearFiltersButton.addEventListener(
+                'click',
+                () => {
+
+                    if (categoryFilter) {
+                        categoryFilter.value = '';
+                    }
+
+                    if (statusFilter) {
+                        statusFilter.value = '';
+                    }
+
+                    currentPage = 1;
+
+                    updateTable();
+
+                }
+            );
+        }
+
         previousButton.addEventListener(
             'click',
             () => {
@@ -309,6 +407,27 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         updateTable();
+    }
+
+    /*
+ * Table filters panel
+ */
+    const filtersButton = document.querySelector(
+        '.table-controls-right .secondary-button'
+    );
+
+    const filterPanel = document.querySelector(
+        '.table-filter-panel'
+    );
+
+    if (filtersButton && filterPanel) {
+
+        filtersButton.addEventListener('click', () => {
+
+            filterPanel.classList.toggle('is-visible');
+
+        });
+
     }
 
 });
