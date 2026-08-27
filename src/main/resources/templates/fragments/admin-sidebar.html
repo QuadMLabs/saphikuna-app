@@ -1,18 +1,18 @@
 <aside class="admin-sidebar" th:fragment="sidebar">
-
+    <!-- HEADER -->
     <div class="sidebar-header">
         <div class="sidebar-brand">
             <span class="sidebar-logo">
                 <img th:src="@{/images/favicom_saphikuna.png}" alt="Saphikuna">
             </span>
-            <span class="sidebar-brand-name">Saphikuna</span>
+            <span class="sidebar-brand-name" th:text="#{app.title}"></span>
         </div>
 
         <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar">
             <i data-lucide="menu"></i>
         </button>
     </div>
-
+    <!-- NAVIGATION -->
     <nav class="sidebar-navigation">
         <!-- MENU HOME -->
         <div class="sidebar-section">
@@ -24,7 +24,6 @@
                 <span class="sidebar-item-label" th:text="#{menu.home}"></span>
             </a>
         </div>
-
         <!-- MENU CATALOGO -->
         <div class="sidebar-section">
             <span class="sidebar-section-title" th:text="#{menu.groups.catalog}"></span>
@@ -45,9 +44,9 @@
                 <div class="sidebar-submenu">
                     <a th:href="@{/admin/products}" class="sidebar-submenu-item"
                         th:classappend="${activeMenu == 'products'} ? ' is-active' : ''"
-                        th:text="#{submenu.list.products}">
+                        th:text="#{submenu.products.list}">
                     </a>
-                    <a th:href="@{/admin/products}" class="sidebar-submenu-item" th:text="#{submenu.add.product}">
+                    <a th:href="@{/admin/products}" class="sidebar-submenu-item" th:text="#{submenu.products.add}">
                     </a>
                 </div>
             </div>

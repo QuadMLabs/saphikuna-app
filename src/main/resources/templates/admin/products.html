@@ -4,451 +4,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Productos - Saphikuna</title>
-
+    <title th:text="#{products.title} + ' - ' + #{app.title}"></title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicom_saphikuna.png}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-
     <div class="admin-layout">
-
         <!-- Sidebar -->
         <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
-
         <!-- Main -->
         <main class="admin-main">
-
             <!-- Topbar -->
             <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
-
             <!-- Content -->
             <section class="admin-content">
-
                 <!-- Page header -->
                 <div class="page-header">
-
-                    <h1 class="page-title" th:text="#{products.title}">
-                        Productos
-                    </h1>
-
-                    <p class="page-subtitle" th:text="#{products.subtitle}">
-                        Administra los productos registrados.
-                    </p>
-
+                    <h1 class="page-title" th:text="#{products.title}"></h1>
+                    <p class="page-subtitle" th:text="#{products.subtitle}"></p>
                 </div>
-
-
                 <!-- Products table -->
                 <div class="content-surface">
-
                     <div class="table-header">
-
+                        <!-- Show ...records table -->
                         <div class="table-controls-left">
-
                             <div class="table-length">
-                                <label for="pageSize" th:text="#{table.show}">
-                                    Mostrar
-                                </label>
-
+                                <label for="pageSize" th:text="#{table.show}"></label>
                                 <select id="pageSize" class="table-select">
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
-
-                                <span th:text="#{table.records}">
-                                    registros
-                                </span>
+                                <span th:text="#{table.records}"></span>
                             </div>
-
                         </div>
-
-
+                        <!-- Left elements table -->
                         <div class="table-controls-right">
-
+                            <!-- Search table -->
                             <div class="table-search">
-
-                                <label for="tableSearch" th:text="#{table.search}">
-                                    Buscar:
-                                </label>
-
+                                <label for="tableSearch" th:text="#{common.search}"></label>
                                 <div class="table-search-input">
-
                                     <i data-lucide="search"></i>
-
                                     <input type="search" id="tableSearch" th:placeholder="#{table.search.placeholder}">
-
                                 </div>
-
                             </div>
-
-
+                            <!-- Filter table -->
                             <button type="button" id="toggleTableFilters" class="secondary-button">
                                 <i data-lucide="sliders-horizontal"></i>
-                                <span>Filtros</span>
+                                <span th:text="#{table.filters}"></span>
                             </button>
-
-
+                            <!-- Add product table -->
                             <button type="button" class="primary-button">
-
                                 <i data-lucide="plus"></i>
-
-                                <span th:text="#{products.new}">
-                                    Nuevo producto
-                                </span>
-
+                                <span th:text="#{products.new}"></span>
                             </button>
-
                         </div>
-
                     </div>
-
+                    <!-- FILTERS TABLE -->
                     <div class="table-filter-panel" th:if="${showFilters}">
-
                         <div class="table-filter-fields">
-
+                            <!-- Category filter -->
                             <div class="table-filter-field">
-
-                                <label for="filterCategory">
-                                    Categoría
-                                </label>
-
+                                <label for="filterCategory" th:text="#{products.category}"></label>
                                 <select id="filterCategory" class="table-filter-select" data-filter-column="category">
-
                                     <option value="">Todas</option>
                                     <option value="Tejidos">Tejidos</option>
                                     <option value="Accesorios">Accesorios</option>
-
                                 </select>
-
                             </div>
-
-
+                            <!-- Status filter -->
                             <div class="table-filter-field">
-
-                                <label for="filterStatus">
-                                    Estado
-                                </label>
-
+                                <label for="filterStatus" th:text="#{products.status}"></label>
                                 <select id="filterStatus" class="table-filter-select" data-filter-column="status">
-
                                     <option value="">Todos</option>
                                     <option value="Activo">Activo</option>
                                     <option value="Inactivo">Inactivo</option>
-
                                 </select>
-
                             </div>
-
+                            <!-- Size filter -->
                             <div class="table-filter-field">
-
-                                <label>
-                                    Tallas
-                                </label>
-
+                                <label for="filterStatus" th:text="#{products.size}"></label>
                                 <div class="table-multi-filter" id="filterTags" data-filter-column="tags"
                                     data-filter-match="multi">
-
                                     <button type="button" class="table-multi-filter-button">
-
-                                        <span class="table-multi-filter-label">
-                                            Todas
-                                        </span>
-
+                                        <span class="table-multi-filter-label" th:text="#{common.all}"></span>
                                         <i data-lucide="chevron-down"></i>
-
                                     </button>
-
                                     <div class="table-multi-filter-options">
-
                                         <label class="table-multi-filter-option">
                                             <input type="checkbox" value="S">
                                             <span>S</span>
                                         </label>
-
                                         <label class="table-multi-filter-option">
                                             <input type="checkbox" value="M">
                                             <span>M</span>
                                         </label>
-
                                         <label class="table-multi-filter-option">
                                             <input type="checkbox" value="L">
                                             <span>L</span>
                                         </label>
-
                                         <label class="table-multi-filter-option">
                                             <input type="checkbox" value="XL">
                                             <span>XL</span>
                                         </label>
-
                                         <label class="table-multi-filter-option">
                                             <input type="checkbox" value="XXL">
                                             <span>XXL</span>
                                         </label>
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </div>
-
-
+                        <!-- Clear filter -->
                         <button type="button" id="clearTableFilters" class="secondary-button">
-
                             <i data-lucide="rotate-ccw"></i>
-
-                            <span>Limpiar</span>
-
+                            <span th:text="#{common.clear}"></span>
                         </button>
-
                     </div>
-
-
+                    <!-- DATA TABLE-->
                     <div class="table-container">
-
                         <table class="data-table">
-
                             <thead>
                                 <tr>
-
-                                    <th data-column-type="image">Imagen</th>
-                                    <th data-column-type="text">Producto</th>
-                                    <th data-column-type="category">Categoría</th>
-                                    <th data-column-type="tags">Tallas</th>
-                                    <th data-column-type="colors">Colores</th>
-                                    <th data-column-type="currency">Precio</th>
-                                    <th data-column-type="status">Estado</th>
-                                    <th data-column-type="actions">Acciones</th>
-
+                                    <th th:text="#{products.table.column.image}" data-column-type="image"></th>
+                                    <th th:text="#{products.table.column.name}" data-column-type="text"></th>
+                                    <th th:text="#{products.table.column.category}" data-column-type="category"></th>
+                                    <th th:text="#{products.table.column.sizes}" data-column-type="tags"></th>
+                                    <th th:text="#{products.table.column.colors}" data-column-type="colors"></th>
+                                    <th th:text="#{products.table.column.price}" data-column-type="currency"></th>
+                                    <th th:text="#{products.table.column.status}" data-column-type="status"></th>
+                                    <th th:text="#{products.table.column.actions}" data-column-type="actions"></th>
                                 </tr>
                             </thead>
-
-
                             <tbody>
-
                                 <tr>
-
                                     <!-- Imagen -->
                                     <td data-column-type="image">
-                                        <button type="button" class="table-thumbnail-button" title="Ver imagen">
-
-                                            <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
-                                                class="table-thumbnail">
-
+                                        <button type="button" class="table-thumbnail-button"
+                                            th:title="#{products.table.column.image.show}">
+                                            <img src="/images/Comun_Saphikuna.png" class="table-thumbnail">
                                         </button>
                                     </td>
-
                                     <!-- Producto -->
                                     <td data-column-type="text">
                                         Chompa Andina
                                     </td>
-
                                     <!-- Categoría -->
                                     <td data-column-type="category">
                                         Tejidos
                                     </td>
-
                                     <!-- Tallas -->
                                     <td data-column-type="tags">
                                         <div class="table-tags">
-
                                             <span class="table-tag">S</span>
                                             <span class="table-tag">M</span>
                                             <span class="table-tag">L</span>
                                             <span class="table-tag">XL</span>
-
                                         </div>
                                     </td>
-
                                     <!-- Colores -->
                                     <td data-column-type="colors">
                                         <div class="table-colors">
-
                                             <span class="table-color" title="Rojo" style="background-color: #c62828;">
                                             </span>
-
                                             <span class="table-color" title="Azul" style="background-color: #1565c0;">
                                             </span>
-
                                             <span class="table-color" title="Negro" style="background-color: #212121;">
                                             </span>
-
                                         </div>
                                     </td>
-
                                     <!-- Precio -->
                                     <td data-column-type="currency">
                                         $45.00
                                     </td>
-
                                     <!-- Estado -->
                                     <td data-column-type="status">
                                         <span class="status-badge status-active">
                                             Activo
                                         </span>
                                     </td>
-
                                     <!-- Acciones -->
                                     <td data-column-type="actions" class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
+                                        <button type="button" class="table-action-button" th:title="#{common.edit}">
                                             <i data-lucide="pencil"></i>
                                         </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
+                                        <button type="button" class="table-action-button" th:title="#{common.delete}">
                                             <i data-lucide="trash-2"></i>
                                         </button>
-
                                     </td>
-
                                 </tr>
-
                                 <tr>
-
                                     <!-- Imagen -->
                                     <td data-column-type="image">
                                         <button type="button" class="table-thumbnail-button" title="Ver imagen">
-
                                             <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
                                                 class="table-thumbnail">
-
                                         </button>
                                     </td>
-
                                     <!-- Producto -->
                                     <td data-column-type="text">
                                         Chompa Andina
                                     </td>
-
                                     <!-- Categoría -->
                                     <td data-column-type="category">
                                         Tejidos
                                     </td>
-
                                     <!-- Tallas -->
                                     <td data-column-type="tags">
                                         <div class="table-tags">
-
                                             <span class="table-tag">L</span>
-
                                         </div>
                                     </td>
-
                                     <!-- Colores -->
                                     <td data-column-type="colors">
                                         <div class="table-colors">
-
                                             <span class="table-color" title="Rojo" style="background-color: #c62828;">
                                             </span>
-
                                             <span class="table-color" title="Azul" style="background-color: #1565c0;">
                                             </span>
-
                                             <span class="table-color" title="Negro" style="background-color: #212121;">
                                             </span>
-
                                         </div>
                                     </td>
-
                                     <!-- Precio -->
                                     <td data-column-type="currency">
                                         $45.00
                                     </td>
-
                                     <!-- Estado -->
                                     <td data-column-type="status">
                                         <span class="status-badge status-active">
                                             Activo
                                         </span>
                                     </td>
-
                                     <!-- Acciones -->
                                     <td data-column-type="actions" class="table-actions">
-
                                         <button type="button" class="table-action-button" title="Editar">
                                             <i data-lucide="pencil"></i>
                                         </button>
-
                                         <button type="button" class="table-action-button" title="Eliminar">
                                             <i data-lucide="trash-2"></i>
                                         </button>
-
                                     </td>
-
                                 </tr>
-
-
-
                             </tbody>
-
                         </table>
-
-
                     </div>
-
                     <div class="table-footer">
-
                         <div class="table-info">
-                            Mostrando <span id="tableVisibleCount">10</span>
-                            de <span id="tableTotalCount">12</span>
-                            elementos
+                            <span th:text="#{table.showing}">Mostrando</span>
+                            <span id="tableVisibleCount">10</span>
+                            <span th:text="#{table.of}">de</span>
+                            <span id="tableTotalCount">12</span>
+                            <span th:text="#{table.items}">elementos</span>
                         </div>
-
                         <div class="table-pagination">
-
                             <button type="button" class="pagination-button" data-page="previous"
-                                aria-label="Página anterior">
-
+                                th:attr="aria-label=#{table.pagination.previous}">
                                 <i data-lucide="chevron-left"></i>
-
                             </button>
-
                             <div id="paginationPages"></div>
-
                             <button type="button" class="pagination-button" data-page="next"
-                                aria-label="Página siguiente">
-
+                                th:attr="aria-label=#{table.pagination.next}">
                                 <i data-lucide="chevron-right"></i>
-
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
-
                 <div id="imageModal" class="image-modal">
-
                     <button type="button" id="imageModalClose" class="image-modal-close" aria-label="Cerrar">
-
                         <i data-lucide="x"></i>
-
                     </button>
-
                     <img id="imageModalImage" class="image-modal-image" src="" alt="">
-
                 </div>
             </section>
-
         </main>
-
     </div>
-
-
     <script th:src="@{/js/admin.js}"></script>
-
     <script>
         lucide.createIcons();
     </script>
-
 </body>
 
 </html>
