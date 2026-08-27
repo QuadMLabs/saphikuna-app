@@ -1200,3 +1200,162 @@ body {
     width: 16px;
     height: 16px;
 }
+
+/*
+ * Table tags
+ */
+.table-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.table-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 28px;
+    height: 24px;
+
+    padding: 0 7px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+
+    background: #f8f7fa;
+    color: #6f6b7d;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/*
+ * Table colors
+ */
+.table-colors {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-color {
+    width: 20px;
+    height: 20px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #d9d9d9;
+
+    cursor: default;
+}
+
+/*
+ * Table thumbnail
+ */
+.table-thumbnail-button {
+    width: 44px;
+    height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.table-thumbnail {
+    width: 44px;
+    height: 44px;
+
+    object-fit: cover;
+
+    border-radius: 6px;
+
+    display: block;
+
+    transition: transform 0.15s ease;
+}
+
+.table-thumbnail-button:hover .table-thumbnail {
+    transform: scale(1.05);
+}
+
+/*
+ * Image modal
+ */
+.image-modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    z-index: 2000;
+}
+
+.image-modal.is-visible {
+    display: flex;
+}
+
+.image-modal-image {
+    max-width: 90vw;
+    max-height: 85vh;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.image-modal-close {
+    position: absolute;
+
+    top: 20px;
+    right: 20px;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition: background-color 0.15s ease;
+}
+
+.image-modal-close:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.image-modal-close svg {
+    width: 20px;
+    height: 20px;
+}

@@ -171,22 +171,12 @@
                             <thead>
                                 <tr>
 
-                                    <th th:text="#{products.name}">
-                                        Producto
-                                    </th>
-
-                                    <th th:text="#{products.category}">
-                                        Categoría
-                                    </th>
-
-                                    <th th:text="#{products.price}">
-                                        Precio
-                                    </th>
-
-                                    <th th:text="#{products.status}">
-                                        Estado
-                                    </th>
-
+                                    <th>Imagen</th>
+                                    <th>Producto</th>
+                                    <th>Tallas</th>
+                                    <th>Colores</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
 
                                 </tr>
@@ -194,6 +184,76 @@
 
 
                             <tbody>
+
+                                <tr>
+
+                                    <!-- Imagen -->
+                                    <td>
+                                        <button type="button" class="table-thumbnail-button" title="Ver imagen">
+
+                                            <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
+                                                class="table-thumbnail">
+
+                                        </button>
+                                    </td>
+
+                                    <!-- Producto -->
+                                    <td>
+                                        Chompa Andina
+                                    </td>
+
+                                    <!-- Tallas -->
+                                    <td>
+                                        <div class="table-tags">
+
+                                            <span class="table-tag">S</span>
+                                            <span class="table-tag">M</span>
+                                            <span class="table-tag">L</span>
+                                            <span class="table-tag">XL</span>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Colores -->
+                                    <td>
+                                        <div class="table-colors">
+
+                                            <span class="table-color" title="Rojo" style="background-color: #c62828;">
+                                            </span>
+
+                                            <span class="table-color" title="Azul" style="background-color: #1565c0;">
+                                            </span>
+
+                                            <span class="table-color" title="Negro" style="background-color: #212121;">
+                                            </span>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Precio -->
+                                    <td>$45.00</td>
+
+                                    <!-- Estado -->
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            Activo
+                                        </span>
+                                    </td>
+
+                                    <!-- Acciones -->
+                                    <td class="table-actions">
+
+                                        <button type="button" class="table-action-button" title="Editar">
+                                            <i data-lucide="pencil"></i>
+                                        </button>
+
+                                        <button type="button" class="table-action-button" title="Eliminar">
+                                            <i data-lucide="trash-2"></i>
+                                        </button>
+
+                                    </td>
+
+                                </tr>
 
                                 <tr>
                                     <td>Chompa Andina</td>
@@ -514,6 +574,17 @@
 
                 </div>
 
+                <div id="imageModal" class="image-modal">
+
+                    <button type="button" id="imageModalClose" class="image-modal-close" aria-label="Cerrar">
+
+                        <i data-lucide="x"></i>
+
+                    </button>
+
+                    <img id="imageModalImage" class="image-modal-image" src="" alt="">
+
+                </div>
             </section>
 
         </main>
