@@ -114,4 +114,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /*
+ * Table
+ */
+    const tableSearch = document.querySelector('#tableSearch');
+    const pageSize = document.querySelector('#pageSize');
+    const table = document.querySelector('.data-table');
+
+    if (table && tableSearch && pageSize) {
+
+        const rows = Array.from(
+            table.querySelectorAll('tbody tr')
+        );
+
+        function updateTable() {
+
+            const searchTerm =
+                tableSearch.value.toLowerCase().trim();
+
+            const limit =
+                parseInt(pageSize.value, 10);
+
+            let visibleRows = 0;
+
+            rows.forEach(row => {
+
+                const rowText =
+                    row.textContent.toLowerCase();
+
+                const matchesSearch =
+                    rowText.includes(searchTerm);
+
+                if (matchesSearch && visibleRows < limit) {
+
+                    row.style.display = '';
+
+                    visibleRows++;
+
+                } else {
+
+                    row.style.display = 'none';
+
+                }
+
+            });
+        }
+
+        tableSearch.addEventListener(
+            'input',
+            updateTable
+        );
+
+        pageSize.addEventListener(
+            'change',
+            updateTable
+        );
+
+        updateTable();
+    }
+
 });
