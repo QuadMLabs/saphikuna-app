@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Productos - Saphikuna</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+
+        <!-- Main -->
+        <main class="admin-main">
+
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+
+            <!-- Content -->
+            <section class="admin-content">
+
+                <!-- Page header -->
+                <div class="page-header">
+
+                    <h1 class="page-title" th:text="#{products.title}">
+                        Productos
+                    </h1>
+
+                    <p class="page-subtitle" th:text="#{products.subtitle}">
+                        Administra los productos registrados.
+                    </p>
+
+                </div>
+
+
+                <!-- Products table -->
+                <div class="content-surface">
+
+                    <div class="table-header">
+
+                        <div>
+                            <h2 class="table-title" th:text="#{products.table.title}">
+                                Productos
+                            </h2>
+                        </div>
+
+                        <button type="button" class="primary-button">
+
+                            <i data-lucide="plus"></i>
+
+                            <span th:text="#{products.new}">
+                                Nuevo producto
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table class="data-table">
+
+                            <thead>
+                                <tr>
+
+                                    <th th:text="#{products.name}">
+                                        Producto
+                                    </th>
+
+                                    <th th:text="#{products.category}">
+                                        Categoría
+                                    </th>
+
+                                    <th th:text="#{products.price}">
+                                        Precio
+                                    </th>
+
+                                    <th th:text="#{products.status}">
+                                        Estado
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr>
+                                    <td>Chompa Andina</td>
+                                    <td>Tejidos</td>
+                                    <td>$45.00</td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            Activo
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Bufanda Cuencana</td>
+                                    <td>Accesorios</td>
+                                    <td>$22.00</td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            Activo
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Poncho Tradicional</td>
+                                    <td>Tejidos</td>
+                                    <td>$68.00</td>
+                                    <td>
+                                        <span class="status-badge status-inactive">
+                                            Inactivo
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script th:src="@{/js/admin.js}"></script>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+
+</html>

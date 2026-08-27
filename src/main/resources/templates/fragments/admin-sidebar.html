@@ -16,26 +16,26 @@
     <nav class="sidebar-navigation">
         <!-- MENU HOME -->
         <div class="sidebar-section">
-            <span class="sidebar-section-title">HOME</span>
-            <a href="#" class="sidebar-item" title="Home">
+            <span class="sidebar-section-title" th:text="#{menu.groups.home}"></span>
+            <a href="#" class="sidebar-item" th:title="#{menu.home}">
                 <span class="sidebar-item-icon">
                     <i data-lucide="home"></i>
                 </span>
-                <span class="sidebar-item-label">Home</span>
+                <span class="sidebar-item-label" th:text="#{menu.home}"></span>
             </a>
         </div>
 
         <!-- MENU CATALOGO -->
         <div class="sidebar-section">
-            <span class="sidebar-section-title">CATÁLOGO</span>
+            <span class="sidebar-section-title" th:text="#{menu.groups.catalog}"></span>
             <!-- MENU PRODUCTOS -->
-            <div class="sidebar-menu-group">
-                <button type="button" class="sidebar-item sidebar-item-parent" title="Productos">
+            <div class="sidebar-menu-group" th:classappend="${activeMenu == 'products'} ? ' is-open' : ''">
+                <button type="button" class="sidebar-item sidebar-item-parent" th:title="#{menu.products}">
                     <span class="sidebar-item-main">
                         <span class="sidebar-item-icon">
                             <i data-lucide="shirt"></i>
                         </span>
-                        <span class="sidebar-item-label">Productos</span>
+                        <span class="sidebar-item-label" th:text="#{menu.products}"></span>
                     </span>
                     <span class="sidebar-item-arrow">
                         <i data-lucide="chevron-right"></i>
@@ -43,14 +43,11 @@
                 </button>
                 <!-- SUB MENU PRODUCTOS -->
                 <div class="sidebar-submenu">
-                    <a href="#" class="sidebar-submenu-item">
-                        Todos los productos
+                    <a th:href="@{/admin/products}" class="sidebar-submenu-item"
+                        th:classappend="${activeMenu == 'products'} ? ' is-active' : ''"
+                        th:text="#{submenu.list.products}">
                     </a>
-                    <a href="#" class="sidebar-submenu-item">
-                        Nuevo producto
-                    </a>
-                    <a href="#" class="sidebar-submenu-item">
-                        Inventario
+                    <a th:href="@{/admin/products}" class="sidebar-submenu-item" th:text="#{submenu.add.product}">
                     </a>
                 </div>
             </div>

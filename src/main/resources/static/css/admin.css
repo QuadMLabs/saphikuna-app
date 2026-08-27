@@ -1,3 +1,6 @@
+:root {
+    --primary-color: #7367f0;
+}
 /*
  * Base
  */
@@ -319,6 +322,20 @@ body {
     background: #f3f4f6;
 }
 
+.sidebar-menu-group.is-open > .sidebar-item-parent {
+    background: #f3f4f6;
+}
+
+.sidebar-submenu-item.is-active {
+    background: var(--primary-color);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.sidebar-submenu-item.is-active:hover {
+    background: #7367f0;
+    color: #ffffff;
+}
 
 /*
  * Open submenu
@@ -624,4 +641,171 @@ body {
 .topbar-user-menu-item svg {
     width: 17px;
     height: 17px;
+}
+
+/*
+ * Page header
+ */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #4b465c;
+}
+
+.page-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #6f6b7d;
+}
+
+
+/*
+ * Content surface
+ */
+.content-surface {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+
+/*
+ * Table header
+ */
+.table-header {
+    min-height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-title {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    color: #4b465c;
+}
+
+
+/*
+ * Primary button
+ */
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 8px 14px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #7367f0;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    opacity: 0.9;
+}
+
+.primary-button svg {
+    width: 17px;
+    height: 17px;
+}
+
+
+/*
+ * Table
+ */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.data-table th {
+    padding: 13px 20px;
+
+    text-align: left;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #6f6b7d;
+
+    background: #fafafa;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 15px 20px;
+
+    color: #4b465c;
+
+    border-bottom: 1px solid #f0f0f0;
+
+    white-space: nowrap;
+}
+
+.data-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/*
+ * Status
+ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #e8f7ee;
+    color: #28a745;
+}
+
+.status-inactive {
+    background: #f1f1f2;
+    color: #6f6b7d;
 }
