@@ -1359,3 +1359,103 @@ body {
     width: 20px;
     height: 20px;
 }
+
+.table-multi-filter {
+    position: relative;
+    width: 100%;
+    min-width: 170px;
+}
+
+.table-multi-filter-button {
+    width: 100%;
+    min-width: 170px;
+    height: 36px;
+
+    padding: 0 10px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+
+    cursor: pointer;
+    text-align: left;
+}
+
+.table-multi-filter-label {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    color: #4b465c;
+}
+
+.table-multi-filter-button:hover {
+    border-color: var(--primary-color);
+}
+
+.table-multi-filter-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.table-multi-filter-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+
+    display: none;
+
+    padding: 6px;
+
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    z-index: 20;
+}
+
+.table-multi-filter.is-open
+.table-multi-filter-options {
+    display: block;
+}
+
+.table-multi-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 10px;
+
+    border-radius: 4px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+
+    color: #4b465c;
+
+    cursor: pointer;
+}
+
+.table-multi-filter-option:hover {
+    background: #f3f4f6;
+}
+
+.table-multi-filter-option input {
+    margin: 0;
+    cursor: pointer;
+}

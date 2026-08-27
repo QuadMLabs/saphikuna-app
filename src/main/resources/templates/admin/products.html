@@ -88,14 +88,9 @@
                             </div>
 
 
-                            <button type="button" class="secondary-button" th:if="${showFilters}">
-
-                                <i data-lucide="filter"></i>
-
-                                <span th:text="#{table.filters}">
-                                    Filtros
-                                </span>
-
+                            <button type="button" id="toggleTableFilters" class="secondary-button">
+                                <i data-lucide="sliders-horizontal"></i>
+                                <span>Filtros</span>
                             </button>
 
 
@@ -147,6 +142,58 @@
                                     <option value="Inactivo">Inactivo</option>
 
                                 </select>
+
+                            </div>
+
+                            <div class="table-filter-field">
+
+                                <label>
+                                    Tallas
+                                </label>
+
+                                <div class="table-multi-filter" id="filterTags" data-filter-column="tags"
+                                    data-filter-match="multi">
+
+                                    <button type="button" class="table-multi-filter-button">
+
+                                        <span class="table-multi-filter-label">
+                                            Todas
+                                        </span>
+
+                                        <i data-lucide="chevron-down"></i>
+
+                                    </button>
+
+                                    <div class="table-multi-filter-options">
+
+                                        <label class="table-multi-filter-option">
+                                            <input type="checkbox" value="S">
+                                            <span>S</span>
+                                        </label>
+
+                                        <label class="table-multi-filter-option">
+                                            <input type="checkbox" value="M">
+                                            <span>M</span>
+                                        </label>
+
+                                        <label class="table-multi-filter-option">
+                                            <input type="checkbox" value="L">
+                                            <span>L</span>
+                                        </label>
+
+                                        <label class="table-multi-filter-option">
+                                            <input type="checkbox" value="XL">
+                                            <span>XL</span>
+                                        </label>
+
+                                        <label class="table-multi-filter-option">
+                                            <input type="checkbox" value="XXL">
+                                            <span>XXL</span>
+                                        </label>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
@@ -289,10 +336,7 @@
                                     <td data-column-type="tags">
                                         <div class="table-tags">
 
-                                            <span class="table-tag">S</span>
-                                            <span class="table-tag">M</span>
                                             <span class="table-tag">L</span>
-                                            <span class="table-tag">XL</span>
 
                                         </div>
                                     </td>
