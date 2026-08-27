@@ -115,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /*
- * Table
- */
+  * Table
+  */
     const tableSearch = document.querySelector('#tableSearch');
     const pageSize = document.querySelector('#pageSize');
     const table = document.querySelector('.data-table');
@@ -127,47 +127,185 @@ document.addEventListener('DOMContentLoaded', () => {
             table.querySelectorAll('tbody tr')
         );
 
-        function updateTable() {
+        const visibleCount = document.querySelector(
+            '#tableVisibleCount'
+        );
+
+        const totalCount = document.querySelector(
+            '#tableTotalCount'
+        );
+
+        const paginationPages = document.querySelector(
+            '#paginationPages'
+        );
+
+        const previousButton = document.querySelector(
+            '[data-page="previous"]'
+        );
+
+        const nextButton = document.querySelector(
+            '[data-page="next"]'
+        );
+
+        let currentPage = 1;
+
+        function getFilteredRows() {
 
             const searchTerm =
                 tableSearch.value.toLowerCase().trim();
 
-            const limit =
-                parseInt(pageSize.value, 10);
-
-            let visibleRows = 0;
-
-            rows.forEach(row => {
+            return rows.filter(row => {
 
                 const rowText =
                     row.textContent.toLowerCase();
 
-                const matchesSearch =
-                    rowText.includes(searchTerm);
-
-                if (matchesSearch && visibleRows < limit) {
-
-                    row.style.display = '';
-
-                    visibleRows++;
-
-                } else {
-
-                    row.style.display = 'none';
-
-                }
+                return rowText.includes(searchTerm);
 
             });
         }
 
+        function renderPagination(totalPages) {
+
+            paginationPages.innerHTML = '';
+
+            for (let page = 1; page <= totalPages; page++) {
+
+                const button =
+                    document.createElement('button');
+
+                button.type = 'button';
+                button.className = 'pagination-page';
+
+                button.textContent = page;
+
+                if (page === currentPage) {
+                    button.classList.add('is-active');
+                }
+
+                button.addEventListener('click', () => {
+
+                    currentPage = page;
+
+                    updateTable();
+
+                });
+
+                paginationPages.appendChild(button);
+            }
+
+            previousButton.disabled =
+                currentPage === 1;
+
+            nextButton.disabled =
+                currentPage === totalPages;
+        }
+
+        function updateTable() {
+
+            const filteredRows =
+                getFilteredRows();
+
+            const limit =
+                parseInt(pageSize.value, 10);
+
+            const totalRows =
+                filteredRows.length;
+
+            const totalPages =
+                Math.max(1, Math.ceil(totalRows / limit));
+
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+
+            const start =
+                (currentPage - 1) * limit;
+
+            const end =
+                start + limit;
+
+            rows.forEach(row => {
+                row.style.display = 'none';
+            });
+
+            filteredRows
+                .slice(start, end)
+                .forEach(row => {
+                    row.style.display = '';
+                });
+
+            const currentVisibleCount =
+                Math.min(
+                    limit,
+                    Math.max(0, totalRows - start)
+                );
+
+            visibleCount.textContent =
+                currentVisibleCount;
+
+            totalCount.textContent =
+                totalRows;
+
+            renderPagination(totalPages);
+        }
+
         tableSearch.addEventListener(
             'input',
-            updateTable
+            () => {
+
+                currentPage = 1;
+
+                updateTable();
+
+            }
         );
 
         pageSize.addEventListener(
             'change',
-            updateTable
+            () => {
+
+                currentPage = 1;
+
+                updateTable();
+
+            }
+        );
+
+        previousButton.addEventListener(
+            'click',
+            () => {
+
+                if (currentPage > 1) {
+
+                    currentPage--;
+
+                    updateTable();
+
+                }
+            }
+        );
+
+        nextButton.addEventListener(
+            'click',
+            () => {
+
+                const totalRows =
+                    getFilteredRows().length;
+
+                const limit =
+                    parseInt(pageSize.value, 10);
+
+                const totalPages =
+                    Math.ceil(totalRows / limit);
+
+                if (currentPage < totalPages) {
+
+                    currentPage++;
+
+                    updateTable();
+
+                }
+            }
         );
 
         updateTable();
