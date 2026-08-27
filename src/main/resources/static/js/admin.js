@@ -147,12 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
             '[data-page="next"]'
         );
 
-        const categoryFilter = document.querySelector(
-            '#filterCategory'
-        );
-
-        const statusFilter = document.querySelector(
-            '#filterStatus'
+        const tableFilters = Array.from(
+            document.querySelectorAll(
+                '[data-filter-column]'
+            )
         );
 
         const clearFiltersButton = document.querySelector(
@@ -162,56 +160,50 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentPage = 1;
 
         function getFilteredRows() {
-
             const searchTerm =
                 tableSearch.value.toLowerCase().trim();
 
-            const selectedCategory =
-                categoryFilter
-                    ? categoryFilter.value.toLowerCase()
-                    : '';
-
-            const selectedStatus =
-                statusFilter
-                    ? statusFilter.value.toLowerCase()
-                    : '';
-
             return rows.filter(row => {
-
-                const cells = row.querySelectorAll('td');
 
                 const rowText =
                     row.textContent.toLowerCase();
 
-                const category =
-                    cells[1]
-                        ? cells[1].textContent.toLowerCase().trim()
-                        : '';
-
-                const status =
-                    cells[3]
-                        ? cells[3].textContent.toLowerCase().trim()
-                        : '';
-
                 const matchesSearch =
                     rowText.includes(searchTerm);
 
-                const matchesCategory =
-                    !selectedCategory ||
-                    category === selectedCategory;
+                if (!matchesSearch) {
+                    return false;
+                }
 
-                const matchesStatus =
-                    !selectedStatus ||
-                    status === selectedStatus;
+                return tableFilters.every(filter => {
 
-                return (
-                    matchesSearch &&
-                    matchesCategory &&
-                    matchesStatus
-                );
+                    const selectedValue =
+                        filter.value.toLowerCase().trim();
 
+                    if (!selectedValue) {
+                        return true;
+                    }
+
+                    const columnType =
+                        filter.dataset.filterColumn;
+
+                    const cell =
+                        row.querySelector(
+                            `[data-column-type="${columnType}"]`
+                        );
+
+                    if (!cell) {
+                        return false;
+                    }
+
+                    const cellValue =
+                        cell.textContent.toLowerCase().trim();
+
+                    return cellValue === selectedValue;
+                });
             });
         }
+
         function renderPagination(totalPages) {
 
             paginationPages.innerHTML = '';
@@ -319,52 +311,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
 
-        if (categoryFilter) {
-
-            categoryFilter.addEventListener(
+        tableFilters.forEach(filter => {
+            filter.addEventListener(
                 'change',
                 () => {
-
                     currentPage = 1;
-
                     updateTable();
-
                 }
             );
-        }
-
-        if (statusFilter) {
-
-            statusFilter.addEventListener(
-                'change',
-                () => {
-
-                    currentPage = 1;
-
-                    updateTable();
-
-                }
-            );
-        }
+        });
 
         if (clearFiltersButton) {
-
             clearFiltersButton.addEventListener(
                 'click',
                 () => {
 
-                    if (categoryFilter) {
-                        categoryFilter.value = '';
-                    }
-
-                    if (statusFilter) {
-                        statusFilter.value = '';
-                    }
+                    tableFilters.forEach(filter => {
+                        filter.value = '';
+                    });
 
                     currentPage = 1;
-
                     updateTable();
-
                 }
             );
         }

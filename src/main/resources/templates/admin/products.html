@@ -123,7 +123,7 @@
                                     Categoría
                                 </label>
 
-                                <select id="filterCategory" class="table-filter-select">
+                                <select id="filterCategory" class="table-filter-select" data-filter-column="category">
 
                                     <option value="">Todas</option>
                                     <option value="Tejidos">Tejidos</option>
@@ -140,7 +140,7 @@
                                     Estado
                                 </label>
 
-                                <select id="filterStatus" class="table-filter-select">
+                                <select id="filterStatus" class="table-filter-select" data-filter-column="status">
 
                                     <option value="">Todos</option>
                                     <option value="Activo">Activo</option>
@@ -171,13 +171,14 @@
                             <thead>
                                 <tr>
 
-                                    <th>Imagen</th>
-                                    <th>Producto</th>
-                                    <th>Tallas</th>
-                                    <th>Colores</th>
-                                    <th>Precio</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th data-column-type="image">Imagen</th>
+                                    <th data-column-type="text">Producto</th>
+                                    <th data-column-type="category">Categoría</th>
+                                    <th data-column-type="tags">Tallas</th>
+                                    <th data-column-type="colors">Colores</th>
+                                    <th data-column-type="currency">Precio</th>
+                                    <th data-column-type="status">Estado</th>
+                                    <th data-column-type="actions">Acciones</th>
 
                                 </tr>
                             </thead>
@@ -188,7 +189,7 @@
                                 <tr>
 
                                     <!-- Imagen -->
-                                    <td>
+                                    <td data-column-type="image">
                                         <button type="button" class="table-thumbnail-button" title="Ver imagen">
 
                                             <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
@@ -198,12 +199,17 @@
                                     </td>
 
                                     <!-- Producto -->
-                                    <td>
+                                    <td data-column-type="text">
                                         Chompa Andina
                                     </td>
 
+                                    <!-- Categoría -->
+                                    <td data-column-type="category">
+                                        Tejidos
+                                    </td>
+
                                     <!-- Tallas -->
-                                    <td>
+                                    <td data-column-type="tags">
                                         <div class="table-tags">
 
                                             <span class="table-tag">S</span>
@@ -215,7 +221,7 @@
                                     </td>
 
                                     <!-- Colores -->
-                                    <td>
+                                    <td data-column-type="colors">
                                         <div class="table-colors">
 
                                             <span class="table-color" title="Rojo" style="background-color: #c62828;">
@@ -231,17 +237,19 @@
                                     </td>
 
                                     <!-- Precio -->
-                                    <td>$45.00</td>
+                                    <td data-column-type="currency">
+                                        $45.00
+                                    </td>
 
                                     <!-- Estado -->
-                                    <td>
+                                    <td data-column-type="status">
                                         <span class="status-badge status-active">
                                             Activo
                                         </span>
                                     </td>
 
                                     <!-- Acciones -->
-                                    <td class="table-actions">
+                                    <td data-column-type="actions" class="table-actions">
 
                                         <button type="button" class="table-action-button" title="Editar">
                                             <i data-lucide="pencil"></i>
@@ -256,284 +264,83 @@
                                 </tr>
 
                                 <tr>
-                                    <td>Chompa Andina</td>
-                                    <td>Tejidos</td>
-                                    <td>$45.00</td>
-                                    <td>
+
+                                    <!-- Imagen -->
+                                    <td data-column-type="image">
+                                        <button type="button" class="table-thumbnail-button" title="Ver imagen">
+
+                                            <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
+                                                class="table-thumbnail">
+
+                                        </button>
+                                    </td>
+
+                                    <!-- Producto -->
+                                    <td data-column-type="text">
+                                        Chompa Andina
+                                    </td>
+
+                                    <!-- Categoría -->
+                                    <td data-column-type="category">
+                                        Tejidos
+                                    </td>
+
+                                    <!-- Tallas -->
+                                    <td data-column-type="tags">
+                                        <div class="table-tags">
+
+                                            <span class="table-tag">S</span>
+                                            <span class="table-tag">M</span>
+                                            <span class="table-tag">L</span>
+                                            <span class="table-tag">XL</span>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Colores -->
+                                    <td data-column-type="colors">
+                                        <div class="table-colors">
+
+                                            <span class="table-color" title="Rojo" style="background-color: #c62828;">
+                                            </span>
+
+                                            <span class="table-color" title="Azul" style="background-color: #1565c0;">
+                                            </span>
+
+                                            <span class="table-color" title="Negro" style="background-color: #212121;">
+                                            </span>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Precio -->
+                                    <td data-column-type="currency">
+                                        $45.00
+                                    </td>
+
+                                    <!-- Estado -->
+                                    <td data-column-type="status">
                                         <span class="status-badge status-active">
                                             Activo
                                         </span>
                                     </td>
-                                    <td class="table-actions">
+
+                                    <!-- Acciones -->
+                                    <td data-column-type="actions" class="table-actions">
 
                                         <button type="button" class="table-action-button" title="Editar">
-
                                             <i data-lucide="pencil"></i>
-
                                         </button>
 
                                         <button type="button" class="table-action-button" title="Eliminar">
-
                                             <i data-lucide="trash-2"></i>
-
                                         </button>
 
                                     </td>
+
                                 </tr>
 
-                                <tr>
-                                    <td>Bufanda Cuencana</td>
-                                    <td>Accesorios</td>
-                                    <td>$22.00</td>
-                                    <td>
-                                        <span class="status-badge status-active">
-                                            Activo
-                                        </span>
-                                    </td>
-                                    <td class="table-actions">
 
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Poncho Tradicional</td>
-                                    <td>Tejidos</td>
-                                    <td>$68.00</td>
-                                    <td>
-                                        <span class="status-badge status-inactive">
-                                            Inactivo
-                                        </span>
-                                    </td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Chaleco Andino</td>
-                                    <td>Tejidos</td>
-                                    <td>$52.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Gorro de Lana</td>
-                                    <td>Accesorios</td>
-                                    <td>$18.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Poncho Negro</td>
-                                    <td>Tejidos</td>
-                                    <td>$72.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Bufanda Roja</td>
-                                    <td>Accesorios</td>
-                                    <td>$25.00</td>
-                                    <td><span class="status-badge status-inactive">Inactivo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Chompa Alpaca</td>
-                                    <td>Tejidos</td>
-                                    <td>$85.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Gorro Tradicional</td>
-                                    <td>Accesorios</td>
-                                    <td>$20.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Poncho Blanco</td>
-                                    <td>Tejidos</td>
-                                    <td>$70.00</td>
-                                    <td><span class="status-badge status-active">Activo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Bufanda Andina</td>
-                                    <td>Accesorios</td>
-                                    <td>$28.00</td>
-                                    <td><span class="status-badge status-inactive">Inactivo</span></td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>Chompa Cuencana</td>
-                                    <td>Tejidos</td>
-                                    <td>$65.00</td>
-                                    <td>
-                                        <span class="status-badge status-active">
-                                            Activo
-                                        </span>
-                                    </td>
-                                    <td class="table-actions">
-
-                                        <button type="button" class="table-action-button" title="Editar">
-
-                                            <i data-lucide="pencil"></i>
-
-                                        </button>
-
-                                        <button type="button" class="table-action-button" title="Eliminar">
-
-                                            <i data-lucide="trash-2"></i>
-
-                                        </button>
-
-                                    </td>
-                                </tr>
 
                             </tbody>
 
