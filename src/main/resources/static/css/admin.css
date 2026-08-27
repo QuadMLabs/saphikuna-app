@@ -1119,3 +1119,84 @@ body {
     outline: none;
     border-color: var(--primary-color);
 }
+
+/*
+ * Table rows
+ */
+.data-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+    background: #f8f7fa;
+}
+
+
+/*
+ * Status
+ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #e8f7ee;
+    color: #28a745;
+}
+
+.status-inactive {
+    background: #f1f1f2;
+    color: #6f6b7d;
+}
+
+
+/*
+ * Table actions
+ */
+.table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.table-action-button {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #6f6b7d;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.table-action-button:hover {
+    background: #f3f4f6;
+    color: var(--primary-color);
+}
+
+.table-action-button svg {
+    width: 16px;
+    height: 16px;
+}
