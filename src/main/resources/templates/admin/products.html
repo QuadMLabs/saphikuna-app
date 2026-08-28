@@ -57,7 +57,7 @@
                         </div>
                     </div>
                     <!-- FILTERS TABLE -->
-                    <div class="table-filter-panel" th:if="${showFilters}">
+                    <div class="table-filter-panel" >
                         <div class="table-filter-fields">
                             <!-- Category filter -->
                             <div class="table-filter-field">
@@ -79,7 +79,7 @@
                             </div>
                             <!-- Size filter -->
                             <div class="table-filter-field">
-                                <label for="filterStatus" th:text="#{products.size}"></label>
+                                <label for="filterTags" th:text="#{products.size}"></label>
                                 <div class="table-multi-filter" id="filterTags" data-filter-column="tags"
                                     data-filter-match="multi">
                                     <button type="button" class="table-multi-filter-button">
