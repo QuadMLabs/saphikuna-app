@@ -361,6 +361,12 @@ body {
     padding: 24px 8px 8px;
 }
 
+.admin-footer {
+    padding: 16px 8px 4px;
+    text-align: center;
+    font-size: 12px;
+    color: #6b6870;
+}
 
 /*
  * Collapsed sidebar
@@ -1458,4 +1464,31 @@ body {
 .table-multi-filter-option input {
     margin: 0;
     cursor: pointer;
+}
+
+.table-empty-state td {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.table-empty-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 18px;
+
+    border: 1px solid #b6d4fe;
+    border-radius: 8px;
+
+    background: #e7f1ff;
+    color: #084298;
+
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.table-empty-message svg {
+    width: 18px;
+    height: 18px;
 }

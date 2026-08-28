@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="#{products.title} + ' - ' + #{app.title}"></title>
-    <link rel="icon" type="image/png" th:href="@{/images/favicom_saphikuna.png}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
+<head th:replace="~{fragments/admin-head :: head(#{products.title})}"></head>
 
 <body>
     <div class="admin-layout">
@@ -126,7 +119,8 @@
                     </div>
                     <!-- DATA TABLE-->
                     <div class="table-container">
-                        <table class="data-table">
+                        <table class="data-table"
+                            th:attr="data-empty-message=#{products.table.empty}, data-empty-filtered-message=#{products.table.empty.filtered}">
                             <thead>
                                 <tr>
                                     <th th:text="#{products.table.column.image}" data-column-type="image"></th>
@@ -249,6 +243,15 @@
                                         </button>
                                     </td>
                                 </tr>
+                                <!-- RESULTADOS NULOS -->
+                                <tr id="tableEmptyState" class="table-empty-state" style="display: none;">
+                                    <td colspan="100%">
+                                        <div class="table-empty-message">
+                                            <i data-lucide="inbox"></i>
+                                            <span id="tableEmptyMessage"></span>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -280,6 +283,8 @@
                     <img id="imageModalImage" class="image-modal-image" src="" alt="">
                 </div>
             </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
         </main>
     </div>
     <script th:src="@{/js/admin.js}"></script>

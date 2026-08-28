@@ -49,10 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const table = document.querySelector('.data-table');
     const tableSearch = document.querySelector('#tableSearch');
     const pageSize = document.querySelector('#pageSize');
+    const emptyState = document.querySelector('#tableEmptyState');
+    const emptyMessage = document.querySelector('#tableEmptyMessage');
     let multiFilters = [];
 
     if (table && tableSearch && pageSize) {
-        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        const rows = Array.from(table.querySelectorAll('tbody tr:not(#tableEmptyState)'));
         const visibleCount = document.querySelector('#tableVisibleCount');
         const totalCount = document.querySelector('#tableTotalCount');
         const paginationPages = document.querySelector('#paginationPages');
@@ -168,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function updateTable() {
             const filteredRows = getFilteredRows();
+            const hasRows = rows.length > 0;
             const limit = parseInt(pageSize.value, 10);
             const totalRows = filteredRows.length;
             const totalPages = Math.max(1, Math.ceil(totalRows / limit));
@@ -193,6 +196,14 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             totalCount.textContent = totalRows;
 
+            if (emptyState && emptyMessage) {
+                if (totalRows === 0) {
+                    emptyState.style.display = '';
+                    emptyMessage.textContent = hasRows ? table.dataset.emptyFilteredMessage : table.dataset.emptyMessage;
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            }
             renderPagination(totalPages);
         }
 
