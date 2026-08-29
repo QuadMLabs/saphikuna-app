@@ -1,13 +1,16 @@
 package com.quadmlabs.saphikuna.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
 @Embeddable
 public class ProductCollectionId implements Serializable {
 
+    @Column(name = "productId")
     private UUID productId;
+
+    @Column(name = "collectionId")
     private UUID collectionId;
 
     public UUID getProductId() {

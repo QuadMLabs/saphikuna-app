@@ -26,11 +26,12 @@ public class ProductController {
 
         List<Product> products = productService.findAll();
 
-        System.out.println("Productos encontrados: " + products.size());
-
         products.forEach(product -> System.out.println(
                 product.getProductId() + " - " + product.getName()));
 
+        model.addAttribute("products", products);
+
         return "admin/products";
     }
+
 }

@@ -57,7 +57,7 @@
                         </div>
                     </div>
                     <!-- FILTERS TABLE -->
-                    <div class="table-filter-panel" >
+                    <div class="table-filter-panel">
                         <div class="table-filter-fields">
                             <!-- Category filter -->
                             <div class="table-filter-field">
@@ -68,13 +68,14 @@
                                     <option value="Accesorios">Accesorios</option>
                                 </select>
                             </div>
-                            <!-- Status filter -->
+                            <!-- Collection filter -->
                             <div class="table-filter-field">
-                                <label for="filterStatus" th:text="#{products.status}"></label>
-                                <select id="filterStatus" class="table-filter-select" data-filter-column="status">
-                                    <option value="">Todos</option>
-                                    <option value="Activo">Activo</option>
-                                    <option value="Inactivo">Inactivo</option>
+                                <label for="filterCollection" th:text="#{products.collection}"></label>
+                                <select id="filterCollection" class="table-filter-select"
+                                    data-filter-column="collection">
+                                    <option value="">Todas</option>
+                                    <option value="Verano">Verano</option>
+                                    <option value="Navidad 2025">Navidad 2025</option>
                                 </select>
                             </div>
                             <!-- Size filter -->
@@ -110,6 +111,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Status filter -->
+                            <div class="table-filter-field">
+                                <label for="filterStatus" th:text="#{products.status}"></label>
+                                <select id="filterStatus" class="table-filter-select" data-filter-column="status">
+                                    <option value="">Todos</option>
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
                         </div>
                         <!-- Clear filter -->
                         <button type="button" id="clearTableFilters" class="secondary-button">
@@ -126,58 +136,66 @@
                                     <th th:text="#{products.table.column.image}" data-column-type="image"></th>
                                     <th th:text="#{products.table.column.name}" data-column-type="text"></th>
                                     <th th:text="#{products.table.column.category}" data-column-type="category"></th>
-                                    <th th:text="#{products.table.column.sizes}" data-column-type="tags"></th>
+                                    <th th:text="#{products.table.column.collection}" data-column-type="collection">
+                                    </th>
                                     <th th:text="#{products.table.column.colors}" data-column-type="colors"></th>
+                                    <th th:text="#{products.table.column.sizes}" data-column-type="tags"></th>
                                     <th th:text="#{products.table.column.price}" data-column-type="currency"></th>
                                     <th th:text="#{products.table.column.status}" data-column-type="status"></th>
                                     <th th:text="#{products.table.column.actions}" data-column-type="actions"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr th:each="product : ${products}">
                                     <!-- Imagen -->
                                     <td data-column-type="image">
                                         <button type="button" class="table-thumbnail-button"
                                             th:title="#{products.table.column.image.show}">
-                                            <img src="/images/Comun_Saphikuna.png" class="table-thumbnail">
+                                            <img th:if="${product.primaryImagePath != null and !product.primaryImagePath.isBlank()}"
+                                                th:src="${product.primaryImagePath}" th:alt="${product.name}"
+                                                class="table-thumbnail">
+                                            <i th:unless="${product.primaryImagePath != null and !product.primaryImagePath.isBlank()}"
+                                                data-lucide="image-off" class="table-thumbnail-placeholder">
+                                            </i>
                                         </button>
                                     </td>
                                     <!-- Producto -->
-                                    <td data-column-type="text">
-                                        Chompa Andina
-                                    </td>
+                                    <td data-column-type="text" th:text="${product.name}"></td>
                                     <!-- Categoría -->
-                                    <td data-column-type="category">
-                                        Tejidos
-                                    </td>
-                                    <!-- Tallas -->
-                                    <td data-column-type="tags">
-                                        <div class="table-tags">
-                                            <span class="table-tag">S</span>
-                                            <span class="table-tag">M</span>
-                                            <span class="table-tag">L</span>
-                                            <span class="table-tag">XL</span>
-                                        </div>
+                                    <td data-column-type="category"
+                                        th:text="${product.category != null ? product.category.name : '—'}"></td>
+                                    <!-- Coleccion -->
+                                    <td data-column-type="collection">
+                                        <span th:if="${#lists.isEmpty(product.productCollections)}">—</span>
+                                        <span th:each="productCollection : ${product.productCollections}"
+                                            class="table-tag" th:text="${productCollection.collection.name}">
+                                        </span>
                                     </td>
                                     <!-- Colores -->
                                     <td data-column-type="colors">
                                         <div class="table-colors">
-                                            <span class="table-color" title="Rojo" style="background-color: #c62828;">
+
+                                            <span th:each="color : ${product.colors}" class="table-color"
+                                                th:title="${color.name}"
+                                                th:style="'background-color: ' + ${color.hexCode}">
                                             </span>
-                                            <span class="table-color" title="Azul" style="background-color: #1565c0;">
-                                            </span>
-                                            <span class="table-color" title="Negro" style="background-color: #212121;">
+
+                                        </div>
+                                    </td>
+                                    <!-- Tallas -->
+                                    <td data-column-type="tags">
+                                        <div class="table-tags">
+                                            <span th:each="size : ${product.sizes}" class="table-tag" th:text="${size}">
                                             </span>
                                         </div>
                                     </td>
                                     <!-- Precio -->
-                                    <td data-column-type="currency">
-                                        $45.00
-                                    </td>
+                                    <td data-column-type="currency" th:text="${product.priceDisplay}"></td>
                                     <!-- Estado -->
                                     <td data-column-type="status">
-                                        <span class="status-badge status-active">
-                                            Activo
+                                        <span
+                                            th:class="'status-badge ' + (${product.status == 'Activo'} ? 'status-active' : 'status-inactive')"
+                                            th:text="${product.status}">
                                         </span>
                                     </td>
                                     <!-- Acciones -->
@@ -186,59 +204,6 @@
                                             <i data-lucide="pencil"></i>
                                         </button>
                                         <button type="button" class="table-action-button" th:title="#{common.delete}">
-                                            <i data-lucide="trash-2"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <!-- Imagen -->
-                                    <td data-column-type="image">
-                                        <button type="button" class="table-thumbnail-button" title="Ver imagen">
-                                            <img src="/images/Comun_Saphikuna.png" alt="Chompa Andina"
-                                                class="table-thumbnail">
-                                        </button>
-                                    </td>
-                                    <!-- Producto -->
-                                    <td data-column-type="text">
-                                        Chompa Andina
-                                    </td>
-                                    <!-- Categoría -->
-                                    <td data-column-type="category">
-                                        Tejidos
-                                    </td>
-                                    <!-- Tallas -->
-                                    <td data-column-type="tags">
-                                        <div class="table-tags">
-                                            <span class="table-tag">L</span>
-                                        </div>
-                                    </td>
-                                    <!-- Colores -->
-                                    <td data-column-type="colors">
-                                        <div class="table-colors">
-                                            <span class="table-color" title="Rojo" style="background-color: #c62828;">
-                                            </span>
-                                            <span class="table-color" title="Azul" style="background-color: #1565c0;">
-                                            </span>
-                                            <span class="table-color" title="Negro" style="background-color: #212121;">
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <!-- Precio -->
-                                    <td data-column-type="currency">
-                                        $45.00
-                                    </td>
-                                    <!-- Estado -->
-                                    <td data-column-type="status">
-                                        <span class="status-badge status-active">
-                                            Activo
-                                        </span>
-                                    </td>
-                                    <!-- Acciones -->
-                                    <td data-column-type="actions" class="table-actions">
-                                        <button type="button" class="table-action-button" title="Editar">
-                                            <i data-lucide="pencil"></i>
-                                        </button>
-                                        <button type="button" class="table-action-button" title="Eliminar">
                                             <i data-lucide="trash-2"></i>
                                         </button>
                                     </td>
