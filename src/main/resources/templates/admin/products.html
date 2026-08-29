@@ -64,18 +64,20 @@
                                 <label for="filterCategory" th:text="#{products.category}"></label>
                                 <select id="filterCategory" class="table-filter-select" data-filter-column="category">
                                     <option value="">Todas</option>
-                                    <option value="Tejidos">Tejidos</option>
-                                    <option value="Accesorios">Accesorios</option>
+                                    <option th:each="category : ${categories}" th:value="${category.name}"
+                                        th:text="${category.name}">
+                                    </option>
                                 </select>
                             </div>
                             <!-- Collection filter -->
                             <div class="table-filter-field">
-                                <label for="filterCollection" th:text="#{products.collection}"></label>
+                                <label for="filterCategory" th:text="#{products.collection}"></label>
                                 <select id="filterCollection" class="table-filter-select"
                                     data-filter-column="collection">
                                     <option value="">Todas</option>
-                                    <option value="Verano">Verano</option>
-                                    <option value="Navidad 2025">Navidad 2025</option>
+                                    <option th:each="collection : ${collections}" th:value="${collection.name}"
+                                        th:text="${collection.name}">
+                                    </option>
                                 </select>
                             </div>
                             <!-- Size filter -->
@@ -88,25 +90,9 @@
                                         <i data-lucide="chevron-down"></i>
                                     </button>
                                     <div class="table-multi-filter-options">
-                                        <label class="table-multi-filter-option">
-                                            <input type="checkbox" value="S">
-                                            <span>S</span>
-                                        </label>
-                                        <label class="table-multi-filter-option">
-                                            <input type="checkbox" value="M">
-                                            <span>M</span>
-                                        </label>
-                                        <label class="table-multi-filter-option">
-                                            <input type="checkbox" value="L">
-                                            <span>L</span>
-                                        </label>
-                                        <label class="table-multi-filter-option">
-                                            <input type="checkbox" value="XL">
-                                            <span>XL</span>
-                                        </label>
-                                        <label class="table-multi-filter-option">
-                                            <input type="checkbox" value="XXL">
-                                            <span>XXL</span>
+                                        <label class="table-multi-filter-option" th:each="size : ${sizes}">
+                                            <input type="checkbox" th:value="${size.name}">
+                                            <span th:text="${size.name}"></span>
                                         </label>
                                     </div>
                                 </div>
