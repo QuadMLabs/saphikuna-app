@@ -1,0 +1,366 @@
+/* =========================================================
+ * GLOBAL TOAST
+ * ========================================================= */
+
+.app-toast-container {
+    position: fixed;
+
+    top: 24px;
+    right: 24px;
+
+    z-index: 9999;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    width: min(
+        calc(100vw - 48px),
+        400px
+    );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+ * TOAST
+ * ========================================================= */
+
+.app-toast {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+
+    width: 100%;
+
+    min-height: 64px;
+
+    padding: 16px 44px 18px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+
+    box-sizing: border-box;
+
+    pointer-events: auto;
+
+    opacity: 0;
+
+    transform:
+        translateX(24px);
+
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+/* =========================================================
+ * VISIBLE
+ * ========================================================= */
+
+.app-toast.is-visible {
+    opacity: 1;
+
+    transform:
+        translateX(0);
+}
+
+
+/* =========================================================
+ * REMOVING
+ * ========================================================= */
+
+.app-toast.is-removing {
+    opacity: 0;
+
+    transform:
+        translateX(24px);
+}
+
+
+/* =========================================================
+ * ICON
+ * ========================================================= */
+
+.app-toast-icon {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
+    margin-right: 12px;
+}
+
+
+.app-toast-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* =========================================================
+ * MESSAGE
+ * ========================================================= */
+
+.app-toast-message {
+    flex: 1;
+
+    min-width: 0;
+
+    padding-top: 2px;
+
+    font-size: 14px;
+    line-height: 1.45;
+
+    font-weight: 500;
+
+    color: #1f2937;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+ * CLOSE BUTTON
+ * ========================================================= */
+
+.app-toast-close {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #6b7280;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.app-toast-close:hover {
+    background: #f3f4f6;
+
+    color: #111827;
+}
+
+
+.app-toast-close:focus-visible {
+    outline: 2px solid #2563eb;
+
+    outline-offset: 2px;
+}
+
+
+.app-toast-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+/* =========================================================
+ * PROGRESS
+ * ========================================================= */
+
+.app-toast-progress {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 3px;
+
+    border-radius:
+        0 0 10px 10px;
+
+    transform-origin: left;
+
+    animation:
+        app-toast-progress 4s linear forwards;
+}
+
+
+@keyframes app-toast-progress {
+
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+
+}
+
+
+/* =========================================================
+ * SUCCESS
+ * ========================================================= */
+
+.app-toast-success {
+    border-color: #bbf7d0;
+}
+
+
+.app-toast-success
+.app-toast-icon {
+    color: #16a34a;
+}
+
+
+.app-toast-success
+.app-toast-progress {
+    background: #16a34a;
+}
+
+
+/* =========================================================
+ * ERROR
+ * ========================================================= */
+
+.app-toast-error {
+    border-color: #fecaca;
+}
+
+
+.app-toast-error
+.app-toast-icon {
+    color: #dc2626;
+}
+
+
+.app-toast-error
+.app-toast-progress {
+    background: #dc2626;
+}
+
+
+/* =========================================================
+ * WARNING
+ * ========================================================= */
+
+.app-toast-warning {
+    border-color: #fde68a;
+}
+
+
+.app-toast-warning
+.app-toast-icon {
+    color: #d97706;
+}
+
+
+.app-toast-warning
+.app-toast-progress {
+    background: #d97706;
+}
+
+
+/* =========================================================
+ * INFO
+ * ========================================================= */
+
+.app-toast-info {
+    border-color: #bfdbfe;
+}
+
+
+.app-toast-info
+.app-toast-icon {
+    color: #2563eb;
+}
+
+
+.app-toast-info
+.app-toast-progress {
+    background: #2563eb;
+}
+
+
+/* =========================================================
+ * REDUCED MOTION
+ * ========================================================= */
+
+@media (
+    prefers-reduced-motion: reduce
+) {
+
+    .app-toast {
+        transition: none;
+
+        transform: none;
+    }
+
+    .app-toast.is-visible {
+        transform: none;
+    }
+
+    .app-toast.is-removing {
+        transform: none;
+    }
+
+    .app-toast-progress {
+        animation: none;
+    }
+
+}
+
+
+/* =========================================================
+ * MOBILE
+ * ========================================================= */
+
+@media (max-width: 600px) {
+
+    .app-toast-container {
+
+        top: 16px;
+        right: 16px;
+        left: 16px;
+
+        width: auto;
+
+    }
+
+
+    .app-toast {
+
+        min-height: 60px;
+
+        padding:
+            14px 42px 16px 14px;
+
+    }
+
+}

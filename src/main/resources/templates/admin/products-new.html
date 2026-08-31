@@ -301,7 +301,10 @@
             </section>
         </main>
     </div>
+    <div id="productMessages" th:data-variant-required-message="#{products.form.validation.variants.required}"
+        th:data-saved-message="#{products.form.saved}" hidden></div>
     <script th:src="@{/js/admin.js}"></script>
+    <script th:src="@{/js/toast.js}"></script>
     <script th:src="@{/js/product-form.js}"></script>
     <script>
         lucide.createIcons();

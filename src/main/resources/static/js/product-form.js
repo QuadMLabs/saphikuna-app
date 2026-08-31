@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const productPrice =
         document.getElementById('price');
 
+    const productMessages =
+        document.getElementById('productMessages');
+
+    const variantRequiredMessage =
+        productMessages?.dataset.variantRequiredMessage || '';
+
 
     /* =========================================================
      * PRODUCT IMAGES
@@ -429,10 +435,9 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         if (variants.length === 0) {
 
-            /*
-             * The variant error will eventually
-             * be shown through the global toast.
-             */
+            Toast.error(
+                variantRequiredMessage
+            );
 
             return;
         }
