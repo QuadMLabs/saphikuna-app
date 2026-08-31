@@ -356,24 +356,73 @@ document.addEventListener('DOMContentLoaded', () => {
     productSaveButton?.addEventListener('click', () => {
 
         /*
-         * Validate required product fields
+         * Product fields
          */
+        const nameField =
+            productName?.closest('.form-field');
+
+        const priceField =
+            productPrice?.closest('.form-field');
+
+
+        /*
+         * Clear previous errors
+         */
+        nameField?.classList.remove('has-error');
+        priceField?.classList.remove('has-error');
+
+        removeFieldError(nameField);
+        removeFieldError(priceField);
+
+
+        let isValid = true;
+
+
+        /* -----------------------------------------------------
+         * NAME
+         * ----------------------------------------------------- */
+
         if (!productName?.value.trim()) {
 
-            productName?.focus();
+            nameField?.classList.add('has-error');
 
-            return;
+            showFieldError(nameField);
+
+            isValid = false;
         }
+
+
+        /* -----------------------------------------------------
+         * PRICE
+         * ----------------------------------------------------- */
 
         if (
             productPrice?.value === '' ||
             Number(productPrice.value) < 0
         ) {
 
-            productPrice?.focus();
+            priceField?.classList.add('has-error');
+
+            showFieldError(priceField);
+
+            isValid = false;
+        }
+
+
+        /*
+         * Stop if product fields are invalid
+         */
+        if (!isValid) {
+
+            if (!productName?.value.trim()) {
+                productName?.focus();
+            } else {
+                productPrice?.focus();
+            }
 
             return;
         }
+
 
         /*
          * A product must have at least one variant
@@ -381,19 +430,58 @@ document.addEventListener('DOMContentLoaded', () => {
         if (variants.length === 0) {
 
             /*
-             * For now, just open the variant modal
-             * so the user can create the required variant.
+             * The variant error will eventually
+             * be shown through the global toast.
              */
-            openVariantModal();
 
             return;
         }
+
 
         /*
          * Product is valid.
          *
          * The actual save logic will be added later.
          */
+
+    });
+
+    /*
+ * REMOVE NAME ERROR
+ */
+    productName?.addEventListener('input', () => {
+
+        if (productName.value.trim()) {
+
+            const field =
+                productName.closest('.form-field');
+
+            field?.classList.remove('has-error');
+
+            removeFieldError(field);
+        }
+
+    });
+
+
+    /*
+     * REMOVE PRICE ERROR
+     */
+    productPrice?.addEventListener('input', () => {
+
+        if (
+            productPrice.value !== '' &&
+            Number(productPrice.value) >= 0
+        ) {
+
+            const field =
+                productPrice.closest('.form-field');
+
+            field?.classList.remove('has-error');
+
+            removeFieldError(field);
+        }
+
     });
 
 
