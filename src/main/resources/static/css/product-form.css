@@ -1,0 +1,1126 @@
+/*
+ * Product form
+ */
+
+.product-form {
+    overflow: visible;
+}
+
+.product-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.product-form-title {
+    margin: 0;
+
+    font-size: 24px;
+    font-weight: 600;
+
+    color: #4b465c;
+}
+
+.product-form-subtitle {
+    margin: 6px 0 0;
+
+    font-size: 14px;
+
+    color: #6f6b7d;
+}
+
+.product-form-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+/*
+ * Product form grid
+ *
+ * Two columns:
+ * - Left: 2fr
+ * - Right: 1fr
+ *
+ * Images span both columns.
+ */
+
+.product-form-content {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(280px, 1fr);
+
+    gap: 20px;
+
+    padding: 0;
+}
+
+.product-form-column {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    min-width: 0;
+}
+
+.product-form-full-width {
+    grid-column: 1 / -1;
+}
+
+
+/*
+ * Form cards
+ */
+
+.form-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.form-card-header {
+    padding: 16px 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-card-header h3 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #4b465c;
+}
+
+.form-card-body {
+    padding: 20px;
+}
+
+
+/*
+ * Form fields
+ */
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 18px;
+}
+
+.form-field:last-child {
+    margin-bottom: 0;
+}
+
+.form-field label {
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #4b465c;
+}
+
+.form-input {
+    width: 100%;
+    height: 38px;
+
+    padding: 0 11px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-input::placeholder {
+    color: #a8aaae;
+}
+
+.form-input:focus {
+    outline: none;
+
+    border-color: var(--primary-color);
+
+    box-shadow: 0 0 0 2px rgba(115, 103, 240, 0.08);
+}
+
+.form-textarea {
+    height: auto;
+
+    min-height: 120px;
+
+    padding: 10px 11px;
+
+    resize: vertical;
+}
+
+.form-select {
+    width: 100%;
+    height: 38px;
+
+    padding: 0 10px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+
+    border-color: var(--primary-color);
+}
+
+
+/*
+ * Checkbox
+ */
+
+.form-checkbox-field {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 4px;
+}
+
+.form-checkbox-field input {
+    width: 16px;
+    height: 16px;
+
+    cursor: pointer;
+
+    accent-color: var(--primary-color);
+}
+
+.form-checkbox-field label {
+    font-size: 13px;
+
+    color: #4b465c;
+
+    cursor: pointer;
+}
+
+
+/*
+ * Product status toggle
+ */
+
+.form-toggle-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-top: 20px;
+    padding-top: 18px;
+
+    border-top: 1px solid #f0f0f0;
+}
+
+.form-toggle-label {
+    display: block;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #4b465c;
+}
+
+.form-toggle-description {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 12px;
+
+    color: #a8aaae;
+}
+
+
+/*
+ * Switch
+ */
+
+.form-switch {
+    position: relative;
+
+    width: 38px;
+    height: 22px;
+
+    flex-shrink: 0;
+}
+
+.form-switch input {
+    opacity: 0;
+
+    width: 0;
+    height: 0;
+}
+
+.form-switch-slider {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 999px;
+
+    background: #d9d9d9;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.form-switch-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    left: 2px;
+    top: 2px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+    transition: transform 0.2s ease;
+}
+
+.form-switch input:checked + .form-switch-slider {
+    background: var(--primary-color);
+}
+
+.form-switch input:checked + .form-switch-slider::before {
+    transform: translateX(16px);
+}
+
+
+/*
+ * Product images
+ */
+
+.product-images {
+    display: flex;
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+}
+
+.product-image-item {
+    position: relative;
+
+    width: 150px;
+    height: 150px;
+
+    flex: 0 0 150px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+.product-image-preview {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f8f7fa;
+}
+
+.product-image-preview img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+.product-image-actions {
+    position: absolute;
+
+    top: 8px;
+    right: 8px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+}
+
+.product-image-primary,
+.product-image-remove {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    color: #6f6b7d;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.product-image-primary:hover,
+.product-image-remove:hover {
+    background: #ffffff;
+
+    color: var(--primary-color);
+}
+
+.product-image-primary svg,
+.product-image-remove svg {
+    width: 16px;
+    height: 16px;
+}
+
+.product-image-primary-label {
+    position: absolute;
+
+    left: 8px;
+    bottom: 8px;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    background: rgba(0, 0, 0, 0.6);
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.product-image-add {
+    width: 150px;
+    height: 150px;
+
+    flex: 0 0 150px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0;
+
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #a8aaae;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.product-image-add:hover {
+    border-color: var(--primary-color);
+
+    background: #faf9ff;
+
+    color: var(--primary-color);
+}
+
+.product-image-add svg {
+    width: 24px;
+    height: 24px;
+}
+
+
+/*
+ * Product variants
+ */
+
+.variant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+.variant-header .form-card-description {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: #a8aaae;
+}
+
+.variant-empty-state {
+    min-height: 120px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: 1px dashed #e5e7eb;
+    border-radius: 6px;
+
+    color: #a8aaae;
+
+    font-size: 14px;
+}
+
+.variant-empty-state.is-hidden {
+    display: none;
+}
+
+.variant-empty-state svg {
+    width: 24px;
+    height: 24px;
+}
+
+
+/*
+ * Responsive
+ */
+
+@media (max-width: 900px) {
+
+    .product-form-content {
+        grid-template-columns: 1fr;
+    }
+
+    .product-form-full-width {
+        grid-column: auto;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .product-form-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 16px;
+    }
+
+    .product-form-actions {
+        width: 100%;
+    }
+
+    .product-form-actions button {
+        flex: 1;
+    }
+
+    .variant-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .variant-header .primary-button {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+}
+
+/*
+ * Variant modal
+ */
+
+.variant-modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: 3000;
+}
+
+.variant-modal.is-visible {
+    display: flex;
+}
+
+
+/*
+ * Modal content
+ */
+
+.variant-modal-content {
+    width: 100%;
+    max-width: 520px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+    overflow: hidden;
+}
+
+
+/*
+ * Modal header
+ */
+
+.variant-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.variant-modal-header h3 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    color: #4b465c;
+}
+
+
+/*
+ * Close button
+ */
+
+.variant-modal-close {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #6f6b7d;
+
+    cursor: pointer;
+}
+
+.variant-modal-close:hover {
+    background: #f3f4f6;
+}
+
+.variant-modal-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+
+/*
+ * Modal body
+ */
+
+.variant-modal-body {
+    padding: 20px;
+}
+
+
+/*
+ * Multiple select
+ */
+
+.variant-multi-select {
+    min-height: 110px;
+
+    height: auto;
+
+    padding: 8px 10px;
+}
+
+
+/*
+ * Field help
+ */
+
+.form-field-help {
+    margin-top: -2px;
+
+    font-size: 12px;
+    color: #a8aaae;
+}
+
+
+/*
+ * Price toggle
+ */
+
+.variant-price-toggle {
+    margin-top: 4px;
+    margin-bottom: 18px;
+}
+
+.variant-price-toggle .form-checkbox-field {
+    margin: 0;
+}
+
+
+/*
+ * Variant price field
+ */
+
+.variant-price-field {
+    display: none;
+}
+
+.variant-price-field.is-visible {
+    display: flex;
+}
+
+
+/*
+ * Modal footer
+ */
+
+.variant-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 16px 20px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.variant-price-checkbox label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b465c;
+    cursor: pointer;
+}
+
+.variant-price-toggle .form-checkbox-field span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b465c;
+}
+
+/*
+ * Variant size options
+ */
+
+.variant-size-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px;
+}
+
+.variant-size-option {
+    min-width: 44px;
+    height: 36px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.variant-size-option:hover {
+    border-color: var(--primary-color);
+}
+
+.variant-size-option.is-selected {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.required-mark {
+    color: #ea5455;
+    margin-left: 2px;
+}
+
+/*
+ * Required mark
+ */
+
+.required-mark {
+    color: #ea5455;
+    margin-left: 2px;
+}
+
+
+/*
+ * Form field errors
+ */
+
+.form-field-error {
+    display: none;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+    color: #ea5455;
+}
+
+.form-field.has-error .form-field-error {
+    display: block;
+}
+
+
+/*
+ * Error state
+ */
+
+.form-field.has-error .form-select,
+.form-field.has-error .form-input {
+    border-color: #ea5455;
+}
+
+.form-field.has-error .form-select:focus,
+.form-field.has-error .form-input:focus {
+    border-color: #ea5455;
+    box-shadow: 0 0 0 2px rgba(234, 84, 85, 0.08);
+}
+
+
+/*
+ * Size options error
+ */
+
+.form-field.has-error .variant-size-options {
+    border: 1px solid #ea5455;
+    border-radius: 6px;
+    padding: 6px;
+    border-color: #ea5455;
+}
+
+.variant-table-container {
+    display: none;
+}
+
+.variant-table-container.is-visible {
+    display: block;
+}
+
+/* =========================================================
+ * PRODUCT VARIANTS TABLE
+ * ========================================================= */
+
+.variant-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.variant-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.variant-table thead {
+    background: #f8f9fa;
+}
+
+.variant-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.variant-table td {
+    padding: 14px;
+    color: #374151;
+    border-bottom: 1px solid #eef0f2;
+    vertical-align: middle;
+}
+
+.variant-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.variant-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* Color */
+
+.variant-color-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+
+/* Sizes */
+
+.variant-size-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.variant-size-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* Stock */
+
+.variant-stock {
+    font-weight: 500;
+}
+
+
+/* Price */
+
+.variant-price {
+    font-weight: 500;
+}
+
+.variant-price-default {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+/* Actions */
+
+.variant-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.variant-action-button {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #6b7280;
+
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.variant-action-button:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.variant-action-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+/* Empty state */
+
+.variant-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 150px;
+    padding: 30px 20px;
+
+    text-align: center;
+    color: #9ca3af;
+}
+
+.variant-empty-state svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 10px;
+}
+
+.variant-empty-state span {
+    font-size: 14px;
+}
+
+
+/* Hide empty state when table has variants */
+
+.variant-empty-state.is-hidden {
+    display: none;
+}
+
+
+/* Hide table until there are variants */
+
+.variant-table-container.is-empty {
+    display: none;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .variant-table {
+        min-width: 650px;
+    }
+
+    .variant-table th,
+    .variant-table td {
+        padding: 11px 12px;
+    }
+}
+
+.variant-action-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #6b7280;
+
+    cursor: pointer;
+}
+
+.variant-action-button:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.variant-action-button svg {
+    width: 15px;
+    height: 15px;
+}
+
+.variant-delete-button:hover {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.variant-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+}

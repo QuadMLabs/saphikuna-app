@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.quadmlabs.saphikuna.entity.Product;
 import com.quadmlabs.saphikuna.entity.Category;
 import com.quadmlabs.saphikuna.entity.Collection;
+import com.quadmlabs.saphikuna.entity.Color;
 import com.quadmlabs.saphikuna.entity.Size;
 import com.quadmlabs.saphikuna.service.ProductService;
 import com.quadmlabs.saphikuna.service.SizeService;
 import com.quadmlabs.saphikuna.service.CategoryService;
 import com.quadmlabs.saphikuna.service.CollectionService;
+import com.quadmlabs.saphikuna.service.ColorService;
 
 import org.springframework.ui.Model;
 
@@ -25,13 +27,15 @@ public class ProductController {
     private final CategoryService categoryService;
     private final CollectionService collectionService;
     private final SizeService sizeService;
+    private final ColorService colorService;
 
     public ProductController(ProductService productService, CategoryService categoryService,
-            CollectionService collectionService, SizeService sizeService) {
+            CollectionService collectionService, SizeService sizeService, ColorService colorService) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.collectionService = collectionService;
         this.sizeService = sizeService;
+        this.colorService = colorService;
     }
 
     @GetMapping("/products")
@@ -55,7 +59,29 @@ public class ProductController {
         model.addAttribute("sizes", sizes);
         model.addAttribute("statuses", statuses);
 
+        model.addAttribute("activeMenu", "products");
+        model.addAttribute("activeSubmenu", "products-list");
+
         return "admin/products";
+    }
+
+    @GetMapping("/products-new")
+    public String productsNew(Model model) {
+
+        List<Color> colors = colorService.findAll();
+        List<Size> sizes = sizeService.findAll();
+        List<Category> categories = categoryService.findAll();
+        List<Collection> collections = collectionService.findAll();
+
+        model.addAttribute("colors", colors);
+        model.addAttribute("sizes", sizes);
+        model.addAttribute("categories", categories);
+        model.addAttribute("collections", collections);
+
+        model.addAttribute("activeMenu", "products");
+        model.addAttribute("activeSubmenu", "products-new");
+
+        return "admin/products-new";
     }
 
 }

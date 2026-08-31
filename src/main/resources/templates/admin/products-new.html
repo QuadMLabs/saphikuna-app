@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(#{products.form.title})}"></head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+                <!-- Products form -->
+                <div class="product-form">
+                    <!-- Form header -->
+                    <div class="product-form-header">
+                        <!-- Form Title Subtitle -->
+                        <div>
+                            <h1 class="product-form-title" th:text="#{products.form.title}"></h1>
+                            <p class="product-form-subtitle" th:text="#{products.form.subtitle}"></p>
+                        </div>
+                        <!-- Form Save/Cancel buttons -->
+                        <div class="product-form-actions">
+                            <button type="button" class="secondary-button" th:text="#{common.cancel}">
+                            </button>
+                            <button type="submit" class="primary-button" th:text="#{common.save}">
+                                <i data-lucide="save"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Form content -->
+                    <div class="product-form-content">
+                        <!-- Information column -->
+                        <div class="product-form-column">
+                            <div class="form-card">
+                                <div class="form-card-header">
+                                    <h3 th:text="#{products.form.section.information}"></h3>
+                                </div>
+                                <div class="form-card-body">
+                                    <!-- NAME -->
+                                    <div class="form-field">
+                                        <label for="name" th:text="#{products.form.section.information.name}"></label>
+                                        <input type="text" id="name" class="form-input"
+                                            th:placeholder="#{products.form.section.information.name.ph}">
+                                    </div>
+                                    <!-- BAR CODE -->
+                                    <div class="form-field">
+                                        <label for="barcode"
+                                            th:text="#{products.form.section.information.barCode}"></label>
+                                        <input type="text" id="barcode" class="form-input"
+                                            th:placeholder="#{products.form.section.information.barCode.ph}">
+                                    </div>
+                                    <!-- DESCRIPTION -->
+                                    <div class="form-field">
+                                        <label for="description"
+                                            th:text="#{products.form.section.information.description}"></label>
+                                        <textarea id="description" class="form-input form-textarea" rows="5"
+                                            th:placeholder="#{products.form.section.information.description.ph}"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Price column -->
+                        <div class="product-form-column">
+                            <div class="form-card">
+                                <div class="form-card-header">
+                                    <h3 th:text="#{products.form.section.price}"></h3>
+                                </div>
+                                <div class="form-card-body">
+                                    <!-- PRICE -->
+                                    <div class="form-field">
+                                        <label for="price" th:text="#{products.form.section.price}"></label>
+                                        <input type="number" id="price" class="form-input" placeholder="0.00"
+                                            step="0.01" min="0">
+                                    </div>
+                                    <!-- DISCOUNT -->
+                                    <div class="form-field">
+                                        <label for="discount" th:text="#{products.form.section.price.discount}"></label>
+                                        <input type="number" id="discount" class="form-input" placeholder="0" min="0">
+                                    </div>
+                                    <!-- TAXES -->
+                                    <div class="form-checkbox-field">
+                                        <input type="checkbox" id="taxes">
+                                        <label for="taxes" th:text="#{products.form.section.price.taxes}"></label>
+                                    </div>
+                                    <!-- STATUS -->
+                                    <div class="form-toggle-field">
+                                        <div>
+                                            <span class="form-toggle-label"
+                                                th:text="#{products.form.section.price.status}"> </span>
+                                            <span class="form-toggle-description"
+                                                th:text="#{products.form.section.price.status.description}">
+                                            </span>
+                                        </div>
+                                        <label class="form-switch">
+                                            <input type="checkbox" id="inStock">
+                                            <span class="form-switch-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Images -->
+                        <div class="form-card product-form-full-width">
+                            <div class="form-card-header">
+                                <h3 th:text="#{products.form.section.images}"></h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="product-images"
+                                    th:attr="data-primary-label=#{products.form.images.primary}">
+                                    <!-- Add image -->
+                                    <button type="button" class="product-image-add">
+                                        <i data-lucide="image-plus"></i>
+                                        <span th:text="#{products.form.section.images.add}"></span>
+                                    </button>
+                                    <input type="file" id="product-image-input" accept="image/*" multiple hidden>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Variants column -->
+                        <div class="product-form-column">
+                            <div class="form-card">
+                                <div class="form-card-header">
+                                    <h3 th:text="#{products.form.section.variants}"></h3>
+                                </div>
+                                <div class="form-card-body">
+                                    <div class="variant-header">
+                                        <span class="form-card-description"
+                                            th:text="#{products.form.section.variants.description}">
+                                        </span>
+                                        <button type="button" class="primary-button variant-add-button">
+                                            <i data-lucide="plus"></i>
+                                            <span th:text="#{products.form.section.variants.add}">
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <!-- Empty state -->
+                                    <div class="variant-empty-state">
+                                        <i data-lucide="layers-3"></i>
+                                        <span th:text="#{products.form.section.variants.empty}"> </span>
+                                    </div>
+                                    <!-- Variants table -->
+                                    <div class="variant-table-container" th:attr="
+                                        data-base-price-label=#{products.form.section.variants.base.price},
+                                        data-edit-title=#{products.form.section.variants.edit},
+                                        data-delete-title=#{products.form.section.variants.delete},
+                                        data-add-title=#{products.form.section.variants.add},
+                                        data-save-changes-title=#{products.form.section.variants.save.changes}">
+                                        <table class="variant-table">
+                                            <thead>
+                                                <tr>
+                                                    <th th:text="#{products.form.section.variants.table.column.color}">
+                                                    </th>
+                                                    <th th:text="#{products.form.section.variants.table.column.size}">
+                                                    </th>
+                                                    <th th:text="#{products.form.section.variants.table.column.stock}">
+                                                    </th>
+                                                    <th th:text="#{products.form.section.variants.table.column.price}">
+                                                    </th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="variantTableBody">
+                                                <!-- Rows added by JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- organization column -->
+                        <div class="product-form-column">
+                            <div class="form-card">
+                                <div class="form-card-header">
+                                    <h3 th:text="#{products.form.section.organization}"></h3>
+                                </div>
+                                <div class="form-card-body">
+                                    <div class="form-field">
+                                        <label for="category" th:text="#{products.form.section.organization.category}">
+                                        </label>
+                                        <select id="category" class="form-select">
+                                            <option value=""
+                                                th:text="#{products.form.section.organization.category.ph}"></option>
+                                            <option th:each="category : ${categories}" th:value="${category.categoryId}"
+                                                th:text="${category.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="collection"
+                                            th:text="#{products.form.section.organization.collection}"></label>
+                                        <select id="collection" class="form-select">
+                                            <option value=""
+                                                th:text="#{products.form.section.organization.collection.ph}"></option>
+                                            <option th:each="collection : ${collections}"
+                                                th:value="${collection.collectionId}" th:text="${collection.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Variant modal -->
+                <div id="variantModal" class="variant-modal">
+                    <div class="variant-modal-content">
+                        <!-- Header -->
+                        <div class="variant-modal-header">
+                            <h3 th:text="#{products.form.section.variants.add}"></h3>
+                            <button type="button" class="variant-modal-close" id="variantModalClose"
+                                th:attr="aria-label=#{common.close}">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        <!-- Body -->
+                        <div class="variant-modal-body">
+                            <!-- Color -->
+                            <div class="form-field"
+                                th:attr="data-error-required=#{products.form.variant.validation.color.required}">
+                                <label for="variantColor">
+                                    <span th:text="#{products.form.section.variants.color}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <select id="variantColor" class="form-select" required>
+                                    <option value="" th:text="#{products.form.section.variants.select.color}">
+                                    </option>
+                                    <option th:each="color : ${colors}" th:value="${color.colorId}"
+                                        th:text="${color.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Talla -->
+                            <div class="form-field"
+                                th:attr="data-error-required=#{products.form.variant.validation.size.required}">
+                                <label>
+                                    <span th:text="#{products.form.section.variants.size}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <div class="variant-size-options">
+                                    <button type="button" class="variant-size-option" th:each="size : ${sizes}"
+                                        th:value="${size.sizeId}" th:text="${size.name}">
+                                    </button>
+                                </div>
+                                <span class="form-field-help" th:text="#{products.form.section.variants.select.size}">
+                                </span>
+                            </div>
+                            <!-- Stock -->
+                            <div class="form-field"
+                                th:attr="data-error-required=#{products.form.variant.validation.stock.required}">
+                                <label for="variantStock">
+                                    <span th:text="#{products.form.section.variants.table.column.stock}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="number" id="variantStock" class="form-input" min="0" value="0" required>
+                            </div>
+                            <!-- Different price -->
+                            <div class="variant-price-toggle">
+                                <label class="form-checkbox-field">
+                                    <input type="checkbox" id="variantDifferentPrice">
+                                    <span th:text="#{products.form.section.variants.price.different}"></span>
+                                </label>
+                            </div>
+                            <!-- Price -->
+                            <div class="form-field variant-price-field" id="variantPriceField">
+                                <label for="variantPrice" th:text="#{products.form.section.price}">
+                                </label>
+                                <input type="number" id="variantPrice" class="form-input" min="0" step="0.01"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="variant-modal-footer">
+                            <button type="button" class="secondary-button" id="variantModalCancel"
+                                th:text="#{common.cancel}">
+                            </button>
+                            <button type="button" class="primary-button" id="variantModalSave">
+                                <i data-lucide="plus"></i>
+                                <span th:text="#{products.form.section.variants.add}"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+            </section>
+        </main>
+    </div>
+    <script th:src="@{/js/admin.js}"></script>
+    <script th:src="@{/js/product-form.js}"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

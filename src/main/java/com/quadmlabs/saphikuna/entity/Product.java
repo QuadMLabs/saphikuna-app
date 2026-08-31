@@ -29,6 +29,9 @@ public class Product {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "generalPrice")
+    private BigDecimal generalPrice;
+
     @Column(name = "description")
     private String description;
 
@@ -131,6 +134,14 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public BigDecimal getGeneralPrice() {
+        return generalPrice;
+    }
+
+    public void setGeneralPrice(BigDecimal generalPrice) {
+        this.generalPrice = generalPrice;
     }
 
     public String getDescription() {
