@@ -52,40 +52,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const addImageButton =
         document.querySelector('.product-image-add');
 
+    const imagesPrimaryLabel =
+        imagesContainer?.dataset.primaryLabel || '';
+
+    let primaryImageItem = null;
+
 
     if (imagesContainer && imageInput && addImageButton) {
 
         /*
          * Open file selector
          */
-        addImageButton.addEventListener('click', () => {
-            imageInput.click();
-        });
+        addImageButton.addEventListener(
+            'click',
+            () => {
+                imageInput.click();
+            }
+        );
 
 
         /*
          * Add selected images
          */
-        imageInput.addEventListener('change', (event) => {
+        imageInput.addEventListener(
+            'change',
+            (event) => {
 
-            const files =
-                Array.from(event.target.files);
+                const files =
+                    Array.from(event.target.files);
 
-            files.forEach(file => {
+                files.forEach(file => {
 
-                if (!file.type.startsWith('image/')) {
-                    return;
-                }
+                    if (!file.type.startsWith('image/')) {
+                        return;
+                    }
 
-                addImage(file);
-            });
+                    addImage(file);
+                });
 
 
-            /*
-             * Allows selecting the same file again
-             */
-            imageInput.value = '';
-        });
+                /*
+                 * Allows selecting the same file again
+                 */
+                imageInput.value = '';
+            }
+        );
 
 
         /*
@@ -102,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             imageItem.className =
                 'product-image-item';
 
+            imageItem.file = file;
 
             imageItem.innerHTML = `
                 <div class="product-image-preview">
@@ -210,19 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
                     const wasPrimary =
-                        imageItem.classList.contains(
-                            'is-primary'
-                        );
+                        imageItem === primaryImageItem;
 
 
                     imageItem.remove();
 
 
-                    /*
-                     * If the removed image was primary,
-                     * select another one automatically.
-                     */
                     if (wasPrimary) {
+
+                        primaryImageItem = null;
+
                         ensurePrimaryImage();
                     }
                 }
@@ -233,30 +242,33 @@ document.addEventListener('DOMContentLoaded', () => {
         /*
          * Set image as primary
          */
-        const imagesPrimaryLabel =
-            imagesContainer?.dataset.primaryLabel || '';
-
-
         function setPrimaryImage(selectedItem) {
 
-            const imageItems =
-                imagesContainer.querySelectorAll(
+            const imageItems = [
+                ...imagesContainer.querySelectorAll(
                     '.product-image-item'
-                );
+                )
+            ];
 
 
+            if (!imageItems.includes(selectedItem)) {
+                return;
+            }
+
+
+            /*
+             * Remove primary state from all images
+             */
             imageItems.forEach(item => {
 
                 item.classList.remove(
                     'is-primary'
                 );
 
-
                 const label =
                     item.querySelector(
                         '.product-image-primary-label'
                     );
-
 
                 if (label) {
                     label.remove();
@@ -265,7 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             /*
-             * Set selected image as primary
+             * Store selected image as primary
+             */
+            primaryImageItem =
+                selectedItem;
+
+
+            /*
+             * Add primary state
              */
             selectedItem.classList.add(
                 'is-primary'
@@ -293,20 +312,37 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         function ensurePrimaryImage() {
 
-            const imageItems =
-                [
-                    ...imagesContainer.querySelectorAll(
-                        '.product-image-item'
-                    )
-                ];
+            const imageItems = [
+                ...imagesContainer.querySelectorAll(
+                    '.product-image-item'
+                )
+            ];
 
 
             if (imageItems.length === 0) {
+
+                primaryImageItem = null;
+
                 return;
             }
 
 
-            const primaryImage =
+            /*
+             * Keep current primary if it still exists
+             */
+            if (
+                primaryImageItem &&
+                imageItems.includes(primaryImageItem)
+            ) {
+                return;
+            }
+
+
+            /*
+             * Check if HTML already contains
+             * a primary image.
+             */
+            const existingPrimary =
                 imageItems.find(item =>
                     item.classList.contains(
                         'is-primary'
@@ -314,10 +350,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
 
 
-            /*
-             * A primary image already exists
-             */
-            if (primaryImage) {
+            if (existingPrimary) {
+
+                primaryImageItem =
+                    existingPrimary;
+
                 return;
             }
 
@@ -341,9 +378,11 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
 
-        existingImages.forEach(imageItem => {
-            bindImageActions(imageItem);
-        });
+        existingImages.forEach(
+            imageItem => {
+                bindImageActions(imageItem);
+            }
+        );
 
 
         /*
@@ -357,33 +396,27 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         function getPrimaryImage() {
 
-            const images =
-                [
-                    ...imagesContainer.querySelectorAll(
-                        '.product-image-item'
-                    )
-                ];
+            const imageItems = [
+                ...imagesContainer.querySelectorAll(
+                    '.product-image-item'
+                )
+            ];
 
 
-            if (images.length === 0) {
+            if (imageItems.length === 0) {
                 return null;
             }
 
 
-            const selectedPrimary =
-                images.find(image =>
-                    image.classList.contains(
-                        'is-primary'
-                    )
-                );
-
-
-            if (selectedPrimary) {
-                return selectedPrimary;
+            if (
+                primaryImageItem &&
+                imageItems.includes(primaryImageItem)
+            ) {
+                return primaryImageItem;
             }
 
 
-            return images[0];
+            return imageItems[0];
         }
     }
 
@@ -515,9 +548,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let isValid = true;
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * NAME
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (!productName?.value.trim()) {
 
@@ -531,9 +566,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * PRICE
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (
                 productPrice?.value === '' ||
@@ -578,9 +615,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* =====================================================
+            /*
+             * =====================================================
              * BUILD PRODUCT REQUEST
-             * ===================================================== */
+             * =====================================================
+             */
 
             const collectionId =
                 productCollection?.value || null;
@@ -605,13 +644,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         ? 'Activo'
                         : 'Inactivo',
 
-                /*
-                 * The UI currently allows one collection.
-                 *
-                 * The backend already expects a list,
-                 * so we send the selected UUID inside
-                 * an array.
-                 */
                 collectionIds:
                     collectionId
                         ? [collectionId]
@@ -640,9 +672,97 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
 
-            /* =====================================================
+            /*
+             * =====================================================
+             * BUILD FORM DATA
+             * =====================================================
+             */
+
+            const formData =
+                new FormData();
+
+
+            /*
+             * Product JSON
+             */
+            formData.append(
+                'product',
+                new Blob(
+                    [
+                        JSON.stringify(
+                            productRequest
+                        )
+                    ],
+                    {
+                        type: 'application/json'
+                    }
+                )
+            );
+
+
+            /*
+             * Product images
+             */
+            const imageItems = imagesContainer
+                ? [
+                    ...imagesContainer.querySelectorAll(
+                        '.product-image-item'
+                    )
+                ]
+                : [];
+
+
+            imageItems.forEach(
+                imageItem => {
+
+                    if (!imageItem.file) {
+                        return;
+                    }
+
+                    formData.append(
+                        'images',
+                        imageItem.file
+                    );
+                }
+            );
+
+
+            /*
+             * Primary image index
+             */
+            const primaryImage =
+                getPrimaryImageForSave(
+                    imageItems
+                );
+
+
+            let primaryImageIndex = 0;
+
+
+            if (primaryImage) {
+
+                const index =
+                    imageItems.indexOf(
+                        primaryImage
+                    );
+
+                if (index >= 0) {
+                    primaryImageIndex = index;
+                }
+            }
+
+
+            formData.append(
+                'primaryImageIndex',
+                String(primaryImageIndex)
+            );
+
+
+            /*
+             * =====================================================
              * SEND TO BACKEND
-             * ===================================================== */
+             * =====================================================
+             */
 
             try {
 
@@ -655,16 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         '/admin/products',
                         {
                             method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    productRequest
-                                )
+                            body: formData
                         }
                     );
 
@@ -673,6 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  * Backend error
                  */
                 if (!response.ok) {
+
                     throw new Error(
                         `HTTP ${response.status}`
                     );
@@ -717,6 +829,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     );
+
+
+    /*
+     * Get primary image specifically for saving
+     */
+    function getPrimaryImageForSave(
+        imageItems
+    ) {
+
+        if (!imageItems.length) {
+            return null;
+        }
+
+
+        const primary =
+            imageItems.find(item =>
+                item.classList.contains(
+                    'is-primary'
+                )
+            );
+
+
+        return primary || imageItems[0];
+    }
 
 
     /* =========================================================
@@ -829,6 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (
                 event.target === variantModal
             ) {
+
                 closeVariantModal();
             }
         }
@@ -866,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * ========================================================= */
 
     variantSizeOptions.forEach(
-        (button) => {
+        button => {
 
             button.addEventListener(
                 'click',
@@ -945,12 +1082,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     : null;
 
 
-            const selectedSizes =
-                [
-                    ...document.querySelectorAll(
-                        '.variant-size-option.is-selected'
-                    )
-                ];
+            const selectedSizes = [
+                ...document.querySelectorAll(
+                    '.variant-size-option.is-selected'
+                )
+            ];
 
 
             let isValid = true;
@@ -976,9 +1112,11 @@ document.addEventListener('DOMContentLoaded', () => {
             removeFieldError(sizesField);
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * COLOR
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (!variantColor.value) {
 
@@ -992,9 +1130,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * SIZE
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (
                 selectedSizes.length === 0
@@ -1010,9 +1150,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * STOCK
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (
                 variantStock.value === '' ||
@@ -1029,9 +1171,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * PRICE
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             if (
                 variantDifferentPrice?.checked &&
@@ -1064,9 +1208,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            /* -----------------------------------------------------
+            /*
+             * -----------------------------------------------------
              * CREATE / UPDATE VARIANT
-             * ----------------------------------------------------- */
+             * -----------------------------------------------------
+             */
 
             const variant = {
 
@@ -1228,14 +1374,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <td>
                         ${escapeHtml(
-                    variant.colorName
-                )}
+                            variant.colorName
+                        )}
                     </td>
 
                     <td>
                         ${escapeHtml(
-                    variant.sizeNames.join(', ')
-                )}
+                            variant.sizeNames.join(', ')
+                        )}
                     </td>
 
                     <td>
@@ -1244,8 +1390,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <td>
                         ${escapeHtml(
-                    priceText
-                )}
+                            priceText
+                        )}
                     </td>
 
                     <td>
@@ -1375,6 +1521,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             1
                         );
 
+
                         renderVariants();
                     }
                 );
@@ -1409,6 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Set color
          */
         if (variantColor) {
+
             variantColor.value =
                 variant.colorId;
         }
@@ -1443,6 +1591,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Set stock
          */
         if (variantStock) {
+
             variantStock.value =
                 variant.stock;
         }
@@ -1465,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             variantPrice.value =
                 variant.differentPrice &&
-                    variant.price !== null
+                variant.price !== null
                     ? variant.price
                     : '';
         }
@@ -1600,6 +1749,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Color
          */
         if (variantColor) {
+
             variantColor.value = '';
         }
 
@@ -1621,6 +1771,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Stock
          */
         if (variantStock) {
+
             variantStock.value = '0';
         }
 
@@ -1882,11 +2033,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function escapeHtml(value) {
 
         return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+            .replace(
+                /&/g,
+                '&amp;'
+            )
+            .replace(
+                /</g,
+                '&lt;'
+            )
+            .replace(
+                />/g,
+                '&gt;'
+            )
+            .replace(
+                /"/g,
+                '&quot;'
+            )
+            .replace(
+                /'/g,
+                '&#039;'
+            );
     }
 
-})
+});

@@ -67,6 +67,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>net.scenariopla.imageio</groupId>
+			<artifactId>webp-imageio</artifactId>
+			<version>0.1.8</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

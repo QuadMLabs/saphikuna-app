@@ -2,25 +2,29 @@ package com.quadmlabs.saphikuna.service.impl;
 
 import com.quadmlabs.saphikuna.dto.ProductRequest;
 import com.quadmlabs.saphikuna.dto.ProductVariantRequest;
+import com.quadmlabs.saphikuna.entity.Category;
+import com.quadmlabs.saphikuna.entity.Collection;
 import com.quadmlabs.saphikuna.entity.Color;
-import com.quadmlabs.saphikuna.entity.Size;
 import com.quadmlabs.saphikuna.entity.Product;
 import com.quadmlabs.saphikuna.entity.ProductCollection;
 import com.quadmlabs.saphikuna.entity.ProductCollectionId;
-import com.quadmlabs.saphikuna.entity.Category;
-import com.quadmlabs.saphikuna.entity.Collection;
+import com.quadmlabs.saphikuna.entity.ProductImage;
 import com.quadmlabs.saphikuna.entity.ProductVariant;
-import com.quadmlabs.saphikuna.repository.ProductRepository;
-import com.quadmlabs.saphikuna.repository.ProductVariantRepository;
+import com.quadmlabs.saphikuna.entity.Size;
 import com.quadmlabs.saphikuna.repository.CategoryRepository;
 import com.quadmlabs.saphikuna.repository.CollectionRepository;
 import com.quadmlabs.saphikuna.repository.ColorRepository;
 import com.quadmlabs.saphikuna.repository.ProductCollectionRepository;
+import com.quadmlabs.saphikuna.repository.ProductImageRepository;
+import com.quadmlabs.saphikuna.repository.ProductRepository;
+import com.quadmlabs.saphikuna.repository.ProductVariantRepository;
 import com.quadmlabs.saphikuna.repository.SizeRepository;
 import com.quadmlabs.saphikuna.service.ProductService;
+import com.quadmlabs.saphikuna.service.StorageService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -36,6 +40,8 @@ public class ProductServiceImpl implements ProductService {
     private final CollectionRepository collectionRepository;
     private final ProductCollectionRepository productCollectionRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final ProductImageRepository productImageRepository;
+    private final StorageService storageService;
 
     public ProductServiceImpl(
             ProductRepository productRepository,
@@ -44,7 +50,10 @@ public class ProductServiceImpl implements ProductService {
             CategoryRepository categoryRepository,
             CollectionRepository collectionRepository,
             ProductCollectionRepository productCollectionRepository,
-            ProductVariantRepository productVariantRepository) {
+            ProductVariantRepository productVariantRepository,
+            ProductImageRepository productImageRepository,
+            StorageService storageService) {
+
         this.productRepository = productRepository;
         this.colorRepository = colorRepository;
         this.sizeRepository = sizeRepository;
@@ -52,6 +61,8 @@ public class ProductServiceImpl implements ProductService {
         this.collectionRepository = collectionRepository;
         this.productCollectionRepository = productCollectionRepository;
         this.productVariantRepository = productVariantRepository;
+        this.productImageRepository = productImageRepository;
+        this.storageService = storageService;
     }
 
     @Override
@@ -61,15 +72,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product saveProduct(ProductRequest request) {
+    public Product saveProduct(
+            ProductRequest request,
+            List<MultipartFile> images,
+            int primaryImageIndex) {
 
         OffsetDateTime now = OffsetDateTime.now();
-
-        /*
-         * =====================================================
-         * PRODUCT
-         * =====================================================
-         */
 
         Product product = new Product();
 
@@ -91,19 +99,7 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
         }
 
-        /*
-         * =====================================================
-         * SAVE PRODUCT
-         * =====================================================
-         */
-
         Product savedProduct = productRepository.save(product);
-
-        /*
-         * =====================================================
-         * COLLECTIONS
-         * =====================================================
-         */
 
         if (request.getCollectionIds() != null) {
 
@@ -119,7 +115,8 @@ public class ProductServiceImpl implements ProductService {
                 id.setProductId(savedProduct.getProductId());
                 id.setCollectionId(collection.getCollectionId());
 
-                ProductCollection productCollection = new ProductCollection();
+                ProductCollection productCollection =
+                        new ProductCollection();
 
                 productCollection.setId(id);
                 productCollection.setProduct(savedProduct);
@@ -129,13 +126,15 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        /*
-         * =====================================================
-         * VARIANTS
-         * =====================================================
-         */
+        if (request.getVariants() == null ||
+                request.getVariants().isEmpty()) {
 
-        for (ProductVariantRequest variantRequest : request.getVariants()) {
+            throw new IllegalArgumentException(
+                    "El producto debe tener al menos una variante");
+        }
+
+        for (ProductVariantRequest variantRequest :
+                request.getVariants()) {
 
             Color color = colorRepository
                     .findById(variantRequest.getColorId())
@@ -171,14 +170,73 @@ public class ProductServiceImpl implements ProductService {
                 variant.setCreatedAt(now);
                 variant.setUpdatedAt(now);
 
-                /*
-                 * Guardamos directamente la variante.
-                 * No dependemos de cascade.
-                 */
                 productVariantRepository.save(variant);
             }
         }
 
+        if (images != null && !images.isEmpty()) {
+
+            if (primaryImageIndex < 0 ||
+                    primaryImageIndex >= images.size()) {
+
+                primaryImageIndex = 0;
+            }
+
+            String primaryImagePath = null;
+            short sortOrder = 0;
+
+            for (int i = 0; i < images.size(); i++) {
+
+                MultipartFile image = images.get(i);
+
+                if (image == null || image.isEmpty()) {
+                    continue;
+                }
+
+                String path = "products/"
+                        + savedProduct.getProductId()
+                        + "/"
+                        + UUID.randomUUID()
+                        + ".webp";
+
+                storageService.upload(image, path);
+
+                ProductImage productImage = new ProductImage();
+
+                productImage.setProductImageId(UUID.randomUUID());
+                productImage.setProduct(savedProduct);
+                productImage.setStoragePath(path);
+                productImage.setSortOrder(sortOrder);
+                productImage.setCreatedAt(now);
+
+                productImageRepository.save(productImage);
+
+                if (i == primaryImageIndex) {
+                    primaryImagePath = path;
+                }
+
+                sortOrder++;
+            }
+
+            if (primaryImagePath == null && sortOrder > 0) {
+                primaryImagePath = getFirstImagePath(savedProduct);
+            }
+
+            savedProduct.setPrimaryImagePath(primaryImagePath);
+
+            productRepository.save(savedProduct);
+        }
+
         return savedProduct;
+    }
+
+    private String getFirstImagePath(Product product) {
+
+        return productImageRepository
+                .findByProductOrderBySortOrderAsc(product)
+                .stream()
+                .findFirst()
+                .map(ProductImage::getStoragePath)
+                .orElse(null);
     }
 }

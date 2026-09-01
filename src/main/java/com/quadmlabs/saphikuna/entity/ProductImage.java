@@ -1,6 +1,7 @@
 package com.quadmlabs.saphikuna.entity;
 
 import jakarta.persistence.*;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -13,8 +14,11 @@ public class ProductImage {
     private UUID productImageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variantId")
-    private ProductVariant variant;
+    @JoinColumn(
+            name = "productId",
+            nullable = false
+    )
+    private Product product;
 
     @Column(name = "storagePath")
     private String storagePath;
@@ -33,12 +37,12 @@ public class ProductImage {
         this.productImageId = productImageId;
     }
 
-    public ProductVariant getVariant() {
-        return variant;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setVariant(ProductVariant variant) {
-        this.variant = variant;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public String getStoragePath() {

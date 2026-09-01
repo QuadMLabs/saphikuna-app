@@ -4,12 +4,10 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.UUID;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -44,17 +42,35 @@ public class Product {
     @Column(name = "updatedAt")
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductCollection> productCollections = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "product",
+            fetch = FetchType.LAZY
+    )
+    private List<ProductCollection> productCollections =
+            new ArrayList<>();
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductVariant> productVariants = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "product",
+            fetch = FetchType.LAZY
+    )
+    private List<ProductVariant> productVariants =
+            new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ProductImage> productImages =
+            new ArrayList<>();
 
     public List<ProductCollection> getProductCollections() {
         return productCollections;
     }
 
-    public void setProductCollections(List<ProductCollection> productCollections) {
+    public void setProductCollections(
+            List<ProductCollection> productCollections) {
+
         this.productCollections = productCollections;
     }
 
@@ -62,11 +78,24 @@ public class Product {
         return productVariants;
     }
 
-    public void setProductVariants(List<ProductVariant> productVariants) {
+    public void setProductVariants(
+            List<ProductVariant> productVariants) {
+
         this.productVariants = productVariants;
     }
 
+    public List<ProductImage> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(
+            List<ProductImage> productImages) {
+
+        this.productImages = productImages;
+    }
+
     public List<Color> getColors() {
+
         return productVariants.stream()
                 .map(ProductVariant::getColor)
                 .filter(Objects::nonNull)
@@ -75,6 +104,7 @@ public class Product {
     }
 
     public List<String> getSizes() {
+
         return productVariants.stream()
                 .map(ProductVariant::getSize)
                 .filter(Objects::nonNull)
@@ -84,6 +114,7 @@ public class Product {
     }
 
     public String getPriceDisplay() {
+
         List<BigDecimal> prices = productVariants.stream()
                 .map(ProductVariant::getPrice)
                 .filter(Objects::nonNull)
@@ -96,12 +127,20 @@ public class Product {
         }
 
         if (prices.size() == 1) {
-            return "$" + prices.get(0).setScale(2).toPlainString();
+            return "$"
+                    + prices.get(0)
+                    .setScale(2)
+                    .toPlainString();
         }
 
-        return "$" + prices.get(0).setScale(2).toPlainString()
+        return "$"
+                + prices.get(0)
+                .setScale(2)
+                .toPlainString()
                 + " – $"
-                + prices.get(prices.size() - 1).setScale(2).toPlainString();
+                + prices.get(prices.size() - 1)
+                .setScale(2)
+                .toPlainString();
     }
 
     public UUID getProductId() {
