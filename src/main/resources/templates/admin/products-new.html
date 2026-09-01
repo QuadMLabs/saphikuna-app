@@ -105,7 +105,7 @@
                                             </span>
                                         </div>
                                         <label class="form-switch">
-                                            <input type="checkbox" id="inStock">
+                                            <input type="checkbox" id="status" checked>
                                             <span class="form-switch-slider"></span>
                                         </label>
                                     </div>
@@ -301,8 +301,11 @@
             </section>
         </main>
     </div>
-    <div id="productMessages" th:data-variant-required-message="#{products.form.validation.variants.required}"
-        th:data-saved-message="#{products.form.saved}" hidden></div>
+    <div id="productMessages" 
+        th:data-variant-required-message="#{products.form.validation.variants.required}"
+        th:data-saved-message="#{products.form.saved}" 
+        th:data-save-error-message="#{products.form.save.error}"
+        hidden></div>
     <script th:src="@{/js/admin.js}"></script>
     <script th:src="@{/js/toast.js}"></script>
     <script th:src="@{/js/product-form.js}"></script>

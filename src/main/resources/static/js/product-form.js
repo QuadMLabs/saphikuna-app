@@ -9,20 +9,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const productPrice =
         document.getElementById('price');
 
+    const productStatus =
+        document.getElementById('status');
+
+    const productDescription =
+        document.getElementById('description');
+
+    const productCategory =
+        document.getElementById('category');
+
+    const productCollection =
+        document.getElementById('collection');
+
     const productMessages =
         document.getElementById('productMessages');
 
+
+    /* =========================================================
+     * MESSAGES
+     * ========================================================= */
+
     const variantRequiredMessage =
         productMessages?.dataset.variantRequiredMessage || '';
+
+    const savedMessage =
+        productMessages?.dataset.savedMessage || '';
+
+    const saveErrorMessage =
+        productMessages?.dataset.saveErrorMessage || '';
 
 
     /* =========================================================
      * PRODUCT IMAGES
      * ========================================================= */
 
-    const imagesContainer = document.querySelector('.product-images');
-    const imageInput = document.querySelector('#product-image-input');
-    const addImageButton = document.querySelector('.product-image-add');
+    const imagesContainer =
+        document.querySelector('.product-images');
+
+    const imageInput =
+        document.querySelector('#product-image-input');
+
+    const addImageButton =
+        document.querySelector('.product-image-add');
+
 
     if (imagesContainer && imageInput && addImageButton) {
 
@@ -39,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         imageInput.addEventListener('change', (event) => {
 
-            const files = Array.from(event.target.files);
+            const files =
+                Array.from(event.target.files);
 
             files.forEach(file => {
 
@@ -49,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 addImage(file);
             });
+
 
             /*
              * Allows selecting the same file again
@@ -62,53 +93,67 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         function addImage(file) {
 
-            const imageUrl = URL.createObjectURL(file);
+            const imageUrl =
+                URL.createObjectURL(file);
 
-            const imageItem = document.createElement('div');
-            imageItem.className = 'product-image-item';
+            const imageItem =
+                document.createElement('div');
+
+            imageItem.className =
+                'product-image-item';
+
 
             imageItem.innerHTML = `
-            <div class="product-image-preview">
-                <img src="${imageUrl}" alt="Imagen del producto">
-            </div>
+                <div class="product-image-preview">
+                    <img
+                        src="${imageUrl}"
+                        alt="Imagen del producto">
+                </div>
 
-            <div class="product-image-actions">
+                <div class="product-image-actions">
 
-                <button
-                    type="button"
-                    class="product-image-primary"
-                    title="Establecer como principal">
+                    <button
+                        type="button"
+                        class="product-image-primary"
+                        title="Establecer como principal">
 
-                    <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
 
-                </button>
+                    </button>
 
-                <button
-                    type="button"
-                    class="product-image-remove"
-                    title="Eliminar imagen">
+                    <button
+                        type="button"
+                        class="product-image-remove"
+                        title="Eliminar imagen">
 
-                    <i data-lucide="trash-2"></i>
+                        <i data-lucide="trash-2"></i>
 
-                </button>
+                    </button>
 
-            </div>
-        `;
+                </div>
+            `;
+
 
             /*
              * Insert before "Agregar imagen"
              */
-            imagesContainer.insertBefore(imageItem, addImageButton);
+            imagesContainer.insertBefore(
+                imageItem,
+                addImageButton
+            );
+
 
             /*
              * Activate Lucide icons
              */
             lucide.createIcons();
 
+
             /*
              * Bind actions
              */
             bindImageActions(imageItem);
+
 
             /*
              * If this is the first image,
@@ -124,45 +169,64 @@ document.addEventListener('DOMContentLoaded', () => {
         function bindImageActions(imageItem) {
 
             const primaryButton =
-                imageItem.querySelector('.product-image-primary');
+                imageItem.querySelector(
+                    '.product-image-primary'
+                );
 
             const removeButton =
-                imageItem.querySelector('.product-image-remove');
+                imageItem.querySelector(
+                    '.product-image-remove'
+                );
 
 
             /*
              * Set as primary
              */
-            primaryButton?.addEventListener('click', () => {
-                setPrimaryImage(imageItem);
-            });
+            primaryButton?.addEventListener(
+                'click',
+                () => {
+                    setPrimaryImage(imageItem);
+                }
+            );
 
 
             /*
              * Remove image
              */
-            removeButton?.addEventListener('click', () => {
+            removeButton?.addEventListener(
+                'click',
+                () => {
 
-                const image =
-                    imageItem.querySelector('img');
+                    const image =
+                        imageItem.querySelector('img');
 
-                if (image && image.src.startsWith('blob:')) {
-                    URL.revokeObjectURL(image.src);
+
+                    if (
+                        image &&
+                        image.src.startsWith('blob:')
+                    ) {
+                        URL.revokeObjectURL(image.src);
+                    }
+
+
+                    const wasPrimary =
+                        imageItem.classList.contains(
+                            'is-primary'
+                        );
+
+
+                    imageItem.remove();
+
+
+                    /*
+                     * If the removed image was primary,
+                     * select another one automatically.
+                     */
+                    if (wasPrimary) {
+                        ensurePrimaryImage();
+                    }
                 }
-
-                const wasPrimary =
-                    imageItem.classList.contains('is-primary');
-
-                imageItem.remove();
-
-                /*
-                 * If the removed image was primary,
-                 * select another one automatically.
-                 */
-                if (wasPrimary) {
-                    ensurePrimaryImage();
-                }
-            });
+            );
         }
 
 
@@ -172,39 +236,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagesPrimaryLabel =
             imagesContainer?.dataset.primaryLabel || '';
 
+
         function setPrimaryImage(selectedItem) {
 
             const imageItems =
-                imagesContainer.querySelectorAll('.product-image-item');
+                imagesContainer.querySelectorAll(
+                    '.product-image-item'
+                );
 
 
             imageItems.forEach(item => {
 
-                item.classList.remove('is-primary');
+                item.classList.remove(
+                    'is-primary'
+                );
+
 
                 const label =
-                    item.querySelector('.product-image-primary-label');
+                    item.querySelector(
+                        '.product-image-primary-label'
+                    );
+
 
                 if (label) {
                     label.remove();
                 }
-
             });
 
 
             /*
              * Set selected image as primary
              */
-            selectedItem.classList.add('is-primary');
+            selectedItem.classList.add(
+                'is-primary'
+            );
 
 
             /*
              * Add primary label
              */
-            const label = document.createElement('span');
+            const label =
+                document.createElement('span');
 
-            label.className = 'product-image-primary-label';
-            label.textContent = imagesPrimaryLabel;
+            label.className =
+                'product-image-primary-label';
+
+            label.textContent =
+                imagesPrimaryLabel;
 
             selectedItem.appendChild(label);
         }
@@ -216,16 +294,25 @@ document.addEventListener('DOMContentLoaded', () => {
         function ensurePrimaryImage() {
 
             const imageItems =
-                [...imagesContainer.querySelectorAll('.product-image-item')];
+                [
+                    ...imagesContainer.querySelectorAll(
+                        '.product-image-item'
+                    )
+                ];
+
 
             if (imageItems.length === 0) {
                 return;
             }
 
+
             const primaryImage =
                 imageItems.find(item =>
-                    item.classList.contains('is-primary')
+                    item.classList.contains(
+                        'is-primary'
+                    )
                 );
+
 
             /*
              * A primary image already exists
@@ -234,11 +321,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+
             /*
              * No primary image exists.
              * Select the first one.
              */
-            setPrimaryImage(imageItems[0]);
+            setPrimaryImage(
+                imageItems[0]
+            );
         }
 
 
@@ -246,7 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
          * Bind actions for images already in HTML
          */
         const existingImages =
-            imagesContainer.querySelectorAll('.product-image-item');
+            imagesContainer.querySelectorAll(
+                '.product-image-item'
+            );
 
 
         existingImages.forEach(imageItem => {
@@ -266,20 +358,30 @@ document.addEventListener('DOMContentLoaded', () => {
         function getPrimaryImage() {
 
             const images =
-                [...imagesContainer.querySelectorAll('.product-image-item')];
+                [
+                    ...imagesContainer.querySelectorAll(
+                        '.product-image-item'
+                    )
+                ];
+
 
             if (images.length === 0) {
                 return null;
             }
 
+
             const selectedPrimary =
                 images.find(image =>
-                    image.classList.contains('is-primary')
+                    image.classList.contains(
+                        'is-primary'
+                    )
                 );
+
 
             if (selectedPrimary) {
                 return selectedPrimary;
             }
+
 
             return images[0];
         }
@@ -300,25 +402,39 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('variantModalCancel');
 
     const variantDifferentPrice =
-        document.getElementById('variantDifferentPrice');
+        document.getElementById(
+            'variantDifferentPrice'
+        );
 
     const variantPriceField =
-        document.getElementById('variantPriceField');
+        document.getElementById(
+            'variantPriceField'
+        );
 
     const variantModalSave =
-        document.getElementById('variantModalSave');
+        document.getElementById(
+            'variantModalSave'
+        );
 
     const variantColor =
-        document.getElementById('variantColor');
+        document.getElementById(
+            'variantColor'
+        );
 
     const variantStock =
-        document.getElementById('variantStock');
+        document.getElementById(
+            'variantStock'
+        );
 
     const variantPrice =
-        document.getElementById('variantPrice');
+        document.getElementById(
+            'variantPrice'
+        );
 
     const variantSizeOptions =
-        document.querySelectorAll('.variant-size-option');
+        document.querySelectorAll(
+            '.variant-size-option'
+        );
 
 
     /* =========================================================
@@ -326,13 +442,19 @@ document.addEventListener('DOMContentLoaded', () => {
      * ========================================================= */
 
     const variantTableContainer =
-        document.querySelector('.variant-table-container');
+        document.querySelector(
+            '.variant-table-container'
+        );
 
     const variantTableBody =
-        document.getElementById('variantTableBody');
+        document.getElementById(
+            'variantTableBody'
+        );
 
     const variantEmptyState =
-        document.querySelector('.variant-empty-state');
+        document.querySelector(
+            '.variant-empty-state'
+        );
 
 
     const variantBasePriceLabel =
@@ -350,180 +472,340 @@ document.addEventListener('DOMContentLoaded', () => {
     const variantSaveChangesTitle =
         variantTableContainer?.dataset.saveChangesTitle || '';
 
+
     /*
      * Variants stored in memory
      */
     const variants = [];
 
+
     /* =========================================================
-     * PRODUCT VALIDATION
+     * PRODUCT VALIDATION / SAVE
      * ========================================================= */
 
-    productSaveButton?.addEventListener('click', () => {
+    productSaveButton?.addEventListener(
+        'click',
+        async () => {
 
-        /*
-         * Product fields
-         */
-        const nameField =
-            productName?.closest('.form-field');
+            /*
+             * Product fields
+             */
+            const nameField =
+                productName?.closest('.form-field');
 
-        const priceField =
-            productPrice?.closest('.form-field');
-
-
-        /*
-         * Clear previous errors
-         */
-        nameField?.classList.remove('has-error');
-        priceField?.classList.remove('has-error');
-
-        removeFieldError(nameField);
-        removeFieldError(priceField);
+            const priceField =
+                productPrice?.closest('.form-field');
 
 
-        let isValid = true;
-
-
-        /* -----------------------------------------------------
-         * NAME
-         * ----------------------------------------------------- */
-
-        if (!productName?.value.trim()) {
-
-            nameField?.classList.add('has-error');
-
-            showFieldError(nameField);
-
-            isValid = false;
-        }
-
-
-        /* -----------------------------------------------------
-         * PRICE
-         * ----------------------------------------------------- */
-
-        if (
-            productPrice?.value === '' ||
-            Number(productPrice.value) < 0
-        ) {
-
-            priceField?.classList.add('has-error');
-
-            showFieldError(priceField);
-
-            isValid = false;
-        }
-
-
-        /*
-         * Stop if product fields are invalid
-         */
-        if (!isValid) {
-
-            if (!productName?.value.trim()) {
-                productName?.focus();
-            } else {
-                productPrice?.focus();
-            }
-
-            return;
-        }
-
-
-        /*
-         * A product must have at least one variant
-         */
-        if (variants.length === 0) {
-
-            Toast.error(
-                variantRequiredMessage
+            /*
+             * Clear previous errors
+             */
+            nameField?.classList.remove(
+                'has-error'
             );
 
-            return;
+            priceField?.classList.remove(
+                'has-error'
+            );
+
+            removeFieldError(nameField);
+            removeFieldError(priceField);
+
+
+            let isValid = true;
+
+
+            /* -----------------------------------------------------
+             * NAME
+             * ----------------------------------------------------- */
+
+            if (!productName?.value.trim()) {
+
+                nameField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(nameField);
+
+                isValid = false;
+            }
+
+
+            /* -----------------------------------------------------
+             * PRICE
+             * ----------------------------------------------------- */
+
+            if (
+                productPrice?.value === '' ||
+                Number(productPrice.value) < 0
+            ) {
+
+                priceField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(priceField);
+
+                isValid = false;
+            }
+
+
+            /*
+             * Stop if product fields are invalid
+             */
+            if (!isValid) {
+
+                if (!productName?.value.trim()) {
+                    productName?.focus();
+                } else {
+                    productPrice?.focus();
+                }
+
+                return;
+            }
+
+
+            /*
+             * A product must have at least one variant
+             */
+            if (variants.length === 0) {
+
+                Toast.error(
+                    variantRequiredMessage
+                );
+
+                return;
+            }
+
+
+            /* =====================================================
+             * BUILD PRODUCT REQUEST
+             * ===================================================== */
+
+            const collectionId =
+                productCollection?.value || null;
+
+
+            const productRequest = {
+
+                name:
+                    productName.value.trim(),
+
+                generalPrice:
+                    Number(productPrice.value),
+
+                description:
+                    productDescription?.value.trim() || null,
+
+                categoryId:
+                    productCategory?.value || null,
+
+                status:
+                    productStatus?.checked
+                        ? 'Activo'
+                        : 'Inactivo',
+
+                /*
+                 * The UI currently allows one collection.
+                 *
+                 * The backend already expects a list,
+                 * so we send the selected UUID inside
+                 * an array.
+                 */
+                collectionIds:
+                    collectionId
+                        ? [collectionId]
+                        : [],
+
+                variants:
+                    variants.map(variant => ({
+
+                        colorId:
+                            variant.colorId,
+
+                        sizeIds:
+                            variant.sizeIds,
+
+                        stock:
+                            variant.stock,
+
+                        differentPrice:
+                            variant.differentPrice,
+
+                        price:
+                            variant.differentPrice
+                                ? variant.price
+                                : null
+                    }))
+            };
+
+
+            /* =====================================================
+             * SEND TO BACKEND
+             * ===================================================== */
+
+            try {
+
+                productSaveButton.disabled =
+                    true;
+
+
+                const response =
+                    await fetch(
+                        '/admin/products',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    productRequest
+                                )
+                        }
+                    );
+
+
+                /*
+                 * Backend error
+                 */
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+                }
+
+
+                /*
+                 * Product saved successfully
+                 */
+                if (savedMessage) {
+
+                    Toast.success(
+                        savedMessage
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    'Error al guardar el producto:',
+                    error
+                );
+
+
+                /*
+                 * Error message comes from
+                 * messages.properties
+                 */
+                if (saveErrorMessage) {
+
+                    Toast.error(
+                        saveErrorMessage
+                    );
+                }
+
+
+            } finally {
+
+                productSaveButton.disabled =
+                    false;
+            }
         }
+    );
 
 
-        /*
-         * Product is valid.
-         *
-         * The actual save logic will be added later.
-         */
+    /* =========================================================
+     * REMOVE NAME ERROR
+     * ========================================================= */
 
-    });
+    productName?.addEventListener(
+        'input',
+        () => {
 
-    /*
- * REMOVE NAME ERROR
- */
-    productName?.addEventListener('input', () => {
+            if (productName.value.trim()) {
 
-        if (productName.value.trim()) {
+                const field =
+                    productName.closest(
+                        '.form-field'
+                    );
 
-            const field =
-                productName.closest('.form-field');
+                field?.classList.remove(
+                    'has-error'
+                );
 
-            field?.classList.remove('has-error');
-
-            removeFieldError(field);
+                removeFieldError(field);
+            }
         }
+    );
 
-    });
 
-
-    /*
+    /* =========================================================
      * REMOVE PRICE ERROR
-     */
-    productPrice?.addEventListener('input', () => {
+     * ========================================================= */
 
-        if (
-            productPrice.value !== '' &&
-            Number(productPrice.value) >= 0
-        ) {
+    productPrice?.addEventListener(
+        'input',
+        () => {
 
-            const field =
-                productPrice.closest('.form-field');
+            if (
+                productPrice.value !== '' &&
+                Number(productPrice.value) >= 0
+            ) {
 
-            field?.classList.remove('has-error');
+                const field =
+                    productPrice.closest(
+                        '.form-field'
+                    );
 
-            removeFieldError(field);
+                field?.classList.remove(
+                    'has-error'
+                );
+
+                removeFieldError(field);
+            }
         }
+    );
 
-    });
 
+    /* =========================================================
+     * VARIANT EDITING INDEX
+     * ========================================================= */
 
-    /*
-     * Index of the variant currently being edited.
-     *
-     * null = adding a new variant
-     * number = editing existing variant
-     */
     let editingVariantIndex = null;
 
 
     /* =========================================================
-     * OPEN MODAL
+     * OPEN VARIANT MODAL
      * ========================================================= */
 
     const addVariantButton =
-        document.querySelector('.variant-add-button');
+        document.querySelector(
+            '.variant-add-button'
+        );
 
-    addVariantButton?.addEventListener('click', () => {
 
-        /*
-         * Make sure we are creating a new variant
-         */
-        editingVariantIndex = null;
+    addVariantButton?.addEventListener(
+        'click',
+        () => {
 
-        resetVariantModal();
+            editingVariantIndex = null;
 
-        updateVariantModalMode();
+            resetVariantModal();
 
-        openVariantModal();
+            updateVariantModalMode();
 
-    });
+            openVariantModal();
+        }
+    );
 
 
     /* =========================================================
-     * CLOSE MODAL
+     * CLOSE VARIANT MODAL
      * ========================================================= */
 
     variantModalClose?.addEventListener(
@@ -540,274 +822,338 @@ document.addEventListener('DOMContentLoaded', () => {
     /*
      * Close clicking outside
      */
-    variantModal?.addEventListener('click', (event) => {
+    variantModal?.addEventListener(
+        'click',
+        (event) => {
 
-        if (event.target === variantModal) {
-            closeVariantModal();
+            if (
+                event.target === variantModal
+            ) {
+                closeVariantModal();
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
      * DIFFERENT PRICE
      * ========================================================= */
 
-    variantDifferentPrice?.addEventListener('change', () => {
+    variantDifferentPrice?.addEventListener(
+        'change',
+        () => {
 
-        if (variantDifferentPrice.checked) {
+            if (
+                variantDifferentPrice.checked
+            ) {
 
-            variantPriceField?.classList.add('is-visible');
+                variantPriceField?.classList.add(
+                    'is-visible'
+                );
 
-        } else {
+            } else {
 
-            variantPriceField?.classList.remove('is-visible');
-
+                variantPriceField?.classList.remove(
+                    'is-visible'
+                );
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
      * SIZE SELECTION
      * ========================================================= */
 
-    variantSizeOptions.forEach((button) => {
+    variantSizeOptions.forEach(
+        (button) => {
 
-        button.addEventListener('click', () => {
+            button.addEventListener(
+                'click',
+                () => {
 
-            button.classList.toggle('is-selected');
+                    button.classList.toggle(
+                        'is-selected'
+                    );
 
 
-            /*
-             * Remove error as soon as the user selects
-             * at least one size.
-             */
-            const sizesField =
-                button.closest('.form-field');
+                    /*
+                     * Remove error as soon as
+                     * the user selects at least
+                     * one size.
+                     */
+                    const sizesField =
+                        button.closest(
+                            '.form-field'
+                        );
 
-            const selectedSizes =
-                document.querySelectorAll(
-                    '.variant-size-option.is-selected'
-                );
 
-            if (selectedSizes.length > 0) {
+                    const selectedSizes =
+                        document.querySelectorAll(
+                            '.variant-size-option.is-selected'
+                        );
 
-                sizesField?.classList.remove('has-error');
 
-                removeFieldError(sizesField);
-            }
+                    if (
+                        selectedSizes.length > 0
+                    ) {
 
-        });
+                        sizesField?.classList.remove(
+                            'has-error'
+                        );
 
-    });
+                        removeFieldError(
+                            sizesField
+                        );
+                    }
+                }
+            );
+        }
+    );
 
 
     /* =========================================================
      * SAVE VARIANT
      * ========================================================= */
 
-    variantModalSave?.addEventListener('click', () => {
+    variantModalSave?.addEventListener(
+        'click',
+        () => {
 
-        if (!variantColor || !variantStock) {
-            return;
-        }
-
-
-        const colorField =
-            variantColor.closest('.form-field');
-
-        const stockField =
-            variantStock.closest('.form-field');
-
-        const sizesField =
-            variantSizeOptions.length > 0
-                ? variantSizeOptions[0].closest('.form-field')
-                : null;
+            if (
+                !variantColor ||
+                !variantStock
+            ) {
+                return;
+            }
 
 
-        const selectedSizes = [
-            ...document.querySelectorAll(
-                '.variant-size-option.is-selected'
-            )
-        ];
+            const colorField =
+                variantColor.closest(
+                    '.form-field'
+                );
+
+            const stockField =
+                variantStock.closest(
+                    '.form-field'
+                );
+
+            const sizesField =
+                variantSizeOptions.length > 0
+                    ? variantSizeOptions[0]
+                        .closest('.form-field')
+                    : null;
 
 
-        let isValid = true;
+            const selectedSizes =
+                [
+                    ...document.querySelectorAll(
+                        '.variant-size-option.is-selected'
+                    )
+                ];
 
 
-        /*
-         * Clear previous errors
-         */
-        colorField?.classList.remove('has-error');
-        stockField?.classList.remove('has-error');
-        sizesField?.classList.remove('has-error');
+            let isValid = true;
 
-        removeFieldError(colorField);
-        removeFieldError(stockField);
-        removeFieldError(sizesField);
-
-
-        /* -----------------------------------------------------
-         * COLOR
-         * ----------------------------------------------------- */
-
-        if (!variantColor.value) {
-
-            colorField?.classList.add('has-error');
-
-            showFieldError(colorField);
-
-            isValid = false;
-        }
-
-
-        /* -----------------------------------------------------
-         * SIZE
-         * ----------------------------------------------------- */
-
-        if (selectedSizes.length === 0) {
-
-            sizesField?.classList.add('has-error');
-
-            showFieldError(sizesField);
-
-            isValid = false;
-        }
-
-
-        /* -----------------------------------------------------
-         * STOCK
-         * ----------------------------------------------------- */
-
-        if (
-            variantStock.value === '' ||
-            Number(variantStock.value) < 0
-        ) {
-
-            stockField?.classList.add('has-error');
-
-            showFieldError(stockField);
-
-            isValid = false;
-        }
-
-
-        /*
-         * PRICE
-         *
-         * If "Different price" is selected,
-         * the price must be valid.
-         */
-        if (
-            variantDifferentPrice?.checked &&
-            (
-                variantPrice?.value === '' ||
-                Number(variantPrice.value) < 0
-            )
-        ) {
-
-            const priceField =
-                variantPrice?.closest('.form-field');
-
-            priceField?.classList.add('has-error');
-
-            showFieldError(priceField);
-
-            isValid = false;
-        }
-
-
-        /*
-         * Stop if invalid
-         */
-        if (!isValid) {
-            return;
-        }
-
-
-        /* -----------------------------------------------------
-         * CREATE / UPDATE VARIANT
-         * ----------------------------------------------------- */
-
-        const variant = {
-
-            colorId:
-                variantColor.value,
-
-            colorName:
-                variantColor.options[
-                    variantColor.selectedIndex
-                ].textContent.trim(),
-
-            sizeIds:
-                selectedSizes.map(
-                    size => size.value
-                ),
-
-            sizeNames:
-                selectedSizes.map(
-                    size => size.textContent.trim()
-                ),
-
-            stock:
-                Number(variantStock.value),
-
-            differentPrice:
-                variantDifferentPrice?.checked ?? false,
-
-            price:
-                variantDifferentPrice?.checked
-                    ? Number(variantPrice?.value || 0)
-                    : null
-        };
-
-
-        /*
-         * Editing existing variant
-         */
-        if (
-            editingVariantIndex !== null &&
-            variants[editingVariantIndex]
-        ) {
-
-            variants[editingVariantIndex] = variant;
-
-        } else {
 
             /*
-             * Creating new variant
+             * Clear previous errors
              */
-            variants.push(variant);
+            colorField?.classList.remove(
+                'has-error'
+            );
+
+            stockField?.classList.remove(
+                'has-error'
+            );
+
+            sizesField?.classList.remove(
+                'has-error'
+            );
+
+            removeFieldError(colorField);
+            removeFieldError(stockField);
+            removeFieldError(sizesField);
+
+
+            /* -----------------------------------------------------
+             * COLOR
+             * ----------------------------------------------------- */
+
+            if (!variantColor.value) {
+
+                colorField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(colorField);
+
+                isValid = false;
+            }
+
+
+            /* -----------------------------------------------------
+             * SIZE
+             * ----------------------------------------------------- */
+
+            if (
+                selectedSizes.length === 0
+            ) {
+
+                sizesField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(sizesField);
+
+                isValid = false;
+            }
+
+
+            /* -----------------------------------------------------
+             * STOCK
+             * ----------------------------------------------------- */
+
+            if (
+                variantStock.value === '' ||
+                Number(variantStock.value) < 0
+            ) {
+
+                stockField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(stockField);
+
+                isValid = false;
+            }
+
+
+            /* -----------------------------------------------------
+             * PRICE
+             * ----------------------------------------------------- */
+
+            if (
+                variantDifferentPrice?.checked &&
+                (
+                    variantPrice?.value === '' ||
+                    Number(variantPrice.value) < 0
+                )
+            ) {
+
+                const priceField =
+                    variantPrice?.closest(
+                        '.form-field'
+                    );
+
+                priceField?.classList.add(
+                    'has-error'
+                );
+
+                showFieldError(priceField);
+
+                isValid = false;
+            }
+
+
+            /*
+             * Stop if invalid
+             */
+            if (!isValid) {
+                return;
+            }
+
+
+            /* -----------------------------------------------------
+             * CREATE / UPDATE VARIANT
+             * ----------------------------------------------------- */
+
+            const variant = {
+
+                colorId:
+                    variantColor.value,
+
+                colorName:
+                    variantColor.options[
+                        variantColor.selectedIndex
+                    ].textContent.trim(),
+
+                sizeIds:
+                    selectedSizes.map(
+                        size => size.value
+                    ),
+
+                sizeNames:
+                    selectedSizes.map(
+                        size =>
+                            size.textContent.trim()
+                    ),
+
+                stock:
+                    Number(
+                        variantStock.value
+                    ),
+
+                differentPrice:
+                    variantDifferentPrice?.checked ??
+                    false,
+
+                price:
+                    variantDifferentPrice?.checked
+                        ? Number(
+                            variantPrice?.value || 0
+                        )
+                        : null
+            };
+
+
+            /*
+             * Editing existing variant
+             */
+            if (
+                editingVariantIndex !== null &&
+                variants[editingVariantIndex]
+            ) {
+
+                variants[
+                    editingVariantIndex
+                ] = variant;
+
+            } else {
+
+                /*
+                 * Creating new variant
+                 */
+                variants.push(variant);
+            }
+
+
+            /*
+             * Render table
+             */
+            renderVariants();
+
+
+            /*
+             * Reset modal
+             */
+            resetVariantModal();
+
+
+            /*
+             * Return to create mode
+             */
+            editingVariantIndex = null;
+
+            updateVariantModalMode();
+
+
+            /*
+             * Close modal
+             */
+            closeVariantModal();
         }
-
-
-        /*
-         * Render table
-         */
-        renderVariants();
-
-
-        /*
-         * Reset modal
-         */
-        resetVariantModal();
-
-
-        /*
-         * Return to create mode
-         */
-        editingVariantIndex = null;
-
-        updateVariantModalMode();
-
-
-        /*
-         * Close modal
-         */
-        closeVariantModal();
-
-    });
+    );
 
 
     /* =========================================================
@@ -863,71 +1209,78 @@ document.addEventListener('DOMContentLoaded', () => {
         /*
          * Create rows
          */
-        variants.forEach((variant, index) => {
+        variants.forEach(
+            (variant, index) => {
 
-            const row =
-                document.createElement('tr');
-
-
-            const priceText =
-                variant.differentPrice
-                    ? Number(variant.price).toFixed(2)
-                    : variantBasePriceLabel;
+                const row =
+                    document.createElement('tr');
 
 
-            row.innerHTML = `
-
-            <td>
-                ${escapeHtml(variant.colorName)}
-            </td>
-
-            <td>
-                ${escapeHtml(
-                variant.sizeNames.join(', ')
-            )}
-            </td>
-
-            <td>
-                ${variant.stock}
-            </td>
-
-            <td>
-                ${escapeHtml(priceText)}
-            </td>
-
-            <td>
-
-                <div class="variant-actions">
-
-                    <button
-                        type="button"
-                        class="variant-action-button variant-edit-button"
-                        data-index="${index}"
-                        title="${variantEditTitle}">
-
-                        <i data-lucide="pencil"></i>
-
-                    </button>
-
-                    <button
-                        type="button"
-                        class="variant-action-button variant-delete-button"
-                        data-index="${index}"
-                        title="${variantDeleteTitle}">
-
-                        <i data-lucide="trash-2"></i>
-
-                    </button>
-
-                </div>
-
-            </td>
-
-        `;
+                const priceText =
+                    variant.differentPrice
+                        ? Number(
+                            variant.price
+                        ).toFixed(2)
+                        : variantBasePriceLabel;
 
 
-            variantTableBody.appendChild(row);
-        });
+                row.innerHTML = `
+
+                    <td>
+                        ${escapeHtml(
+                    variant.colorName
+                )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                    variant.sizeNames.join(', ')
+                )}
+                    </td>
+
+                    <td>
+                        ${variant.stock}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                    priceText
+                )}
+                    </td>
+
+                    <td>
+
+                        <div class="variant-actions">
+
+                            <button
+                                type="button"
+                                class="variant-action-button variant-edit-button"
+                                data-index="${index}"
+                                title="${variantEditTitle}">
+
+                                <i data-lucide="pencil"></i>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="variant-action-button variant-delete-button"
+                                data-index="${index}"
+                                title="${variantDeleteTitle}">
+
+                                <i data-lucide="trash-2"></i>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+                `;
+
+
+                variantTableBody.appendChild(row);
+            }
+        );
 
 
         /*
@@ -963,58 +1316,70 @@ document.addEventListener('DOMContentLoaded', () => {
         /*
          * EDIT
          */
-        editButtons?.forEach(button => {
+        editButtons?.forEach(
+            button => {
 
-            button.addEventListener('click', () => {
+                button.addEventListener(
+                    'click',
+                    () => {
 
-                const index =
-                    Number(button.dataset.index);
-
-
-                if (
-                    !Number.isInteger(index) ||
-                    index < 0 ||
-                    index >= variants.length
-                ) {
-                    return;
-                }
+                        const index =
+                            Number(
+                                button.dataset.index
+                            );
 
 
-                editVariant(index);
+                        if (
+                            !Number.isInteger(index) ||
+                            index < 0 ||
+                            index >= variants.length
+                        ) {
+                            return;
+                        }
 
-            });
 
-        });
+                        editVariant(index);
+                    }
+                );
+            }
+        );
 
 
         /*
          * DELETE
          */
-        deleteButtons?.forEach(button => {
+        deleteButtons?.forEach(
+            button => {
 
-            button.addEventListener('click', () => {
+                button.addEventListener(
+                    'click',
+                    () => {
 
-                const index =
-                    Number(button.dataset.index);
-
-
-                if (
-                    !Number.isInteger(index) ||
-                    index < 0 ||
-                    index >= variants.length
-                ) {
-                    return;
-                }
+                        const index =
+                            Number(
+                                button.dataset.index
+                            );
 
 
-                variants.splice(index, 1);
+                        if (
+                            !Number.isInteger(index) ||
+                            index < 0 ||
+                            index >= variants.length
+                        ) {
+                            return;
+                        }
 
-                renderVariants();
 
-            });
+                        variants.splice(
+                            index,
+                            1
+                        );
 
-        });
-
+                        renderVariants();
+                    }
+                );
+            }
+        );
     }
 
 
@@ -1027,6 +1392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const variant =
             variants[index];
 
+
         if (!variant) {
             return;
         }
@@ -1035,40 +1401,50 @@ document.addEventListener('DOMContentLoaded', () => {
         /*
          * Store index being edited
          */
-        editingVariantIndex = index;
+        editingVariantIndex =
+            index;
 
 
         /*
          * Set color
          */
         if (variantColor) {
-            variantColor.value = variant.colorId;
+            variantColor.value =
+                variant.colorId;
         }
 
 
         /*
          * Set sizes
          */
-        variantSizeOptions.forEach(button => {
+        variantSizeOptions.forEach(
+            button => {
 
-            button.classList.remove('is-selected');
+                button.classList.remove(
+                    'is-selected'
+                );
 
-            if (
-                variant.sizeIds.includes(
-                    button.value
-                )
-            ) {
-                button.classList.add('is-selected');
+
+                if (
+                    variant.sizeIds.includes(
+                        button.value
+                    )
+                ) {
+
+                    button.classList.add(
+                        'is-selected'
+                    );
+                }
             }
-
-        });
+        );
 
 
         /*
          * Set stock
          */
         if (variantStock) {
-            variantStock.value = variant.stock;
+            variantStock.value =
+                variant.stock;
         }
 
 
@@ -1079,7 +1455,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             variantDifferentPrice.checked =
                 variant.differentPrice;
-
         }
 
 
@@ -1093,7 +1468,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     variant.price !== null
                     ? variant.price
                     : '';
-
         }
 
 
@@ -1102,7 +1476,9 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         if (variantPriceField) {
 
-            if (variant.differentPrice) {
+            if (
+                variant.differentPrice
+            ) {
 
                 variantPriceField.classList.add(
                     'is-visible'
@@ -1113,9 +1489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 variantPriceField.classList.remove(
                     'is-visible'
                 );
-
             }
-
         }
 
 
@@ -1127,13 +1501,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 '.form-field'
             );
 
-        fields?.forEach(field => {
 
-            field.classList.remove('has-error');
+        fields?.forEach(
+            field => {
 
-            removeFieldError(field);
+                field.classList.remove(
+                    'has-error'
+                );
 
-        });
+                removeFieldError(field);
+            }
+        );
 
 
         /*
@@ -1146,7 +1524,6 @@ document.addEventListener('DOMContentLoaded', () => {
          * Open modal
          */
         openVariantModal();
-
     }
 
 
@@ -1167,20 +1544,27 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
         const buttonText =
-            variantModalSave?.querySelector('span');
+            variantModalSave?.querySelector(
+                'span'
+            );
 
 
-        if (editingVariantIndex !== null) {
+        if (
+            editingVariantIndex !== null
+        ) {
 
             /*
              * Edit mode
              */
             if (title) {
+
                 title.textContent =
                     variantEditTitle;
             }
 
+
             if (buttonText) {
+
                 buttonText.textContent =
                     variantSaveChangesTitle;
             }
@@ -1191,17 +1575,18 @@ document.addEventListener('DOMContentLoaded', () => {
              * Create mode
              */
             if (title) {
+
                 title.textContent =
                     variantAddTitle;
             }
 
+
             if (buttonText) {
+
                 buttonText.textContent =
                     variantAddTitle;
             }
-
         }
-
     }
 
 
@@ -1222,11 +1607,14 @@ document.addEventListener('DOMContentLoaded', () => {
         /*
          * Sizes
          */
-        variantSizeOptions.forEach(button => {
+        variantSizeOptions.forEach(
+            button => {
 
-            button.classList.remove('is-selected');
-
-        });
+                button.classList.remove(
+                    'is-selected'
+                );
+            }
+        );
 
 
         /*
@@ -1241,7 +1629,9 @@ document.addEventListener('DOMContentLoaded', () => {
          * Different price
          */
         if (variantDifferentPrice) {
-            variantDifferentPrice.checked = false;
+
+            variantDifferentPrice.checked =
+                false;
         }
 
 
@@ -1249,6 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Price
          */
         if (variantPrice) {
+
             variantPrice.value = '';
         }
 
@@ -1270,14 +1661,16 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
 
-        fields?.forEach(field => {
+        fields?.forEach(
+            field => {
 
-            field.classList.remove('has-error');
+                field.classList.remove(
+                    'has-error'
+                );
 
-            removeFieldError(field);
-
-        });
-
+                removeFieldError(field);
+            }
+        );
     }
 
 
@@ -1285,81 +1678,102 @@ document.addEventListener('DOMContentLoaded', () => {
      * REMOVE COLOR ERROR
      * ========================================================= */
 
-    variantColor?.addEventListener('change', () => {
+    variantColor?.addEventListener(
+        'change',
+        () => {
 
-        if (variantColor.value) {
+            if (variantColor.value) {
 
-            const field =
-                variantColor.closest('.form-field');
+                const field =
+                    variantColor.closest(
+                        '.form-field'
+                    );
 
-            field?.classList.remove('has-error');
+                field?.classList.remove(
+                    'has-error'
+                );
 
-            removeFieldError(field);
+                removeFieldError(field);
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
      * REMOVE STOCK ERROR
      * ========================================================= */
 
-    variantStock?.addEventListener('input', () => {
+    variantStock?.addEventListener(
+        'input',
+        () => {
 
-        if (
-            variantStock.value !== '' &&
-            Number(variantStock.value) >= 0
-        ) {
+            if (
+                variantStock.value !== '' &&
+                Number(variantStock.value) >= 0
+            ) {
 
-            const field =
-                variantStock.closest('.form-field');
+                const field =
+                    variantStock.closest(
+                        '.form-field'
+                    );
 
-            field?.classList.remove('has-error');
+                field?.classList.remove(
+                    'has-error'
+                );
 
-            removeFieldError(field);
+                removeFieldError(field);
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
      * REMOVE PRICE ERROR
      * ========================================================= */
 
-    variantPrice?.addEventListener('input', () => {
+    variantPrice?.addEventListener(
+        'input',
+        () => {
 
-        if (
-            variantPrice.value !== '' &&
-            Number(variantPrice.value) >= 0
-        ) {
+            if (
+                variantPrice.value !== '' &&
+                Number(variantPrice.value) >= 0
+            ) {
 
-            const field =
-                variantPrice.closest('.form-field');
+                const field =
+                    variantPrice.closest(
+                        '.form-field'
+                    );
 
-            field?.classList.remove('has-error');
+                field?.classList.remove(
+                    'has-error'
+                );
 
-            removeFieldError(field);
+                removeFieldError(field);
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
      * ESCAPE KEY
      * ========================================================= */
 
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener(
+        'keydown',
+        (event) => {
 
-        if (
-            event.key === 'Escape' &&
-            variantModal?.classList.contains('is-visible')
-        ) {
+            if (
+                event.key === 'Escape' &&
+                variantModal?.classList.contains(
+                    'is-visible'
+                )
+            ) {
 
-            closeVariantModal();
-
+                closeVariantModal();
+            }
         }
-
-    });
+    );
 
 
     /* =========================================================
@@ -1372,9 +1786,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        variantModal.classList.add('is-visible');
 
-        document.body.style.overflow = 'hidden';
+        variantModal.classList.add(
+            'is-visible'
+        );
+
+
+        document.body.style.overflow =
+            'hidden';
     }
 
 
@@ -1384,10 +1803,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        variantModal.classList.remove('is-visible');
 
-        document.body.style.overflow = '';
+        variantModal.classList.remove(
+            'is-visible'
+        );
 
+
+        document.body.style.overflow =
+            '';
     }
 
 
@@ -1420,9 +1843,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const error =
             document.createElement('span');
 
-        error.className = 'form-field-error';
 
-        error.textContent = message;
+        error.className =
+            'form-field-error';
+
+
+        error.textContent =
+            message;
+
 
         field.appendChild(error);
     }
@@ -1436,13 +1864,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         const error =
-            field.querySelector('.form-field-error');
+            field.querySelector(
+                '.form-field-error'
+            );
 
 
         if (error) {
             error.remove();
         }
-
     }
 
 
@@ -1458,7 +1887,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-
     }
 
-});
+})

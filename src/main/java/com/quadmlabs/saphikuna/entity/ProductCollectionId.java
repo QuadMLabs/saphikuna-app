@@ -1,7 +1,10 @@
 package com.quadmlabs.saphikuna.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
@@ -27,5 +30,27 @@ public class ProductCollectionId implements Serializable {
 
     public void setCollectionId(UUID collectionId) {
         this.collectionId = collectionId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof ProductCollectionId)) {
+            return false;
+        }
+
+        ProductCollectionId that = (ProductCollectionId) o;
+
+        return Objects.equals(productId, that.productId)
+                && Objects.equals(collectionId, that.collectionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productId, collectionId);
     }
 }

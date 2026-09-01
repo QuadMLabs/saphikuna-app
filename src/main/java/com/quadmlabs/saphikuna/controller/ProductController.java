@@ -1,8 +1,12 @@
 package com.quadmlabs.saphikuna.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.quadmlabs.saphikuna.entity.Product;
 import com.quadmlabs.saphikuna.entity.Category;
@@ -14,6 +18,7 @@ import com.quadmlabs.saphikuna.service.SizeService;
 import com.quadmlabs.saphikuna.service.CategoryService;
 import com.quadmlabs.saphikuna.service.CollectionService;
 import com.quadmlabs.saphikuna.service.ColorService;
+import com.quadmlabs.saphikuna.dto.ProductRequest;
 
 import org.springframework.ui.Model;
 
@@ -82,6 +87,15 @@ public class ProductController {
         model.addAttribute("activeSubmenu", "products-new");
 
         return "admin/products-new";
+    }
+
+    @PostMapping("/products")
+    @ResponseBody
+    public ResponseEntity<Product> saveProduct(@RequestBody ProductRequest request) {
+
+        productService.saveProduct(request);
+
+        return ResponseEntity.ok().build();
     }
 
 }
