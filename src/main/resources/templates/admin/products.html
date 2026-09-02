@@ -50,10 +50,10 @@
                                 <span th:text="#{table.filters}"></span>
                             </button>
                             <!-- Add product table -->
-                            <button type="button" class="primary-button">
+                            <a th:href="@{/admin/products-new}" class="primary-button">
                                 <i data-lucide="plus"></i>
                                 <span th:text="#{products.new}"></span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                     <!-- FILTERS TABLE -->
@@ -176,7 +176,7 @@
                                         </div>
                                     </td>
                                     <!-- Precio -->
-                                    <td data-column-type="currency" th:text="${product.priceDisplay}"></td>
+                                    <td data-column-type="currency" th:text="${product.generalPrice}"></td>
                                     <!-- Estado -->
                                     <td data-column-type="status">
                                         <span

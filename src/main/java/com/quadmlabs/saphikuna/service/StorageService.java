@@ -6,4 +6,6 @@ public interface StorageService {
 
     String upload(MultipartFile file, String path);
 
+    String getPublicUrl(String path);
+
 }

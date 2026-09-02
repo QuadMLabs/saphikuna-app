@@ -1,65 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const productSaveButton =
-        document.getElementById('productSaveButton');
-
-    const productName =
-        document.getElementById('name');
-
-    const productPrice =
-        document.getElementById('price');
-
-    const productStatus =
-        document.getElementById('status');
-
-    const productDescription =
-        document.getElementById('description');
-
-    const productCategory =
-        document.getElementById('category');
-
-    const productCollection =
-        document.getElementById('collection');
-
-    const productMessages =
-        document.getElementById('productMessages');
-
+    const productSaveButton = document.getElementById('productSaveButton');
+    //productSaveButton.disabled = true;
+    const productName = document.getElementById('name');
+    const productPrice = document.getElementById('price');
+    const productStatus = document.getElementById('status');
+    const productDescription = document.getElementById('description');
+    const productCategory = document.getElementById('category');
+    const productCollection = document.getElementById('collection');
+    const productMessages = document.getElementById('productMessages');
+    const productCancelButton = document.getElementById('productCancelButton');
 
     /* =========================================================
      * MESSAGES
      * ========================================================= */
 
-    const variantRequiredMessage =
-        productMessages?.dataset.variantRequiredMessage || '';
-
-    const savedMessage =
-        productMessages?.dataset.savedMessage || '';
-
-    const saveErrorMessage =
-        productMessages?.dataset.saveErrorMessage || '';
-
+    const variantRequiredMessage = productMessages?.dataset.variantRequiredMessage || '';
+    const savedMessage = productMessages?.dataset.savedMessage || '';
+    const saveErrorMessage = productMessages?.dataset.saveErrorMessage || '';
 
     /* =========================================================
      * PRODUCT IMAGES
      * ========================================================= */
 
-    const imagesContainer =
-        document.querySelector('.product-images');
-
-    const imageInput =
-        document.querySelector('#product-image-input');
-
-    const addImageButton =
-        document.querySelector('.product-image-add');
-
-    const imagesPrimaryLabel =
-        imagesContainer?.dataset.primaryLabel || '';
+    const imagesContainer = document.querySelector('.product-images');
+    const imageInput = document.querySelector('#product-image-input');
+    const addImageButton = document.querySelector('.product-image-add');
+    const imagesPrimaryLabel = imagesContainer?.dataset.primaryLabel || '';
 
     let primaryImageItem = null;
 
-
     if (imagesContainer && imageInput && addImageButton) {
-
         /*
          * Open file selector
          */
@@ -69,50 +40,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageInput.click();
             }
         );
-
-
         /*
          * Add selected images
          */
         imageInput.addEventListener(
             'change',
             (event) => {
-
                 const files =
                     Array.from(event.target.files);
 
                 files.forEach(file => {
-
                     if (!file.type.startsWith('image/')) {
                         return;
                     }
-
                     addImage(file);
                 });
-
-
                 /*
                  * Allows selecting the same file again
                  */
                 imageInput.value = '';
             }
         );
-
-
         /*
          * Create image card
          */
         function addImage(file) {
+            const imageUrl = URL.createObjectURL(file);
+            const imageItem = document.createElement('div');
 
-            const imageUrl =
-                URL.createObjectURL(file);
-
-            const imageItem =
-                document.createElement('div');
-
-            imageItem.className =
-                'product-image-item';
-
+            imageItem.className = 'product-image-item';
             imageItem.file = file;
 
             imageItem.innerHTML = `
@@ -121,31 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         src="${imageUrl}"
                         alt="Imagen del producto">
                 </div>
-
                 <div class="product-image-actions">
-
                     <button
                         type="button"
                         class="product-image-primary"
                         title="Establecer como principal">
-
                         <i data-lucide="star"></i>
-
                     </button>
-
                     <button
                         type="button"
                         class="product-image-remove"
                         title="Eliminar imagen">
-
                         <i data-lucide="trash-2"></i>
-
                     </button>
-
                 </div>
             `;
-
-
             /*
              * Insert before "Agregar imagen"
              */
@@ -153,33 +99,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageItem,
                 addImageButton
             );
-
-
             /*
              * Activate Lucide icons
              */
             lucide.createIcons();
-
-
             /*
              * Bind actions
              */
             bindImageActions(imageItem);
-
-
             /*
              * If this is the first image,
              * automatically make it primary.
              */
             ensurePrimaryImage();
         }
-
-
         /*
          * Bind image actions
          */
         function bindImageActions(imageItem) {
-
             const primaryButton =
                 imageItem.querySelector(
                     '.product-image-primary'
@@ -190,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     '.product-image-remove'
                 );
 
-
             /*
              * Set as primary
              */
@@ -200,45 +136,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     setPrimaryImage(imageItem);
                 }
             );
-
-
             /*
              * Remove image
              */
-            removeButton?.addEventListener(
-                'click',
-                () => {
+            removeButton?.addEventListener('click', () => {
 
-                    const image =
-                        imageItem.querySelector('img');
+                const image = imageItem.querySelector('img');
 
-
-                    if (
-                        image &&
-                        image.src.startsWith('blob:')
-                    ) {
-                        URL.revokeObjectURL(image.src);
-                    }
-
-
-                    const wasPrimary =
-                        imageItem === primaryImageItem;
-
-
-                    imageItem.remove();
-
-
-                    if (wasPrimary) {
-
-                        primaryImageItem = null;
-
-                        ensurePrimaryImage();
-                    }
+                if (image && image.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(image.src);
                 }
+
+                const wasPrimary = imageItem === primaryImageItem;
+
+                imageItem.remove();
+
+                if (wasPrimary) {
+                    primaryImageItem = null;
+                    ensurePrimaryImage();
+                }
+            }
             );
         }
-
-
         /*
          * Set image as primary
          */
@@ -250,63 +169,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
             ];
 
-
             if (!imageItems.includes(selectedItem)) {
                 return;
             }
-
-
             /*
              * Remove primary state from all images
              */
             imageItems.forEach(item => {
 
-                item.classList.remove(
-                    'is-primary'
-                );
+                item.classList.remove('is-primary');
 
-                const label =
-                    item.querySelector(
-                        '.product-image-primary-label'
-                    );
+                const label = item.querySelector('.product-image-primary-label');
 
                 if (label) {
                     label.remove();
                 }
             });
-
-
             /*
              * Store selected image as primary
              */
-            primaryImageItem =
-                selectedItem;
-
-
+            primaryImageItem = selectedItem;
             /*
              * Add primary state
              */
-            selectedItem.classList.add(
-                'is-primary'
-            );
-
-
+            selectedItem.classList.add('is-primary');
             /*
              * Add primary label
              */
-            const label =
-                document.createElement('span');
+            const label = document.createElement('span');
 
-            label.className =
-                'product-image-primary-label';
+            label.className = 'product-image-primary-label';
 
-            label.textContent =
-                imagesPrimaryLabel;
+            label.textContent = imagesPrimaryLabel;
 
             selectedItem.appendChild(label);
         }
-
-
         /*
          * Make sure there is always a primary image
          */
@@ -318,26 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
             ];
 
-
             if (imageItems.length === 0) {
-
                 primaryImageItem = null;
-
                 return;
             }
-
-
             /*
              * Keep current primary if it still exists
              */
-            if (
-                primaryImageItem &&
-                imageItems.includes(primaryImageItem)
-            ) {
+            if (primaryImageItem && imageItems.includes(primaryImageItem)) {
                 return;
             }
-
-
             /*
              * Check if HTML already contains
              * a primary image.
@@ -349,26 +236,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     )
                 );
 
-
             if (existingPrimary) {
-
-                primaryImageItem =
-                    existingPrimary;
-
+                primaryImageItem = existingPrimary;
                 return;
             }
-
-
             /*
              * No primary image exists.
              * Select the first one.
              */
-            setPrimaryImage(
-                imageItems[0]
-            );
+            setPrimaryImage(imageItems[0]);
         }
-
-
         /*
          * Bind actions for images already in HTML
          */
@@ -377,20 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 '.product-image-item'
             );
 
-
-        existingImages.forEach(
-            imageItem => {
-                bindImageActions(imageItem);
-            }
+        existingImages.forEach(imageItem => {
+            bindImageActions(imageItem);
+        }
         );
-
-
         /*
          * Make sure an existing image is primary
          */
         ensurePrimaryImage();
-
-
         /*
          * Get primary image
          */
@@ -402,73 +273,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
             ];
 
-
             if (imageItems.length === 0) {
                 return null;
             }
 
-
-            if (
-                primaryImageItem &&
-                imageItems.includes(primaryImageItem)
-            ) {
+            if (primaryImageItem && imageItems.includes(primaryImageItem)) {
                 return primaryImageItem;
             }
-
 
             return imageItems[0];
         }
     }
-
-
     /* =========================================================
      * VARIANT MODAL
      * ========================================================= */
 
-    const variantModal =
-        document.getElementById('variantModal');
-
-    const variantModalClose =
-        document.getElementById('variantModalClose');
-
-    const variantModalCancel =
-        document.getElementById('variantModalCancel');
-
-    const variantDifferentPrice =
-        document.getElementById(
-            'variantDifferentPrice'
-        );
-
-    const variantPriceField =
-        document.getElementById(
-            'variantPriceField'
-        );
-
-    const variantModalSave =
-        document.getElementById(
-            'variantModalSave'
-        );
-
-    const variantColor =
-        document.getElementById(
-            'variantColor'
-        );
-
-    const variantStock =
-        document.getElementById(
-            'variantStock'
-        );
-
-    const variantPrice =
-        document.getElementById(
-            'variantPrice'
-        );
-
-    const variantSizeOptions =
-        document.querySelectorAll(
-            '.variant-size-option'
-        );
-
+    const variantModal = document.getElementById('variantModal');
+    const variantModalClose = document.getElementById('variantModalClose');
+    const variantModalCancel = document.getElementById('variantModalCancel');
+    const variantDifferentPrice = document.getElementById('variantDifferentPrice');
+    const variantPriceField = document.getElementById('variantPriceField');
+    const variantModalSave = document.getElementById('variantModalSave');
+    const variantColor = document.getElementById('variantColor');
+    const variantStock = document.getElementById('variantStock');
+    const variantPrice = document.getElementById('variantPrice');
+    const variantSizeOptions = document.querySelectorAll('.variant-size-option');
 
     /* =========================================================
      * VARIANTS TABLE
@@ -511,6 +340,150 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const variants = [];
 
+    /*
+ * =========================================================
+ * SAVE BUTTON STATE
+ * =========================================================
+ */
+
+    function setSavingState(isSaving) {
+
+        if (!productSaveButton) {
+            return;
+        }
+
+        if (isSaving) {
+
+            productSaveButton.disabled = true;
+
+            if (productCancelButton) {
+                productCancelButton.disabled = true;
+            }
+
+            productSaveButton.dataset.originalContent =
+                productSaveButton.innerHTML;
+
+            productSaveButton.innerHTML = `
+            <span class="button-spinner"></span>
+            <span>Guardando...</span>
+        `;
+
+        } else {
+
+            productSaveButton.disabled = false;
+
+            if (productCancelButton) {
+                productCancelButton.disabled = false;
+            }
+
+            const originalContent =
+                productSaveButton.dataset.originalContent;
+
+            if (originalContent) {
+                productSaveButton.innerHTML =
+                    originalContent;
+            }
+        }
+    }
+
+    /*
+ * =========================================================
+ * RESET PRODUCT FORM
+ * =========================================================
+ */
+
+    function resetProductForm() {
+
+        /*
+         * Product fields
+         */
+        if (productName) {
+            productName.value = '';
+        }
+
+        if (productPrice) {
+            productPrice.value = '';
+        }
+
+        if (productDescription) {
+            productDescription.value = '';
+        }
+
+        if (productCategory) {
+            productCategory.value = '';
+        }
+
+        if (productCollection) {
+            productCollection.value = '';
+        }
+
+        if (productStatus) {
+            productStatus.checked = true;
+        }
+
+        /*
+         * Remove product validation errors
+         */
+        const productFields =
+            document.querySelectorAll(
+                '.form-field.has-error'
+            );
+
+        productFields.forEach(field => {
+            field.classList.remove('has-error');
+            removeFieldError(field);
+        });
+
+        /*
+         * Remove images
+         */
+        if (imagesContainer) {
+
+            const imageItems =
+                imagesContainer.querySelectorAll(
+                    '.product-image-item'
+                );
+
+            imageItems.forEach(imageItem => {
+
+                const image =
+                    imageItem.querySelector('img');
+
+                if (
+                    image &&
+                    image.src.startsWith('blob:')
+                ) {
+                    URL.revokeObjectURL(image.src);
+                }
+
+                imageItem.remove();
+            });
+        }
+
+        primaryImageItem = null;
+
+        /*
+         * Remove variants
+         */
+        variants.length = 0;
+
+        renderVariants();
+
+        /*
+         * Reset image input
+         */
+        if (imageInput) {
+            imageInput.value = '';
+        }
+
+        /*
+         * Reset variant modal
+         */
+        editingVariantIndex = null;
+
+        resetVariantModal();
+        updateVariantModalMode();
+    }
 
     /* =========================================================
      * PRODUCT VALIDATION / SAVE
@@ -766,9 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
 
-                productSaveButton.disabled =
-                    true;
-
+                setSavingState(true);
 
                 const response =
                     await fetch(
@@ -801,6 +772,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
                 }
 
+                resetProductForm();
+
 
             } catch (error) {
 
@@ -824,8 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } finally {
 
-                productSaveButton.disabled =
-                    false;
+                setSavingState(false);
             }
         }
     );
@@ -1374,14 +1346,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <td>
                         ${escapeHtml(
-                            variant.colorName
-                        )}
+                    variant.colorName
+                )}
                     </td>
 
                     <td>
                         ${escapeHtml(
-                            variant.sizeNames.join(', ')
-                        )}
+                    variant.sizeNames.join(', ')
+                )}
                     </td>
 
                     <td>
@@ -1390,8 +1362,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <td>
                         ${escapeHtml(
-                            priceText
-                        )}
+                    priceText
+                )}
                     </td>
 
                     <td>
@@ -1614,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             variantPrice.value =
                 variant.differentPrice &&
-                variant.price !== null
+                    variant.price !== null
                     ? variant.price
                     : '';
         }

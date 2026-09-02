@@ -25,176 +25,102 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
 public class ProductController {
 
-    private final ProductService productService;
-    private final CategoryService categoryService;
-    private final CollectionService collectionService;
-    private final SizeService sizeService;
-    private final ColorService colorService;
-    private final StorageService storageService;
+        private final ProductService productService;
+        private final CategoryService categoryService;
+        private final CollectionService collectionService;
+        private final SizeService sizeService;
+        private final ColorService colorService;
+        private final StorageService storageService;
 
-    public ProductController(
-            ProductService productService,
-            CategoryService categoryService,
-            CollectionService collectionService,
-            SizeService sizeService,
-            ColorService colorService,
-            StorageService storageService) {
+        public ProductController(
+                        ProductService productService,
+                        CategoryService categoryService,
+                        CollectionService collectionService,
+                        SizeService sizeService,
+                        ColorService colorService,
+                        StorageService storageService) {
 
-        this.productService = productService;
-        this.categoryService = categoryService;
-        this.collectionService = collectionService;
-        this.sizeService = sizeService;
-        this.colorService = colorService;
-        this.storageService = storageService;
-    }
+                this.productService = productService;
+                this.categoryService = categoryService;
+                this.collectionService = collectionService;
+                this.sizeService = sizeService;
+                this.colorService = colorService;
+                this.storageService = storageService;
+        }
 
-    @GetMapping("/products")
-    public String products(Model model) {
+        @GetMapping("/products")
+        public String products(Model model) {
 
-        List<Product> products =
-                productService.findAll();
+                List<Product> products = productService.findAll();
+                products.forEach(product -> {
+                        if (product.getPrimaryImagePath() != null
+                                        && !product.getPrimaryImagePath().isBlank()) {
 
-        List<Category> categories =
-                categoryService.findAll();
+                                product.setPrimaryImagePath(
+                                                storageService.getPublicUrl(
+                                                                product.getPrimaryImagePath()));
+                        }
+                });
+                List<Category> categories = categoryService.findAll();
+                List<Collection> collections = collectionService.findAll();
+                List<Size> sizes = sizeService.findAll();
+                List<String> statuses = products.stream()
+                                .map(Product::getStatus)
+                                .filter(status -> status != null &&
+                                                !status.isBlank())
+                                .distinct()
+                                .sorted()
+                                .toList();
 
-        List<Collection> collections =
-                collectionService.findAll();
+                model.addAttribute("products", products);
+                model.addAttribute("categories", categories);
+                model.addAttribute("collections", collections);
+                model.addAttribute("sizes", sizes);
+                model.addAttribute("statuses", statuses);
 
-        List<Size> sizes =
-                sizeService.findAll();
+                model.addAttribute("activeMenu", "products");
+                model.addAttribute("activeSubmenu", "products-list");
 
-        List<String> statuses =
-                products.stream()
-                        .map(Product::getStatus)
-                        .filter(status ->
-                                status != null &&
-                                !status.isBlank())
-                        .distinct()
-                        .sorted()
-                        .toList();
+                return "admin/products";
+        }
 
-        model.addAttribute(
-                "products",
-                products);
+        @GetMapping("/products-new")
+        public String productsNew(Model model) {
 
-        model.addAttribute(
-                "categories",
-                categories);
+                List<Color> colors = colorService.findAll();
+                List<Size> sizes = sizeService.findAll();
+                List<Category> categories = categoryService.findAll();
+                List<Collection> collections = collectionService.findAll();
 
-        model.addAttribute(
-                "collections",
-                collections);
+                model.addAttribute("colors", colors);
+                model.addAttribute("sizes", sizes);
+                model.addAttribute("categories", categories);
+                model.addAttribute("collections", collections);
 
-        model.addAttribute(
-                "sizes",
-                sizes);
+                model.addAttribute("activeMenu", "products");
+                model.addAttribute("activeSubmenu", "products-new");
 
-        model.addAttribute(
-                "statuses",
-                statuses);
+                return "admin/products-new";
+        }
 
-        model.addAttribute(
-                "activeMenu",
-                "products");
+        @PostMapping(value = "/products", consumes = "multipart/form-data")
+        @ResponseBody
+        public ResponseEntity<Void> saveProduct(
+                        @RequestPart("product") ProductRequest request,
+                        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+                        @RequestParam(value = "primaryImageIndex", defaultValue = "0") int primaryImageIndex) {
 
-        model.addAttribute(
-                "activeSubmenu",
-                "products-list");
+                productService.saveProduct(
+                                request,
+                                images,
+                                primaryImageIndex);
 
-        return "admin/products";
-    }
+                return ResponseEntity.ok().build();
+        }
 
-    @GetMapping("/products-new")
-    public String productsNew(Model model) {
-
-        List<Color> colors =
-                colorService.findAll();
-
-        List<Size> sizes =
-                sizeService.findAll();
-
-        List<Category> categories =
-                categoryService.findAll();
-
-        List<Collection> collections =
-                collectionService.findAll();
-
-        model.addAttribute(
-                "colors",
-                colors);
-
-        model.addAttribute(
-                "sizes",
-                sizes);
-
-        model.addAttribute(
-                "categories",
-                categories);
-
-        model.addAttribute(
-                "collections",
-                collections);
-
-        model.addAttribute(
-                "activeMenu",
-                "products");
-
-        model.addAttribute(
-                "activeSubmenu",
-                "products-new");
-
-        return "admin/products-new";
-    }
-
-    @PostMapping(
-            value = "/products",
-            consumes = "multipart/form-data")
-    @ResponseBody
-    public ResponseEntity<Void> saveProduct(
-
-            @RequestPart("product")
-            ProductRequest request,
-
-            @RequestPart(
-                    value = "images",
-                    required = false)
-            List<MultipartFile> images,
-
-            @RequestParam(
-                    value = "primaryImageIndex",
-                    defaultValue = "0")
-            int primaryImageIndex) {
-
-        productService.saveProduct(
-                request,
-                images,
-                primaryImageIndex);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/storage-test")
-    @ResponseBody
-    public ResponseEntity<String> testStorage(
-            @RequestParam("file")
-            MultipartFile file) {
-
-        String path =
-                "test/"
-                        + UUID.randomUUID()
-                        + ".webp";
-
-        String url =
-                storageService.upload(
-                        file,
-                        path);
-
-        return ResponseEntity.ok(url);
-    }
 }

@@ -88,9 +88,7 @@ public class Product {
         return productImages;
     }
 
-    public void setProductImages(
-            List<ProductImage> productImages) {
-
+    public void setProductImages(List<ProductImage> productImages) {
         this.productImages = productImages;
     }
 
@@ -175,8 +173,9 @@ public class Product {
         this.name = name;
     }
 
-    public BigDecimal getGeneralPrice() {
-        return generalPrice;
+    public String getGeneralPrice() {
+        String gPrice = generalPrice.toString();
+        return "$" + gPrice;
     }
 
     public void setGeneralPrice(BigDecimal generalPrice) {

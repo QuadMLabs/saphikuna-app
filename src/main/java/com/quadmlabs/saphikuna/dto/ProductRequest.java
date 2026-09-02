@@ -7,26 +7,16 @@ import java.util.UUID;
 public class ProductRequest {
 
     private String name;
-
     private BigDecimal generalPrice;
-
     private String description;
-
     private UUID categoryId;
-
     private String status;
-
     private List<ProductVariantRequest> variants;
-
     private List<UUID> collectionIds;
 
-    public List<UUID> getCollectionIds() {
-        return collectionIds;
-    }
-
-    public void setCollectionIds(List<UUID> collectionIds) {
-        this.collectionIds = collectionIds;
-    }
+    /**
+     * GETTERS & SETTERS
+     */
 
     public String getName() {
         return name;
@@ -60,6 +50,14 @@ public class ProductRequest {
         this.categoryId = categoryId;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public List<ProductVariantRequest> getVariants() {
         return variants;
     }
@@ -68,11 +66,11 @@ public class ProductRequest {
         this.variants = variants;
     }
 
-    public String getStatus() {
-        return status;
+    public List<UUID> getCollectionIds() {
+        return collectionIds;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setCollectionIds(List<UUID> collectionIds) {
+        this.collectionIds = collectionIds;
     }
 }

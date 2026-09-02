@@ -7,13 +7,9 @@ import java.util.UUID;
 public class ProductVariantRequest {
 
     private UUID colorId;
-
     private List<UUID> sizeIds;
-
     private Integer stock;
-
     private boolean differentPrice;
-
     private BigDecimal price;
 
     public UUID getColorId() {
