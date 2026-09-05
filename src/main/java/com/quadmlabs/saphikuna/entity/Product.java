@@ -42,27 +42,14 @@ public class Product {
     @Column(name = "updatedAt")
     private OffsetDateTime updatedAt;
 
-    @OneToMany(
-            mappedBy = "product",
-            fetch = FetchType.LAZY
-    )
-    private List<ProductCollection> productCollections =
-            new ArrayList<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductCollection> productCollections = new ArrayList<>();
 
-    @OneToMany(
-            mappedBy = "product",
-            fetch = FetchType.LAZY
-    )
-    private List<ProductVariant> productVariants =
-            new ArrayList<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductVariant> productVariants = new ArrayList<>();
 
-    @OneToMany(
-            mappedBy = "product",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<ProductImage> productImages =
-            new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages = new ArrayList<>();
 
     public List<ProductCollection> getProductCollections() {
         return productCollections;
@@ -127,18 +114,18 @@ public class Product {
         if (prices.size() == 1) {
             return "$"
                     + prices.get(0)
-                    .setScale(2)
-                    .toPlainString();
+                            .setScale(2)
+                            .toPlainString();
         }
 
         return "$"
                 + prices.get(0)
-                .setScale(2)
-                .toPlainString()
+                        .setScale(2)
+                        .toPlainString()
                 + " – $"
                 + prices.get(prices.size() - 1)
-                .setScale(2)
-                .toPlainString();
+                        .setScale(2)
+                        .toPlainString();
     }
 
     public UUID getProductId() {
@@ -176,6 +163,10 @@ public class Product {
     public String getGeneralPrice() {
         String gPrice = generalPrice.toString();
         return "$" + gPrice;
+    }
+
+    public BigDecimal getGeneralPriceValue() {
+        return generalPrice;
     }
 
     public void setGeneralPrice(BigDecimal generalPrice) {

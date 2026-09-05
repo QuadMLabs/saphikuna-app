@@ -19,12 +19,20 @@
                     <div class="product-form-header">
                         <!-- Form Title Subtitle -->
                         <div>
-                            <h1 class="product-form-title" th:text="#{products.form.title}"></h1>
-                            <p class="product-form-subtitle" th:text="#{products.form.subtitle}"></p>
+                            <h1 class="product-form-title"
+                                th:text="${product != null ? #messages.msg('products.form.title.edit') : #messages.msg('products.form.title')}">
+                                Nuevo producto
+                            </h1>
+
+                            <p class="product-form-subtitle"
+                                th:text="${product != null ? #messages.msg('products.form.subtitle.edit') : #messages.msg('products.form.subtitle')}">
+                                Crea un nuevo producto para tu catálogo
+                            </p>
                         </div>
                         <!-- Form Save/Cancel buttons -->
                         <div class="product-form-actions">
-                            <button type="button" class="secondary-button" th:text="#{common.cancel}" id="productCancelButton">
+                            <button type="button" class="secondary-button" th:text="#{common.cancel}"
+                                id="productCancelButton">
                             </button>
                             <button type="button" id="productSaveButton" class="primary-button"
                                 th:text="#{common.save}">
@@ -49,6 +57,7 @@
                                             <span class="required-mark">*</span>
                                         </label>
                                         <input type="text" id="name" class="form-input" required
+                                            th:value="${product != null ? product.name : ''}"
                                             th:placeholder="#{products.form.section.information.name.ph}">
                                     </div>
                                     <!-- BAR CODE -->
@@ -63,7 +72,8 @@
                                         <label for="description"
                                             th:text="#{products.form.section.information.description}"></label>
                                         <textarea id="description" class="form-input form-textarea" rows="5"
-                                            th:placeholder="#{products.form.section.information.description.ph}"></textarea>
+                                            th:placeholder="#{products.form.section.information.description.ph}"
+                                            th:text="${product != null ? product.description : ''}"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +93,8 @@
                                             <span class="required-mark">*</span>
                                         </label>
                                         <input type="number" id="price" class="form-input" placeholder="0.00"
-                                            step="0.01" min="0" required>
+                                            step="0.01" min="0" required
+                                            th:value="${product != null ? product.generalPriceValue : ''}">
                                     </div>
                                     <!-- DISCOUNT -->
                                     <div class="form-field">
@@ -105,7 +116,8 @@
                                             </span>
                                         </div>
                                         <label class="form-switch">
-                                            <input type="checkbox" id="status" checked>
+                                            <input type="checkbox" id="status"
+                                                th:checked="${product == null or product.status == 'Activo'}">
                                             <span class="form-switch-slider"></span>
                                         </label>
                                     </div>
@@ -120,6 +132,35 @@
                             <div class="form-card-body">
                                 <div class="product-images"
                                     th:attr="data-primary-label=#{products.form.images.primary}">
+                                    <!-- IMÁGENES EXISTENTES -->
+                                    <div th:if="${product != null and product.productImages != null}"
+                                        th:each="image : ${product.productImages}" class="product-image-item"
+                                        th:classappend="${image.storagePath == product.primaryImagePath ? ' is-primary' : ''}"
+                                        th:attr="data-product-image-id=${image.productImageId},
+                  data-storage-path=${image.storagePath},
+                  data-sort-order=${image.sortOrder}">
+
+                                        <div class="product-image-preview">
+                                            <img th:src="${image.publicUrl}" alt="Imagen del producto">
+                                        </div>
+
+                                        <div class="product-image-actions">
+                                            <button type="button" class="product-image-primary"
+                                                title="Establecer como principal">
+                                                <i data-lucide="star"></i>
+                                            </button>
+
+                                            <button type="button" class="product-image-remove" title="Eliminar imagen">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </div>
+
+                                        <span th:if="${image.storagePath == product.primaryImagePath}"
+                                            class="product-image-primary-label"
+                                            th:text="#{products.form.images.primary}">
+                                        </span>
+                                    </div>
+
                                     <!-- Add image -->
                                     <button type="button" class="product-image-add">
                                         <i data-lucide="image-plus"></i>
@@ -197,7 +238,9 @@
                                             <option value=""
                                                 th:text="#{products.form.section.organization.category.ph}"></option>
                                             <option th:each="category : ${categories}" th:value="${category.categoryId}"
-                                                th:text="${category.name}">
+                                                th:text="${category.name}" th:selected="${product != null
+                                                        and product.category != null
+                                                        and category.categoryId == product.category.categoryId}">>
                                             </option>
                                         </select>
                                     </div>
@@ -208,7 +251,11 @@
                                             <option value=""
                                                 th:text="#{products.form.section.organization.collection.ph}"></option>
                                             <option th:each="collection : ${collections}"
-                                                th:value="${collection.collectionId}" th:text="${collection.name}">
+                                                th:value="${collection.collectionId}" th:text="${collection.name}"
+                                                th:selected="${product != null
+                                                            and product.productCollections != null
+                                                            and !product.productCollections.isEmpty()
+                                                            and product.productCollections[0].collection.collectionId == collection.collectionId}">
                                             </option>
                                         </select>
                                     </div>
@@ -301,13 +348,25 @@
             </section>
         </main>
     </div>
-    <div id="productMessages" 
-        th:data-variant-required-message="#{products.form.validation.variants.required}"
-        th:data-saved-message="#{products.form.saved}" 
-        th:data-save-error-message="#{products.form.save.error}"
-        hidden></div>
+    <div id="productMessages" th:data-variant-required-message="#{products.form.validation.variants.required}"
+        th:data-saved-message="#{products.form.saved}" th:data-save-error-message="#{products.form.save.error}" hidden>
+    </div>
     <script th:src="@{/js/admin.js}"></script>
     <script th:src="@{/js/toast.js}"></script>
+    <script th:inline="javascript">
+        window.existingVariantRows = [
+            /*[# th:each="variant, stat : ${variants}"]*/
+            {
+                colorId: /*[[${variant.color.colorId}]]*/,
+                colorName: /*[[${variant.color.name}]]*/,
+                sizeId: /*[[${variant.size.sizeId}]]*/,
+                sizeName: /*[[${variant.size.name}]]*/,
+                stock: /*[[${variant.stock}]]*/,
+                price: /*[[${variant.price}]]*/
+        }/*[# th:if="${!stat.last}"]*/,/*[/]*/
+            /*[/]*/
+        ];
+    </script>
     <script th:src="@{/js/product-form.js}"></script>
     <script>
         lucide.createIcons();

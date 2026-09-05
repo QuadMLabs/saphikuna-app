@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
+@Service("storageService")
 public class StorageServiceImpl implements StorageService {
 
         private final RestClient restClient;
@@ -231,5 +231,30 @@ public class StorageServiceImpl implements StorageService {
                                 + bucket
                                 + "/"
                                 + path;
+        }
+
+        @Override
+        public void delete(String path) {
+
+                if (path == null || path.isBlank()) {
+                        return;
+                }
+
+                String storageUrl = supabaseUrl
+                                + "/storage/v1/object/"
+                                + bucket
+                                + "/"
+                                + path;
+
+                restClient.delete()
+                                .uri(storageUrl)
+                                .header(
+                                                HttpHeaders.AUTHORIZATION,
+                                                "Bearer " + serviceKey)
+                                .header(
+                                                "apikey",
+                                                serviceKey)
+                                .retrieve()
+                                .toBodilessEntity();
         }
 }

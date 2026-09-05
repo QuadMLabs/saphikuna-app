@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class ProductRequest {
 
+    private UUID productId;
     private String name;
     private BigDecimal generalPrice;
     private String description;
@@ -13,10 +14,45 @@ public class ProductRequest {
     private String status;
     private List<ProductVariantRequest> variants;
     private List<UUID> collectionIds;
+    private List<UUID> existingImageIds;
+    private UUID primaryImageId;
+    private Integer primaryNewImageIndex;
 
     /**
      * GETTERS & SETTERS
      */
+
+    public UUID getProductId() {
+        return productId;
+    }
+
+    public void setProductId(UUID productId) {
+        this.productId = productId;
+    }
+
+    public List<UUID> getExistingImageIds() {
+        return existingImageIds;
+    }
+
+    public void setExistingImageIds(List<UUID> existingImageIds) {
+        this.existingImageIds = existingImageIds;
+    }
+
+    public UUID getPrimaryImageId() {
+        return primaryImageId;
+    }
+
+    public void setPrimaryImageId(UUID primaryImageId) {
+        this.primaryImageId = primaryImageId;
+    }
+
+    public Integer getPrimaryNewImageIndex() {
+        return primaryNewImageIndex;
+    }
+
+    public void setPrimaryNewImageIndex(Integer primaryNewImageIndex) {
+        this.primaryNewImageIndex = primaryNewImageIndex;
+    }
 
     public String getName() {
         return name;

@@ -8,4 +8,5 @@ public interface StorageService {
 
     String getPublicUrl(String path);
 
+    void delete(String path);
 }

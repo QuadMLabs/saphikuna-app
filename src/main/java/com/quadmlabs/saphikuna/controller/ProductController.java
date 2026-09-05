@@ -5,6 +5,7 @@ import com.quadmlabs.saphikuna.entity.Category;
 import com.quadmlabs.saphikuna.entity.Collection;
 import com.quadmlabs.saphikuna.entity.Color;
 import com.quadmlabs.saphikuna.entity.Product;
+import com.quadmlabs.saphikuna.entity.ProductVariant;
 import com.quadmlabs.saphikuna.entity.Size;
 import com.quadmlabs.saphikuna.service.CategoryService;
 import com.quadmlabs.saphikuna.service.CollectionService;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -58,9 +61,7 @@ public class ProductController {
 
                 List<Product> products = productService.findAll();
                 products.forEach(product -> {
-                        if (product.getPrimaryImagePath() != null
-                                        && !product.getPrimaryImagePath().isBlank()) {
-
+                        if (product.getPrimaryImagePath() != null && !product.getPrimaryImagePath().isBlank()) {
                                 product.setPrimaryImagePath(
                                                 storageService.getPublicUrl(
                                                                 product.getPrimaryImagePath()));
@@ -121,6 +122,31 @@ public class ProductController {
                                 primaryImageIndex);
 
                 return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/products/{id}/edit")
+        public String productsEdit(
+                        @PathVariable UUID id,
+                        Model model) {
+
+                Product product = productService.findById(id);
+                product.getProductImages().forEach(image -> image.setPublicUrl(
+                                storageService.getPublicUrl(image.getStoragePath())));
+
+                List<ProductVariant> variants = productService.findVariantsByProduct(product);
+
+                model.addAttribute("product", product);
+                model.addAttribute("variants", variants);
+
+                model.addAttribute("colors", colorService.findAll());
+                model.addAttribute("sizes", sizeService.findAll());
+                model.addAttribute("categories", categoryService.findAll());
+                model.addAttribute("collections", collectionService.findAll());
+
+                model.addAttribute("activeMenu", "products");
+                model.addAttribute("activeSubmenu", "products-new");
+
+                return "admin/products-new";
         }
 
 }

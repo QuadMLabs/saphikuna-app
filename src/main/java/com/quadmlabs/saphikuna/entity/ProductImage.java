@@ -14,10 +14,7 @@ public class ProductImage {
     private UUID productImageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "productId",
-            nullable = false
-    )
+    @JoinColumn(name = "productId", nullable = false)
     private Product product;
 
     @Column(name = "storagePath")
@@ -28,6 +25,17 @@ public class ProductImage {
 
     @Column(name = "createdAt")
     private OffsetDateTime createdAt;
+
+    @Transient
+    private String publicUrl;
+
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    public void setPublicUrl(String publicUrl) {
+        this.publicUrl = publicUrl;
+    }
 
     public UUID getProductImageId() {
         return productImageId;

@@ -79,9 +79,23 @@ public class ProductServiceImpl implements ProductService {
 
         OffsetDateTime now = OffsetDateTime.now();
 
-        Product product = new Product();
+        Product product;
 
-        product.setProductId(UUID.randomUUID());
+        if (request.getProductId() != null) {
+
+            product = productRepository.findById(request.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Producto no encontrado"));
+
+        } else {
+
+            product = new Product();
+
+            product.setProductId(UUID.randomUUID());
+            product.setCreatedAt(now);
+        }
+
+        // product.setProductId(UUID.randomUUID());
         product.setName(request.getName());
         product.setGeneralPrice(request.getGeneralPrice());
         product.setDescription(request.getDescription());
@@ -115,8 +129,7 @@ public class ProductServiceImpl implements ProductService {
                 id.setProductId(savedProduct.getProductId());
                 id.setCollectionId(collection.getCollectionId());
 
-                ProductCollection productCollection =
-                        new ProductCollection();
+                ProductCollection productCollection = new ProductCollection();
 
                 productCollection.setId(id);
                 productCollection.setProduct(savedProduct);
@@ -133,8 +146,7 @@ public class ProductServiceImpl implements ProductService {
                     "El producto debe tener al menos una variante");
         }
 
-        for (ProductVariantRequest variantRequest :
-                request.getVariants()) {
+        for (ProductVariantRequest variantRequest : request.getVariants()) {
 
             Color color = colorRepository
                     .findById(variantRequest.getColorId())
@@ -171,6 +183,25 @@ public class ProductServiceImpl implements ProductService {
                 variant.setUpdatedAt(now);
 
                 productVariantRepository.save(variant);
+            }
+        }
+
+        List<UUID> existingImageIds = request.getExistingImageIds() != null
+                ? request.getExistingImageIds()
+                : List.of();
+
+        List<ProductImage> existingImages = productImageRepository
+                .findByProductOrderBySortOrderAsc(product);
+
+        for (ProductImage existingImage : existingImages) {
+
+            if (!existingImageIds.contains(
+                    existingImage.getProductImageId())) {
+
+                storageService.delete(
+                        existingImage.getStoragePath());
+
+                productImageRepository.delete(existingImage);
             }
         }
 
@@ -238,5 +269,26 @@ public class ProductServiceImpl implements ProductService {
                 .findFirst()
                 .map(ProductImage::getStoragePath)
                 .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Product findById(UUID productId) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+
+        // Forzar la carga de las relaciones LAZY
+        product.getProductVariants().size();
+        product.getProductCollections().size();
+        product.getProductImages().size();
+
+        return product;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductVariant> findVariantsByProduct(Product product) {
+        return product.getProductVariants();
     }
 }

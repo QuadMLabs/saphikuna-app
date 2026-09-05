@@ -2,6 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const productSaveButton = document.getElementById('productSaveButton');
     //productSaveButton.disabled = true;
+
+    const pathParts = window.location.pathname.split('/');
+    const productId = pathParts.includes('edit')
+        ? pathParts[pathParts.indexOf('edit') - 1]
+        : null;
+
     const productName = document.getElementById('name');
     const productPrice = document.getElementById('price');
     const productStatus = document.getElementById('status');
@@ -303,49 +309,51 @@ document.addEventListener('DOMContentLoaded', () => {
      * VARIANTS TABLE
      * ========================================================= */
 
-    const variantTableContainer =
-        document.querySelector(
-            '.variant-table-container'
-        );
-
-    const variantTableBody =
-        document.getElementById(
-            'variantTableBody'
-        );
-
-    const variantEmptyState =
-        document.querySelector(
-            '.variant-empty-state'
-        );
-
-
-    const variantBasePriceLabel =
-        variantTableContainer?.dataset.basePriceLabel || '';
-
-    const variantEditTitle =
-        variantTableContainer?.dataset.editTitle || '';
-
-    const variantDeleteTitle =
-        variantTableContainer?.dataset.deleteTitle || '';
-
-    const variantAddTitle =
-        variantTableContainer?.dataset.addTitle || '';
-
-    const variantSaveChangesTitle =
-        variantTableContainer?.dataset.saveChangesTitle || '';
-
-
+    const variantTableContainer = document.querySelector('.variant-table-container');
+    const variantTableBody = document.getElementById('variantTableBody');
+    const variantEmptyState = document.querySelector('.variant-empty-state');
+    const variantBasePriceLabel = variantTableContainer?.dataset.basePriceLabel || '';
+    const variantEditTitle = variantTableContainer?.dataset.editTitle || '';
+    const variantDeleteTitle = variantTableContainer?.dataset.deleteTitle || '';
+    const variantAddTitle = variantTableContainer?.dataset.addTitle || '';
+    const variantSaveChangesTitle = variantTableContainer?.dataset.saveChangesTitle || '';
     /*
      * Variants stored in memory
      */
     const variants = [];
 
+    const existingVariantRows = window.existingVariantRows || [];
+    if (existingVariantRows.length > 0) {
+        const groupedVariants = new Map();
+
+        existingVariantRows.forEach(row => {
+            if (!groupedVariants.has(row.colorId)) {
+                groupedVariants.set(row.colorId, {
+                    colorId: row.colorId,
+                    colorName: row.colorName,
+                    sizeIds: [],
+                    sizeNames: [],
+                    stock: row.stock,
+                    differentPrice: row.price !== null,
+                    price: row.price
+                });
+            }
+
+            const variant = groupedVariants.get(row.colorId);
+
+            variant.sizeIds.push(row.sizeId);
+            variant.sizeNames.push(row.sizeName);
+        });
+
+        variants.push(...groupedVariants.values());
+
+        renderVariants();
+    }
     /*
  * =========================================================
  * SAVE BUTTON STATE
  * =========================================================
  */
-
     function setSavingState(isSaving) {
 
         if (!productSaveButton) {
@@ -360,13 +368,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 productCancelButton.disabled = true;
             }
 
-            productSaveButton.dataset.originalContent =
-                productSaveButton.innerHTML;
+            productSaveButton.dataset.originalContent = productSaveButton.innerHTML;
 
-            productSaveButton.innerHTML = `
-            <span class="button-spinner"></span>
-            <span>Guardando...</span>
-        `;
+            productSaveButton.innerHTML = `<span class="button-spinner"></span><span>Guardando...</span>`;
 
         } else {
 
@@ -376,24 +380,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 productCancelButton.disabled = false;
             }
 
-            const originalContent =
-                productSaveButton.dataset.originalContent;
+            const originalContent = productSaveButton.dataset.originalContent;
 
             if (originalContent) {
-                productSaveButton.innerHTML =
-                    originalContent;
+                productSaveButton.innerHTML = originalContent;
             }
         }
     }
-
     /*
  * =========================================================
  * RESET PRODUCT FORM
  * =========================================================
  */
-
     function resetProductForm() {
-
         /*
          * Product fields
          */
@@ -420,39 +419,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (productStatus) {
             productStatus.checked = true;
         }
-
         /*
          * Remove product validation errors
          */
-        const productFields =
-            document.querySelectorAll(
-                '.form-field.has-error'
-            );
+        const productFields = document.querySelectorAll('.form-field.has-error');
 
         productFields.forEach(field => {
             field.classList.remove('has-error');
             removeFieldError(field);
         });
-
         /*
          * Remove images
          */
         if (imagesContainer) {
 
-            const imageItems =
-                imagesContainer.querySelectorAll(
-                    '.product-image-item'
-                );
+            const imageItems = imagesContainer.querySelectorAll('.product-image-item');
 
             imageItems.forEach(imageItem => {
 
-                const image =
-                    imageItem.querySelector('img');
+                const image = imageItem.querySelector('img');
 
-                if (
-                    image &&
-                    image.src.startsWith('blob:')
-                ) {
+                if (image && image.src.startsWith('blob:')) {
                     URL.revokeObjectURL(image.src);
                 }
 
@@ -461,21 +448,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         primaryImageItem = null;
-
         /*
          * Remove variants
          */
         variants.length = 0;
 
         renderVariants();
-
         /*
          * Reset image input
          */
         if (imageInput) {
             imageInput.value = '';
         }
-
         /*
          * Reset variant modal
          */
@@ -492,74 +476,47 @@ document.addEventListener('DOMContentLoaded', () => {
     productSaveButton?.addEventListener(
         'click',
         async () => {
-
             /*
              * Product fields
              */
-            const nameField =
-                productName?.closest('.form-field');
-
-            const priceField =
-                productPrice?.closest('.form-field');
-
-
+            const nameField = productName?.closest('.form-field');
+            const priceField = productPrice?.closest('.form-field');
             /*
              * Clear previous errors
              */
-            nameField?.classList.remove(
-                'has-error'
-            );
-
-            priceField?.classList.remove(
-                'has-error'
-            );
+            nameField?.classList.remove('has-error');
+            priceField?.classList.remove('has-error');
 
             removeFieldError(nameField);
             removeFieldError(priceField);
 
-
             let isValid = true;
-
-
             /*
              * -----------------------------------------------------
              * NAME
              * -----------------------------------------------------
              */
-
             if (!productName?.value.trim()) {
 
-                nameField?.classList.add(
-                    'has-error'
-                );
+                nameField?.classList.add('has-error');
 
                 showFieldError(nameField);
 
                 isValid = false;
             }
-
-
             /*
              * -----------------------------------------------------
              * PRICE
              * -----------------------------------------------------
              */
+            if (productPrice?.value === '' || Number(productPrice.value) < 0) {
 
-            if (
-                productPrice?.value === '' ||
-                Number(productPrice.value) < 0
-            ) {
-
-                priceField?.classList.add(
-                    'has-error'
-                );
+                priceField?.classList.add('has-error');
 
                 showFieldError(priceField);
 
                 isValid = false;
             }
-
-
             /*
              * Stop if product fields are invalid
              */
@@ -573,88 +530,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 return;
             }
-
-
             /*
              * A product must have at least one variant
              */
             if (variants.length === 0) {
 
-                Toast.error(
-                    variantRequiredMessage
-                );
+                Toast.error(variantRequiredMessage);
 
                 return;
             }
-
-
             /*
              * =====================================================
              * BUILD PRODUCT REQUEST
              * =====================================================
              */
-
-            const collectionId =
-                productCollection?.value || null;
-
-
+            const collectionId = productCollection?.value || null;
             const productRequest = {
-
-                name:
-                    productName.value.trim(),
-
-                generalPrice:
-                    Number(productPrice.value),
-
-                description:
-                    productDescription?.value.trim() || null,
-
-                categoryId:
-                    productCategory?.value || null,
-
-                status:
-                    productStatus?.checked
-                        ? 'Activo'
-                        : 'Inactivo',
-
-                collectionIds:
-                    collectionId
-                        ? [collectionId]
-                        : [],
-
-                variants:
-                    variants.map(variant => ({
-
-                        colorId:
-                            variant.colorId,
-
-                        sizeIds:
-                            variant.sizeIds,
-
-                        stock:
-                            variant.stock,
-
-                        differentPrice:
-                            variant.differentPrice,
-
-                        price:
-                            variant.differentPrice
-                                ? variant.price
-                                : null
-                    }))
+                productId,
+                name: productName.value.trim(),
+                generalPrice: Number(productPrice.value),
+                description: productDescription?.value.trim() || null,
+                categoryId: productCategory?.value || null,
+                status: productStatus?.checked ? 'Activo' : 'Inactivo',
+                collectionIds: collectionId ? [collectionId] : [],
+                variants: variants.map(variant => ({
+                    colorId: variant.colorId,
+                    sizeIds: variant.sizeIds,
+                    stock: variant.stock,
+                    differentPrice: variant.differentPrice,
+                    price: variant.differentPrice ? variant.price : null
+                }))
             };
-
-
             /*
              * =====================================================
              * BUILD FORM DATA
              * =====================================================
              */
-
-            const formData =
-                new FormData();
-
-
+            const formData = new FormData();
             /*
              * Product JSON
              */
@@ -671,8 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 )
             );
-
-
             /*
              * Product images
              */
@@ -684,59 +594,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]
                 : [];
 
+            const newImageItems = [];
 
-            imageItems.forEach(
-                imageItem => {
+            const existingImageIds = [];
 
-                    if (!imageItem.file) {
-                        return;
-                    }
+            imageItems.forEach(imageItem => {
 
-                    formData.append(
-                        'images',
-                        imageItem.file
-                    );
+                if (imageItem.file) {
+
+                    newImageItems.push(imageItem);
+
+                    return;
                 }
-            );
 
+                const imageId = imageItem.dataset.productImageId;
 
+                if (imageId) {
+                    existingImageIds.push(imageId);
+                }
+            });
+
+            existingImageIds.forEach(imageId => {
+                formData.append('existingImageIds', imageId);
+            });
+
+            newImageItems.forEach(imageItem => {
+
+                formData.append(
+                    'images',
+                    imageItem.file
+                );
+            });
             /*
              * Primary image index
              */
-            const primaryImage =
-                getPrimaryImageForSave(
-                    imageItems
-                );
-
-
-            let primaryImageIndex = 0;
-
+            const primaryImage = getPrimaryImageForSave(imageItems);
 
             if (primaryImage) {
 
-                const index =
-                    imageItems.indexOf(
-                        primaryImage
+                const existingImageId =
+                    primaryImage.dataset.productImageId;
+
+                if (existingImageId) {
+
+                    formData.append(
+                        'primaryImageId',
+                        existingImageId
                     );
 
-                if (index >= 0) {
-                    primaryImageIndex = index;
+                } else {
+
+                    const newImageIndex =
+                        newImageItems.indexOf(primaryImage);
+
+                    formData.append(
+                        'primaryNewImageIndex',
+                        String(newImageIndex)
+                    );
                 }
             }
-
-
-            formData.append(
-                'primaryImageIndex',
-                String(primaryImageIndex)
-            );
-
-
             /*
              * =====================================================
              * SEND TO BACKEND
              * =====================================================
              */
-
             try {
 
                 setSavingState(true);
@@ -749,84 +670,49 @@ document.addEventListener('DOMContentLoaded', () => {
                             body: formData
                         }
                     );
-
-
                 /*
                  * Backend error
                  */
                 if (!response.ok) {
-
-                    throw new Error(
-                        `HTTP ${response.status}`
-                    );
+                    throw new Error(`HTTP ${response.status}`);
                 }
-
-
                 /*
                  * Product saved successfully
                  */
                 if (savedMessage) {
-
-                    Toast.success(
-                        savedMessage
-                    );
+                    Toast.success(savedMessage);
                 }
 
                 resetProductForm();
 
-
             } catch (error) {
 
-                console.error(
-                    'Error al guardar el producto:',
-                    error
-                );
-
-
+                console.error('Error al guardar el producto:', error);
                 /*
                  * Error message comes from
                  * messages.properties
                  */
                 if (saveErrorMessage) {
-
-                    Toast.error(
-                        saveErrorMessage
-                    );
+                    Toast.error(saveErrorMessage);
                 }
-
-
             } finally {
-
                 setSavingState(false);
             }
         }
     );
-
-
     /*
      * Get primary image specifically for saving
      */
-    function getPrimaryImageForSave(
-        imageItems
-    ) {
+    function getPrimaryImageForSave(imageItems) {
 
         if (!imageItems.length) {
             return null;
         }
 
-
-        const primary =
-            imageItems.find(item =>
-                item.classList.contains(
-                    'is-primary'
-                )
-            );
-
+        const primary = imageItems.find(item => item.classList.contains('is-primary'));
 
         return primary || imageItems[0];
     }
-
-
     /* =========================================================
      * REMOVE NAME ERROR
      * ========================================================= */
@@ -837,70 +723,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (productName.value.trim()) {
 
-                const field =
-                    productName.closest(
-                        '.form-field'
-                    );
+                const field = productName.closest('.form-field');
 
-                field?.classList.remove(
-                    'has-error'
-                );
+                field?.classList.remove('has-error');
 
                 removeFieldError(field);
             }
         }
     );
-
-
     /* =========================================================
      * REMOVE PRICE ERROR
      * ========================================================= */
-
     productPrice?.addEventListener(
         'input',
         () => {
 
-            if (
-                productPrice.value !== '' &&
-                Number(productPrice.value) >= 0
-            ) {
+            if (productPrice.value !== '' && Number(productPrice.value) >= 0) {
 
-                const field =
-                    productPrice.closest(
-                        '.form-field'
-                    );
+                const field = productPrice.closest('.form-field');
 
-                field?.classList.remove(
-                    'has-error'
-                );
+                field?.classList.remove('has-error');
 
                 removeFieldError(field);
             }
         }
     );
-
-
     /* =========================================================
      * VARIANT EDITING INDEX
      * ========================================================= */
 
     let editingVariantIndex = null;
-
-
     /* =========================================================
      * OPEN VARIANT MODAL
      * ========================================================= */
-
-    const addVariantButton =
-        document.querySelector(
-            '.variant-add-button'
-        );
-
+    const addVariantButton = document.querySelector('.variant-add-button');
 
     addVariantButton?.addEventListener(
         'click',
         () => {
-
             editingVariantIndex = null;
 
             resetVariantModal();
@@ -910,40 +770,24 @@ document.addEventListener('DOMContentLoaded', () => {
             openVariantModal();
         }
     );
-
-
     /* =========================================================
      * CLOSE VARIANT MODAL
      * ========================================================= */
 
-    variantModalClose?.addEventListener(
-        'click',
-        closeVariantModal
-    );
+    variantModalClose?.addEventListener('click', closeVariantModal);
 
-    variantModalCancel?.addEventListener(
-        'click',
-        closeVariantModal
-    );
-
-
+    variantModalCancel?.addEventListener('click', closeVariantModal);
     /*
      * Close clicking outside
      */
     variantModal?.addEventListener(
         'click',
         (event) => {
-
-            if (
-                event.target === variantModal
-            ) {
-
+            if (event.target === variantModal) {
                 closeVariantModal();
             }
         }
     );
-
-
     /* =========================================================
      * DIFFERENT PRICE
      * ========================================================= */
@@ -952,24 +796,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'change',
         () => {
 
-            if (
-                variantDifferentPrice.checked
-            ) {
-
-                variantPriceField?.classList.add(
-                    'is-visible'
-                );
-
+            if (variantDifferentPrice.checked) {
+                variantPriceField?.classList.add('is-visible');
             } else {
-
-                variantPriceField?.classList.remove(
-                    'is-visible'
-                );
+                variantPriceField?.classList.remove('is-visible');
             }
         }
     );
-
-
     /* =========================================================
      * SIZE SELECTION
      * ========================================================= */
@@ -981,46 +814,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 'click',
                 () => {
 
-                    button.classList.toggle(
-                        'is-selected'
-                    );
-
-
+                    button.classList.toggle('is-selected');
                     /*
                      * Remove error as soon as
                      * the user selects at least
                      * one size.
                      */
-                    const sizesField =
-                        button.closest(
-                            '.form-field'
-                        );
+                    const sizesField = button.closest('.form-field');
 
+                    const selectedSizes = document.querySelectorAll('.variant-size-option.is-selected');
 
-                    const selectedSizes =
-                        document.querySelectorAll(
-                            '.variant-size-option.is-selected'
-                        );
+                    if (selectedSizes.length > 0) {
 
+                        sizesField?.classList.remove('has-error');
 
-                    if (
-                        selectedSizes.length > 0
-                    ) {
-
-                        sizesField?.classList.remove(
-                            'has-error'
-                        );
-
-                        removeFieldError(
-                            sizesField
-                        );
+                        removeFieldError(sizesField);
                     }
                 }
             );
         }
     );
-
-
     /* =========================================================
      * SAVE VARIANT
      * ========================================================= */
@@ -1029,23 +842,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'click',
         () => {
 
-            if (
-                !variantColor ||
-                !variantStock
-            ) {
+            if (!variantColor || !variantStock) {
                 return;
             }
 
+            const colorField = variantColor.closest('.form-field');
 
-            const colorField =
-                variantColor.closest(
-                    '.form-field'
-                );
-
-            const stockField =
-                variantStock.closest(
-                    '.form-field'
-                );
+            const stockField = variantStock.closest('.form-field');
 
             const sizesField =
                 variantSizeOptions.length > 0
@@ -1053,37 +856,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         .closest('.form-field')
                     : null;
 
-
             const selectedSizes = [
                 ...document.querySelectorAll(
                     '.variant-size-option.is-selected'
                 )
             ];
 
-
             let isValid = true;
-
-
             /*
              * Clear previous errors
              */
-            colorField?.classList.remove(
-                'has-error'
-            );
-
-            stockField?.classList.remove(
-                'has-error'
-            );
-
-            sizesField?.classList.remove(
-                'has-error'
-            );
+            colorField?.classList.remove('has-error');
+            stockField?.classList.remove('has-error');
+            sizesField?.classList.remove('has-error');
 
             removeFieldError(colorField);
             removeFieldError(stockField);
             removeFieldError(sizesField);
-
-
             /*
              * -----------------------------------------------------
              * COLOR
@@ -1092,94 +881,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!variantColor.value) {
 
-                colorField?.classList.add(
-                    'has-error'
-                );
+                colorField?.classList.add('has-error');
 
                 showFieldError(colorField);
 
                 isValid = false;
             }
-
-
             /*
              * -----------------------------------------------------
              * SIZE
              * -----------------------------------------------------
              */
 
-            if (
-                selectedSizes.length === 0
-            ) {
+            if (selectedSizes.length === 0) {
 
-                sizesField?.classList.add(
-                    'has-error'
-                );
+                sizesField?.classList.add('has-error');
 
                 showFieldError(sizesField);
 
                 isValid = false;
             }
-
-
             /*
              * -----------------------------------------------------
              * STOCK
              * -----------------------------------------------------
              */
 
-            if (
-                variantStock.value === '' ||
-                Number(variantStock.value) < 0
-            ) {
+            if (variantStock.value === '' || Number(variantStock.value) < 0) {
 
-                stockField?.classList.add(
-                    'has-error'
-                );
+                stockField?.classList.add('has-error');
 
                 showFieldError(stockField);
 
                 isValid = false;
             }
-
-
             /*
              * -----------------------------------------------------
              * PRICE
              * -----------------------------------------------------
              */
 
-            if (
-                variantDifferentPrice?.checked &&
-                (
-                    variantPrice?.value === '' ||
-                    Number(variantPrice.value) < 0
-                )
-            ) {
+            if (variantDifferentPrice?.checked && (variantPrice?.value === '' || Number(variantPrice.value) < 0)) {
 
-                const priceField =
-                    variantPrice?.closest(
-                        '.form-field'
-                    );
+                const priceField = variantPrice?.closest('.form-field');
 
-                priceField?.classList.add(
-                    'has-error'
-                );
+                priceField?.classList.add('has-error');
 
                 showFieldError(priceField);
 
                 isValid = false;
             }
-
-
             /*
              * Stop if invalid
              */
             if (!isValid) {
                 return;
             }
-
-
             /*
              * -----------------------------------------------------
              * CREATE / UPDATE VARIANT
@@ -1187,153 +944,80 @@ document.addEventListener('DOMContentLoaded', () => {
              */
 
             const variant = {
-
-                colorId:
-                    variantColor.value,
-
-                colorName:
-                    variantColor.options[
-                        variantColor.selectedIndex
-                    ].textContent.trim(),
-
-                sizeIds:
-                    selectedSizes.map(
-                        size => size.value
-                    ),
-
-                sizeNames:
-                    selectedSizes.map(
-                        size =>
-                            size.textContent.trim()
-                    ),
-
-                stock:
-                    Number(
-                        variantStock.value
-                    ),
-
-                differentPrice:
-                    variantDifferentPrice?.checked ??
-                    false,
-
-                price:
-                    variantDifferentPrice?.checked
-                        ? Number(
-                            variantPrice?.value || 0
-                        )
-                        : null
+                colorId: variantColor.value,
+                colorName: variantColor.options[variantColor.selectedIndex].textContent.trim(),
+                sizeIds: selectedSizes.map(size => size.value),
+                sizeNames: selectedSizes.map(size => size.textContent.trim()),
+                stock: Number(variantStock.value),
+                differentPrice: variantDifferentPrice?.checked ?? false,
+                price: variantDifferentPrice?.checked ? Number(variantPrice?.value || 0) : null
             };
-
-
             /*
              * Editing existing variant
              */
-            if (
-                editingVariantIndex !== null &&
-                variants[editingVariantIndex]
-            ) {
-
-                variants[
-                    editingVariantIndex
-                ] = variant;
-
+            if (editingVariantIndex !== null && variants[editingVariantIndex]) {
+                variants[editingVariantIndex] = variant;
             } else {
-
                 /*
                  * Creating new variant
                  */
                 variants.push(variant);
             }
-
-
             /*
              * Render table
              */
             renderVariants();
-
-
             /*
              * Reset modal
              */
             resetVariantModal();
-
-
             /*
              * Return to create mode
              */
             editingVariantIndex = null;
 
             updateVariantModalMode();
-
-
             /*
              * Close modal
              */
             closeVariantModal();
         }
     );
-
-
     /* =========================================================
      * RENDER VARIANTS
      * ========================================================= */
 
     function renderVariants() {
 
-        if (
-            !variantTableBody ||
-            !variantTableContainer ||
-            !variantEmptyState
-        ) {
+        if (!variantTableBody || !variantTableContainer || !variantEmptyState) {
             return;
         }
-
-
         /*
          * Clear current table
          */
         variantTableBody.innerHTML = '';
-
-
         /*
          * No variants
          */
         if (variants.length === 0) {
+            variantTableContainer.classList.remove('is-visible');
 
-            variantTableContainer.classList.remove(
-                'is-visible'
-            );
-
-            variantEmptyState.classList.remove(
-                'is-hidden'
-            );
+            variantEmptyState.classList.remove('is-hidden');
 
             return;
         }
-
-
         /*
          * Show table
          */
-        variantTableContainer.classList.add(
-            'is-visible'
-        );
-
-        variantEmptyState.classList.add(
-            'is-hidden'
-        );
-
-
+        variantTableContainer.classList.add('is-visible');
+        variantEmptyState.classList.add('is-hidden');
         /*
          * Create rows
          */
         variants.forEach(
             (variant, index) => {
 
-                const row =
-                    document.createElement('tr');
-
-
+                const row = document.createElement('tr');
                 const priceText =
                     variant.differentPrice
                         ? Number(
@@ -1341,9 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ).toFixed(2)
                         : variantBasePriceLabel;
 
-
                 row.innerHTML = `
-
                     <td>
                         ${escapeHtml(
                     variant.colorName
@@ -1367,9 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
 
                     <td>
-
                         <div class="variant-actions">
-
                             <button
                                 type="button"
                                 class="variant-action-button variant-edit-button"
@@ -1377,7 +1057,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title="${variantEditTitle}">
 
                                 <i data-lucide="pencil"></i>
-
                             </button>
 
                             <button
@@ -1389,48 +1068,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <i data-lucide="trash-2"></i>
 
                             </button>
-
                         </div>
-
                     </td>
                 `;
-
 
                 variantTableBody.appendChild(row);
             }
         );
-
-
         /*
          * Activate Lucide icons
          */
         lucide.createIcons();
-
-
         /*
          * Bind table actions
          */
         bindVariantActions();
     }
-
-
     /* =========================================================
      * VARIANT TABLE ACTIONS
      * ========================================================= */
 
     function bindVariantActions() {
 
-        const editButtons =
-            variantTableBody?.querySelectorAll(
-                '.variant-edit-button'
-            );
-
-        const deleteButtons =
-            variantTableBody?.querySelectorAll(
-                '.variant-delete-button'
-            );
-
-
+        const editButtons = variantTableBody?.querySelectorAll('.variant-edit-button');
+        const deleteButtons = variantTableBody?.querySelectorAll('.variant-delete-button');
         /*
          * EDIT
          */
@@ -1441,28 +1102,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     'click',
                     () => {
 
-                        const index =
-                            Number(
-                                button.dataset.index
-                            );
+                        const index = Number(button.dataset.index);
 
-
-                        if (
-                            !Number.isInteger(index) ||
-                            index < 0 ||
-                            index >= variants.length
-                        ) {
+                        if (!Number.isInteger(index) || index < 0 || index >= variants.length) {
                             return;
                         }
-
 
                         editVariant(index);
                     }
                 );
             }
         );
-
-
         /*
          * DELETE
          */
@@ -1473,26 +1123,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     'click',
                     () => {
 
-                        const index =
-                            Number(
-                                button.dataset.index
-                            );
+                        const index = Number(button.dataset.index);
 
-
-                        if (
-                            !Number.isInteger(index) ||
-                            index < 0 ||
-                            index >= variants.length
-                        ) {
+                        if (!Number.isInteger(index) || index < 0 || index >= variants.length) {
                             return;
                         }
 
-
-                        variants.splice(
-                            index,
-                            1
-                        );
-
+                        variants.splice(index, 1);
 
                         renderVariants();
                     }
@@ -1500,39 +1137,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
     }
-
-
     /* =========================================================
      * EDIT VARIANT
      * ========================================================= */
 
     function editVariant(index) {
 
-        const variant =
-            variants[index];
-
+        const variant = variants[index];
 
         if (!variant) {
             return;
         }
-
-
         /*
          * Store index being edited
          */
-        editingVariantIndex =
-            index;
-
+        editingVariantIndex = index;
 
         /*
          * Set color
          */
         if (variantColor) {
-
-            variantColor.value =
-                variant.colorId;
+            variantColor.value = variant.colorId;
         }
-
 
         /*
          * Set sizes
@@ -1540,45 +1166,28 @@ document.addEventListener('DOMContentLoaded', () => {
         variantSizeOptions.forEach(
             button => {
 
-                button.classList.remove(
-                    'is-selected'
-                );
+                button.classList.remove('is-selected');
 
+                if (variant.sizeIds.includes(button.value)) {
 
-                if (
-                    variant.sizeIds.includes(
-                        button.value
-                    )
-                ) {
-
-                    button.classList.add(
-                        'is-selected'
-                    );
+                    button.classList.add('is-selected');
                 }
             }
         );
-
-
         /*
          * Set stock
          */
         if (variantStock) {
 
-            variantStock.value =
-                variant.stock;
+            variantStock.value = variant.stock;
         }
-
-
         /*
          * Set different price
          */
         if (variantDifferentPrice) {
 
-            variantDifferentPrice.checked =
-                variant.differentPrice;
+            variantDifferentPrice.checked = variant.differentPrice;
         }
-
-
         /*
          * Set price
          */
@@ -1590,64 +1199,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? variant.price
                     : '';
         }
-
-
         /*
          * Show / hide price field
          */
         if (variantPriceField) {
 
-            if (
-                variant.differentPrice
-            ) {
+            if (variant.differentPrice) {
 
-                variantPriceField.classList.add(
-                    'is-visible'
-                );
+                variantPriceField.classList.add('is-visible');
 
             } else {
 
-                variantPriceField.classList.remove(
-                    'is-visible'
-                );
+                variantPriceField.classList.remove('is-visible');
             }
         }
-
-
         /*
          * Clear validation errors
          */
-        const fields =
-            variantModal?.querySelectorAll(
-                '.form-field'
-            );
-
+        const fields = variantModal?.querySelectorAll('.form-field');
 
         fields?.forEach(
             field => {
-
-                field.classList.remove(
-                    'has-error'
-                );
-
+                field.classList.remove('has-error');
                 removeFieldError(field);
             }
         );
-
-
         /*
          * Change modal to edit mode
          */
         updateVariantModalMode();
-
-
         /*
          * Open modal
          */
         openVariantModal();
     }
-
-
     /* =========================================================
      * UPDATE MODAL MODE
      * ========================================================= */
@@ -1658,198 +1243,121 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const title = variantModal.querySelector('.variant-modal-header h3');
 
-        const title =
-            variantModal.querySelector(
-                '.variant-modal-header h3'
-            );
+        const buttonText = variantModalSave?.querySelector('span');
 
-        const buttonText =
-            variantModalSave?.querySelector(
-                'span'
-            );
-
-
-        if (
-            editingVariantIndex !== null
-        ) {
+        if (editingVariantIndex !== null) {
 
             /*
              * Edit mode
              */
             if (title) {
-
-                title.textContent =
-                    variantEditTitle;
+                title.textContent = variantEditTitle;
             }
 
-
             if (buttonText) {
-
-                buttonText.textContent =
-                    variantSaveChangesTitle;
+                buttonText.textContent = variantSaveChangesTitle;
             }
 
         } else {
-
             /*
              * Create mode
              */
             if (title) {
-
-                title.textContent =
-                    variantAddTitle;
+                title.textContent = variantAddTitle;
             }
 
-
             if (buttonText) {
-
-                buttonText.textContent =
-                    variantAddTitle;
+                buttonText.textContent = variantAddTitle;
             }
         }
     }
-
-
     /* =========================================================
      * RESET VARIANT MODAL
      * ========================================================= */
 
     function resetVariantModal() {
-
         /*
          * Color
          */
         if (variantColor) {
-
             variantColor.value = '';
         }
-
-
         /*
          * Sizes
          */
         variantSizeOptions.forEach(
             button => {
-
-                button.classList.remove(
-                    'is-selected'
-                );
+                button.classList.remove('is-selected');
             }
         );
-
-
         /*
          * Stock
          */
         if (variantStock) {
-
             variantStock.value = '0';
         }
-
-
         /*
          * Different price
          */
         if (variantDifferentPrice) {
-
-            variantDifferentPrice.checked =
-                false;
+            variantDifferentPrice.checked = false;
         }
-
-
         /*
          * Price
          */
         if (variantPrice) {
-
             variantPrice.value = '';
         }
-
-
         /*
          * Hide price field
          */
-        variantPriceField?.classList.remove(
-            'is-visible'
-        );
-
-
+        variantPriceField?.classList.remove('is-visible');
         /*
          * Remove validation errors
          */
-        const fields =
-            variantModal?.querySelectorAll(
-                '.form-field'
-            );
-
+        const fields = variantModal?.querySelectorAll('.form-field');
 
         fields?.forEach(
             field => {
-
-                field.classList.remove(
-                    'has-error'
-                );
-
+                field.classList.remove('has-error');
                 removeFieldError(field);
             }
         );
     }
-
-
     /* =========================================================
      * REMOVE COLOR ERROR
      * ========================================================= */
-
     variantColor?.addEventListener(
         'change',
         () => {
-
             if (variantColor.value) {
 
-                const field =
-                    variantColor.closest(
-                        '.form-field'
-                    );
+                const field = variantColor.closest('.form-field');
 
-                field?.classList.remove(
-                    'has-error'
-                );
+                field?.classList.remove('has-error');
 
                 removeFieldError(field);
             }
         }
     );
-
-
     /* =========================================================
      * REMOVE STOCK ERROR
      * ========================================================= */
-
     variantStock?.addEventListener(
         'input',
         () => {
+            if (variantStock.value !== '' && Number(variantStock.value) >= 0) {
 
-            if (
-                variantStock.value !== '' &&
-                Number(variantStock.value) >= 0
-            ) {
+                const field = variantStock.closest('.form-field');
 
-                const field =
-                    variantStock.closest(
-                        '.form-field'
-                    );
-
-                field?.classList.remove(
-                    'has-error'
-                );
+                field?.classList.remove('has-error');
 
                 removeFieldError(field);
             }
         }
     );
-
-
     /* =========================================================
      * REMOVE PRICE ERROR
      * ========================================================= */
@@ -1858,26 +1366,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'input',
         () => {
 
-            if (
-                variantPrice.value !== '' &&
-                Number(variantPrice.value) >= 0
-            ) {
+            if (variantPrice.value !== '' && Number(variantPrice.value) >= 0) {
 
-                const field =
-                    variantPrice.closest(
-                        '.form-field'
-                    );
+                const field = variantPrice.closest('.form-field');
 
-                field?.classList.remove(
-                    'has-error'
-                );
+                field?.classList.remove('has-error');
 
                 removeFieldError(field);
             }
         }
     );
-
-
     /* =========================================================
      * ESCAPE KEY
      * ========================================================= */
@@ -1886,19 +1384,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'keydown',
         (event) => {
 
-            if (
-                event.key === 'Escape' &&
-                variantModal?.classList.contains(
-                    'is-visible'
-                )
-            ) {
-
+            if (event.key === 'Escape' && variantModal?.classList.contains('is-visible')) {
                 closeVariantModal();
             }
         }
     );
-
-
     /* =========================================================
      * MODAL FUNCTIONS
      * ========================================================= */
@@ -1909,16 +1399,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        variantModal.classList.add('is-visible');
 
-        variantModal.classList.add(
-            'is-visible'
-        );
-
-
-        document.body.style.overflow =
-            'hidden';
+        document.body.style.overflow = 'hidden';
     }
-
 
     function closeVariantModal() {
 
@@ -1926,17 +1410,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        variantModal.classList.remove('is-visible');
 
-        variantModal.classList.remove(
-            'is-visible'
-        );
-
-
-        document.body.style.overflow =
-            '';
+        document.body.style.overflow = '';
     }
-
-
     /* =========================================================
      * VALIDATION HELPERS
      * ========================================================= */
@@ -1946,38 +1423,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!field) {
             return;
         }
-
-
         /*
          * Avoid duplicated messages
          */
         removeFieldError(field);
 
-
-        const message =
-            field.dataset.errorRequired;
-
+        const message = field.dataset.errorRequired;
 
         if (!message) {
             return;
         }
 
+        const error = document.createElement('span');
 
-        const error =
-            document.createElement('span');
+        error.className = 'form-field-error';
 
-
-        error.className =
-            'form-field-error';
-
-
-        error.textContent =
-            message;
-
+        error.textContent = message;
 
         field.appendChild(error);
     }
-
 
     function removeFieldError(field) {
 
@@ -1985,19 +1449,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
         const error =
             field.querySelector(
                 '.form-field-error'
             );
 
-
         if (error) {
             error.remove();
         }
     }
-
-
     /* =========================================================
      * HTML ESCAPE
      * ========================================================= */
@@ -2026,5 +1486,4 @@ document.addEventListener('DOMContentLoaded', () => {
                 '&#039;'
             );
     }
-
 });
