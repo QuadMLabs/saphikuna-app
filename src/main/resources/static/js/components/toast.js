@@ -29,9 +29,7 @@
  */
 
 (function (window) {
-
     'use strict';
-
 
     /* =========================================================
      * CONFIGURATION
@@ -40,27 +38,17 @@
     const DEFAULT_DURATION = 4000;
 
     const TOAST_TYPES = {
-        success: {
-            icon: 'check-circle'
-        },
-        error: {
-            icon: 'circle-alert'
-        },
-        warning: {
-            icon: 'triangle-alert'
-        },
-        info: {
-            icon: 'info'
-        }
+        success: {icon: 'check-circle'},
+        error: {icon: 'circle-alert'},
+        warning: {icon: 'triangle-alert'},
+        info: {icon: 'info'}
     };
-
 
     /* =========================================================
      * CONTAINER
      * ========================================================= */
 
     let toastContainer = null;
-
 
     /*
      * Create toast container only when necessary.
@@ -71,32 +59,14 @@
             return toastContainer;
         }
 
-
-        toastContainer =
-            document.createElement('div');
-
-        toastContainer.className =
-            'app-toast-container';
-
-        toastContainer.setAttribute(
-            'aria-live',
-            'polite'
-        );
-
-        toastContainer.setAttribute(
-            'aria-atomic',
-            'true'
-        );
-
-
-        document.body.appendChild(
-            toastContainer
-        );
-
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'app-toast-container';
+        toastContainer.setAttribute('aria-live', 'polite');
+        toastContainer.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(toastContainer);
 
         return toastContainer;
     }
-
 
     /* =========================================================
      * SHOW TOAST
@@ -107,7 +77,6 @@
         type = 'info',
         options = {}
     ) {
-
         /*
          * Make sure the requested type exists.
          */
@@ -115,173 +84,84 @@
             type = 'info';
         }
 
-
         /*
          * Normalize duration.
          */
-        const duration =
-            typeof options.duration === 'number'
-                ? options.duration
-                : DEFAULT_DURATION;
-
-
-        const container =
-            getContainer();
-
+        const duration = typeof options.duration === 'number' ? options.duration : DEFAULT_DURATION;
+        const container = getContainer();
 
         /* -----------------------------------------------------
          * TOAST
          * ----------------------------------------------------- */
 
-        const toast =
-            document.createElement('div');
-
-        toast.className =
-            `app-toast app-toast-${type}`;
-
-        toast.setAttribute(
-            'role',
-            type === 'error'
-                ? 'alert'
-                : 'status'
-        );
-
+        const toast = document.createElement('div');
+        toast.className = `app-toast app-toast-${type}`;
+        toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
         /* -----------------------------------------------------
          * ICON
          * ----------------------------------------------------- */
 
-        const iconContainer =
-            document.createElement('div');
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'app-toast-icon';
+        iconContainer.setAttribute('aria-hidden', 'true');
 
-        iconContainer.className =
-            'app-toast-icon';
-
-        iconContainer.setAttribute(
-            'aria-hidden',
-            'true'
-        );
-
-
-        const icon =
-            document.createElement('i');
-
-        icon.setAttribute(
-            'data-lucide',
-            TOAST_TYPES[type].icon
-        );
-
+        const icon = document.createElement('i');
+        icon.setAttribute('data-lucide', TOAST_TYPES[type].icon);
 
         iconContainer.appendChild(icon);
-
 
         /* -----------------------------------------------------
          * MESSAGE
          * ----------------------------------------------------- */
 
-        const messageElement =
-            document.createElement('div');
-
-        messageElement.className =
-            'app-toast-message';
-
-        messageElement.textContent =
-            message;
-
+        const messageElement = document.createElement('div');
+        messageElement.className = 'app-toast-message';
+        messageElement.textContent = message;
 
         /* -----------------------------------------------------
          * CLOSE BUTTON
          * ----------------------------------------------------- */
 
-        const closeButton =
-            document.createElement('button');
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'app-toast-close';
+        closeButton.setAttribute('aria-label', 'Cerrar');
+        closeButton.setAttribute('title', 'Cerrar');
 
-        closeButton.type =
-            'button';
-
-        closeButton.className =
-            'app-toast-close';
-
-        closeButton.setAttribute(
-            'aria-label',
-            'Cerrar'
-        );
-
-        closeButton.setAttribute(
-            'title',
-            'Cerrar'
-        );
-
-
-        const closeIcon =
-            document.createElement('i');
-
-        closeIcon.setAttribute(
-            'data-lucide',
-            'x'
-        );
-
-
-        closeButton.appendChild(
-            closeIcon
-        );
-
+        const closeIcon = document.createElement('i');
+        closeIcon.setAttribute('data-lucide', 'x');
+        closeButton.appendChild(closeIcon);
 
         /* -----------------------------------------------------
          * PROGRESS BAR
          * ----------------------------------------------------- */
 
-        const progress =
-            document.createElement('div');
-
-        progress.className =
-            'app-toast-progress';
-
+        const progress = document.createElement('div');
+        progress.className = 'app-toast-progress';
         progress.style.animationDuration = `${duration}ms`;
-
 
         /* -----------------------------------------------------
          * ASSEMBLE TOAST
          * ----------------------------------------------------- */
 
-        toast.appendChild(
-            iconContainer
-        );
+        toast.appendChild(iconContainer);
+        toast.appendChild(messageElement);
+        toast.appendChild(closeButton);
+        toast.appendChild(progress);
 
-        toast.appendChild(
-            messageElement
-        );
-
-        toast.appendChild(
-            closeButton
-        );
-
-        toast.appendChild(
-            progress
-        );
-
-
-        container.appendChild(
-            toast
-        );
-
+        container.appendChild(toast);
 
         /*
          * Activate Lucide icons.
          */
-        if (
-            typeof lucide !== 'undefined' &&
-            typeof lucide.createIcons === 'function'
-        ) {
-
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
             lucide.createIcons({
                 attrs: {
                     'stroke-width': 2
                 }
             });
-
         }
-
 
         /* =====================================================
          * CLOSE LOGIC
@@ -290,81 +170,50 @@
         let timeoutId = null;
         let removeTimeoutId = null;
 
-
         function removeToast() {
 
-            if (
-                toast.classList.contains(
-                    'is-removing'
-                )
-            ) {
+            if (toast.classList.contains('is-removing')) {
                 return;
             }
-
 
             if (timeoutId) {
                 clearTimeout(timeoutId);
             }
 
+            toast.classList.remove('is-visible');
+            toast.classList.add('is-removing');
 
-            toast.classList.remove(
-                'is-visible'
-            );
-
-            toast.classList.add(
-                'is-removing'
-            );
-
-
-            removeTimeoutId =
-                setTimeout(() => {
-
+            removeTimeoutId = setTimeout(() => {
                     toast.remove();
-
                 }, 250);
-
         }
-
 
         function closeToast() {
             removeToast();
         }
 
-
-        closeButton.addEventListener(
-            'click',
-            closeToast
-        );
-
+        closeButton.addEventListener('click', closeToast);
 
         /* =====================================================
          * SHOW ANIMATION
          * ===================================================== */
 
         requestAnimationFrame(() => {
-
             toast.classList.add(
                 'is-visible'
             );
-
         });
-
 
         /* =====================================================
          * AUTO CLOSE
          * ===================================================== */
 
         if (duration > 0) {
-
             timeoutId =
                 setTimeout(() => {
-
                     removeToast();
-
                 }, duration);
-
         }
-
 
         /* =====================================================
          * RETURN CONTROL
@@ -373,9 +222,7 @@
         return {
             close: closeToast
         };
-
     }
-
 
     /* =========================================================
      * SHORTCUTS
@@ -388,9 +235,7 @@
             'success',
             options
         );
-
     }
-
 
     function error(message, options = {}) {
 
@@ -399,9 +244,7 @@
             'error',
             options
         );
-
     }
-
 
     function warning(message, options = {}) {
 
@@ -410,9 +253,7 @@
             'warning',
             options
         );
-
     }
-
 
     function info(message, options = {}) {
 
@@ -421,23 +262,17 @@
             'info',
             options
         );
-
     }
-
 
     /* =========================================================
      * PUBLIC API
      * ========================================================= */
 
     window.Toast = {
-
         show,
         success,
         error,
         warning,
         info
-
     };
-
-
 })(window);

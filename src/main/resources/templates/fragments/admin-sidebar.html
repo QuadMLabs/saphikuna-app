@@ -42,11 +42,11 @@
                 </button>
                 <!-- SUB MENU PRODUCTOS -->
                 <div class="sidebar-submenu">
-                    <a th:href="@{/admin/products}" class="sidebar-submenu-item"
+                    <a th:href="@{/admin/products/list}" class="sidebar-submenu-item"
                         th:classappend="${activeSubmenu == 'products-list'} ? ' is-active' : ''"
                         th:text="#{submenu.products.list}">
                     </a>
-                    <a th:href="@{/admin/products-new}" class="sidebar-submenu-item" 
+                    <a th:href="@{/admin/products/form}" class="sidebar-submenu-item" 
                         th:classappend="${activeSubmenu == 'products-new'} ? ' is-active' : ''"
                         th:text="#{submenu.products.add}">
                     </a>

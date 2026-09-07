@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/admin-head :: head(#{products.title})}"></head>
+<head th:replace="~{fragments/admin-head :: head(title=#{products.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <!-- Solo esta pantalla cargará el CSS de la tabla -->
+        <link rel="stylesheet" th:href="@{/css/components/data-table.css}">
+        <link rel="stylesheet" th:href="@{/css/components/image-zoom.css}">
+    </th:block>
+</head>
 
 <body>
     <div class="admin-layout">
@@ -238,10 +244,12 @@
             <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
         </main>
     </div>
-    <script th:src="@{/js/admin.js}"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_productos})}">
+        <th:block th:fragment="scripts_productos">
+            <script th:src="@{/js/components/data-table.js}"></script>
+            <script th:src="@{/js/components/image-zoom.js}"></script>
+        </th:block>
+    </th:block>
 </body>
 
 </html>

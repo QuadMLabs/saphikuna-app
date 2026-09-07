@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/admin-head :: head(#{products.form.title})}"></head>
-
+<head th:replace="~{fragments/admin-head :: head(title=#{products.form.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/components/toast.css}">
+        <link rel="stylesheet" th:href="@{/css/products/product-form.css}">
+    </th:block>
+</head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
@@ -134,11 +138,7 @@
                                     th:attr="data-primary-label=#{products.form.images.primary}">
                                     <!-- IMÁGENES EXISTENTES -->
                                     <div th:if="${product != null and product.productImages != null}"
-                                        th:each="image : ${product.productImages}" class="product-image-item"
-                                        th:classappend="${image.storagePath == product.primaryImagePath ? ' is-primary' : ''}"
-                                        th:attr="data-product-image-id=${image.productImageId},
-                  data-storage-path=${image.storagePath},
-                  data-sort-order=${image.sortOrder}">
+                                        >
 
                                         <div class="product-image-preview">
                                             <img th:src="${image.publicUrl}" alt="Imagen del producto">
@@ -351,26 +351,13 @@
     <div id="productMessages" th:data-variant-required-message="#{products.form.validation.variants.required}"
         th:data-saved-message="#{products.form.saved}" th:data-save-error-message="#{products.form.save.error}" hidden>
     </div>
-    <script th:src="@{/js/admin.js}"></script>
+    <script th:src="@{/js/sidebar.js}"></script>
+    <script th:src="@{/js/topbar.js}"></script>
     <script th:src="@{/js/toast.js}"></script>
-    <script th:inline="javascript">
-        window.existingVariantRows = [
-            /*[# th:each="variant, stat : ${variants}"]*/
-            {
-                colorId: /*[[${variant.color.colorId}]]*/,
-                colorName: /*[[${variant.color.name}]]*/,
-                sizeId: /*[[${variant.size.sizeId}]]*/,
-                sizeName: /*[[${variant.size.name}]]*/,
-                stock: /*[[${variant.stock}]]*/,
-                price: /*[[${variant.price}]]*/
-        }/*[# th:if="${!stat.last}"]*/,/*[/]*/
-            /*[/]*/
-        ];
-    </script>
+    
     <script th:src="@{/js/product-form.js}"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>

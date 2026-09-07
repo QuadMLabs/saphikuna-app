@@ -56,7 +56,7 @@ public class ProductController {
                 this.storageService = storageService;
         }
 
-        @GetMapping("/products")
+        @GetMapping("/products/list")
         public String products(Model model) {
 
                 List<Product> products = productService.findAll();
@@ -87,10 +87,10 @@ public class ProductController {
                 model.addAttribute("activeMenu", "products");
                 model.addAttribute("activeSubmenu", "products-list");
 
-                return "admin/products";
+                return "admin/products/list";
         }
 
-        @GetMapping("/products-new")
+        @GetMapping("/products/form")
         public String productsNew(Model model) {
 
                 List<Color> colors = colorService.findAll();
@@ -106,7 +106,7 @@ public class ProductController {
                 model.addAttribute("activeMenu", "products");
                 model.addAttribute("activeSubmenu", "products-new");
 
-                return "admin/products-new";
+                return "admin/products/form";
         }
 
         @PostMapping(value = "/products", consumes = "multipart/form-data")
@@ -124,7 +124,7 @@ public class ProductController {
                 return ResponseEntity.ok().build();
         }
 
-        @GetMapping("/products/{id}/edit")
+        @GetMapping("/products/form/{id}/edit")
         public String productsEdit(
                         @PathVariable UUID id,
                         Model model) {
@@ -146,7 +146,7 @@ public class ProductController {
                 model.addAttribute("activeMenu", "products");
                 model.addAttribute("activeSubmenu", "products-new");
 
-                return "admin/products-new";
+                return "admin/products/form";
         }
 
 }
