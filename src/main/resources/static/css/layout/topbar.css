@@ -1,0 +1,163 @@
+/*
+ * Topbar
+ */
+
+.admin-topbar {
+    height: 64px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    position: relative;
+}
+
+.admin-topbar::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+    pointer-events: none;
+}
+
+.topbar-spacer {
+    flex: 1;
+}
+
+/*
+ * User
+ */
+
+.topbar-user {
+    position: relative;
+}
+
+.topbar-user-button {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 6px 8px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: var(--ink);
+
+    font-family: inherit;
+
+    cursor: pointer;
+}
+
+.topbar-user-button:hover {
+    background: #f3f4f6;
+}
+
+.topbar-user-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.topbar-user-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.topbar-user-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.topbar-user-arrow {
+    display: flex;
+    align-items: center;
+}
+
+.topbar-user-arrow svg {
+    width: 16px;
+    height: 16px;
+}
+
+/*
+ * User menu
+ */
+
+.topbar-user-menu {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    right: 0;
+
+    min-width: 180px;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    display: none;
+
+    z-index: 1000;
+}
+
+.topbar-user-menu.is-open {
+    display: block;
+}
+
+.topbar-user-menu-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: var(--ink);
+
+    text-decoration: none;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.topbar-user-menu-item:hover {
+    background: #f3f4f6;
+}
+
+.topbar-user-menu-item svg {
+    width: 17px;
+    height: 17px;
+}
+

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{${'catalog.' + catalog.key() + '.title'}}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+
+                <!-- Encabezado + Nuevo -->
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{${'catalog.' + catalog.key() + '.title'}}"></h1>
+                        <p class="page-subtitle" th:text="#{${'catalog.' + catalog.key() + '.subtitle'}}"></p>
+                    </div>
+                    <a th:href="@{/admin/{key}/new(key=${catalog.key()})}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{${'catalog.' + catalog.key() + '.new'}}"></span>
+                    </a>
+                </div>
+
+                <!-- Mensajes -->
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+
+                <!-- Búsqueda: formulario GET normal -->
+                <form class="catalog-search" method="get" th:action="@{/admin/{key}(key=${catalog.key()})}">
+                    <input type="search" name="q" class="form-input" th:value="${q}" th:placeholder="#{catalog.search.ph}"
+                        th:aria-label="#{common.search}">
+                    <a th:if="${!#strings.isEmpty(q)}" th:href="@{/admin/{key}(key=${catalog.key()})}"
+                        class="secondary-button" th:text="#{common.clear}"></a>
+                    <button type="submit" class="primary-button">
+                        <i data-lucide="search"></i>
+                        <span th:text="#{common.search}"></span>
+                    </button>
+                </form>
+
+                <!-- Vacío -->
+                <div class="list-empty" th:if="${#lists.isEmpty(items)}"
+                    th:text="${#strings.isEmpty(q)} ? #{catalog.empty} : #{catalog.empty.filtered}"></div>
+
+                <!-- Lista: tarjetas en celular, tabla en pantallas grandes -->
+                <div class="catalog-list" th:unless="${#lists.isEmpty(items)}">
+                    <div class="catalog-list-head" aria-hidden="true">
+                        <span th:text="#{catalog.column.name}"></span>
+                        <span th:text="#{catalog.column.detail}"></span>
+                        <span th:text="#{catalog.column.usage}"></span>
+                        <span th:text="#{catalog.column.actions}"></span>
+                    </div>
+
+                    <article class="catalog-row" th:each="item : ${items}">
+                        <!-- Nombre (con muestra del color en Colores) -->
+                        <div class="cat-main">
+                            <span class="cat-swatch" th:if="${catalog.key() == 'colors'}"
+                                th:style="'background:' + ${item.values().get('hex')}"></span>
+                            <a class="cat-name" th:href="@{/admin/{key}/{id}/edit(key=${catalog.key()}, id=${item.id()})}"
+                                th:text="${item.name()}"></a>
+                        </div>
+
+                        <!-- Detalle según el catálogo -->
+                        <div class="cat-detail" th:switch="${catalog.key()}">
+                            <span th:case="'colors'" th:text="${item.values().get('hex')}"></span>
+                            <span th:case="'sizes'"
+                                th:text="#{catalog.order.label} + ': ' + ${item.values().get('sortOrder')}"></span>
+                            <span th:case="*"
+                                th:text="${#strings.isEmpty(item.values().get('description'))} ? '—' : ${item.values().get('description')}"></span>
+                        </div>
+
+                        <!-- Cuántos productos lo usan -->
+                        <div class="cat-usage">
+                            <span class="tag" th:classappend="${item.usage() == 0} ? '' : 'badge-available'"
+                                th:text="#{catalog.usage(${item.usage()})}"></span>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="cat-actions">
+                            <a class="icon-button"
+                                th:href="@{/admin/{key}/{id}/edit(key=${catalog.key()}, id=${item.id()})}"
+                                th:title="#{common.edit}" th:aria-label="#{common.edit}">
+                                <i data-lucide="pencil"></i>
+                            </a>
+
+                            <!-- En uso: no se puede eliminar -->
+                            <button type="button" class="icon-button is-danger" disabled th:if="${item.usage() > 0}"
+                                th:title="#{catalog.delete.inuse.title}" th:aria-label="#{catalog.delete.inuse.title}">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+
+                            <!-- Sin uso: confirmación con <details>, sin JS -->
+                            <details class="row-delete" th:unless="${item.usage() > 0}">
+                                <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                    th:aria-label="#{common.delete}">
+                                    <i data-lucide="trash-2"></i>
+                                </summary>
+                                <form class="row-delete-pop" method="post" data-saving
+                                    th:action="@{/admin/{key}/{id}/delete(key=${catalog.key()}, id=${item.id()})}">
+                                    <p th:text="#{catalog.delete.confirm(${item.name()})}"></p>
+                                    <button type="submit" class="danger-button" data-saving-button
+                                        th:attr="data-saving-text=#{products.deleting}"
+                                        th:text="#{products.delete.confirm.button}"></button>
+                                </form>
+                            </details>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_catalogo})}">
+        <th:block th:fragment="scripts_catalogo">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

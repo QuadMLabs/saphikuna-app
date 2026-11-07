@@ -1,0 +1,85 @@
+/* Administradores y Mi perfil */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    align-items: center;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--primary-border);
+    border-radius: 12px;
+}
+
+.user-row.is-off {
+    opacity: .65;
+}
+
+.user-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.user-login {
+    color: var(--muted);
+    font-size: .88rem;
+}
+
+.user-state {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.user-last {
+    grid-column: 1;
+    color: var(--muted);
+}
+
+.user-actions {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+}
+
+.user-enabled {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.user-enabled input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.user-form {
+    max-width: 640px;
+}
+
+@media (min-width: 768px) {
+    .user-row {
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+    }
+
+    .user-state,
+    .user-last,
+    .user-actions {
+        grid-column: auto;
+        grid-row: auto;
+    }
+}

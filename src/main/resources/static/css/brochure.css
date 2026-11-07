@@ -1,0 +1,135 @@
+/* Catálogo público (/catalogo): pensado primero para el celular */
+:root {
+    --primary: #6C47FF;
+    --primary-dark: #4B2DD0;
+    --soft: #EFEAFF;
+    --ink: #2A2550;
+    --muted: #6B6790;
+    --bg: #F7F5FF;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+}
+
+h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; margin: 0; }
+
+.bro-cover {
+    text-align: center;
+    padding: 36px 20px 30px;
+    background: var(--soft);
+}
+
+.bro-logo { width: min(260px, 70vw); height: auto; }
+.bro-cover h1 { font-size: 2rem; margin-top: 14px; }
+.bro-scope { color: var(--primary); font-family: Georgia, serif; font-size: 1.1rem; margin: 6px 0 0; }
+.bro-tagline { color: var(--muted); margin: 8px 0 0; }
+
+.bro-button, .bro-ask {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+.bro-button:hover, .bro-ask:hover { background: var(--primary-dark); }
+
+.bro-main { max-width: 1100px; margin: 0 auto; padding: 8px 14px 30px; }
+.bro-empty { text-align: center; color: var(--muted); padding: 50px 0; }
+
+.bro-section h2 {
+    margin: 28px 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--primary);
+    font-size: 1.5rem;
+}
+.bro-section h2.is-new { color: var(--primary); }
+
+.bro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.bro-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(42, 37, 80, .08);
+}
+
+.bro-photos {
+    position: relative;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    background: #F4F1FA;
+    aspect-ratio: 3 / 4;
+}
+.bro-photos img {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scroll-snap-align: center;
+}
+.bro-flag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.bro-body { padding: 12px 14px 16px; }
+.bro-body h3 { font-size: 1.15rem; }
+.bro-code { margin: 2px 0 0; color: #8A86A0; font-size: .75rem; letter-spacing: 1px; }
+
+.bro-state { margin: 6px 0 0; font-size: .8rem; font-weight: 700; }
+.bro-state.is-request { color: #8A5A00; }
+.bro-state.is-soldout { color: #B42318; }
+
+.bro-price { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.bro-price b { font-family: Georgia, serif; font-size: 1.3rem; color: var(--primary); }
+.bro-price s { color: #8A86A0; }
+.bro-price em { color: #B42318; font-style: normal; font-size: .8rem; }
+.bro-price small { flex-basis: 100%; color: var(--muted); }
+
+.bro-line { margin: 8px 0 0; font-size: .9rem; color: var(--muted); }
+.bro-line b { color: var(--ink); font-weight: 600; }
+
+.bro-colors { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .88rem; color: var(--muted); }
+.bro-color { display: inline-flex; align-items: center; gap: 5px; }
+.bro-color i { width: 13px; height: 13px; border-radius: 50%; border: 1px solid #B9B5CC; }
+
+.bro-desc { margin: 8px 0 0; font-size: .9rem; color: var(--muted); }
+
+.bro-ask { margin-top: 12px; padding: 9px 18px; font-size: .9rem; }
+
+.bro-footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    background: var(--soft);
+    color: var(--muted);
+}
+.bro-footer h2 { color: var(--ink); margin-bottom: 8px; }
+.bro-footer p { margin: 3px 0; }
+
+@media (min-width: 700px) {
+    .bro-cover h1 { font-size: 2.6rem; }
+    .bro-main { padding: 8px 24px 40px; }
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{${'catalog.' + catalog.key() + (item != null ? '.form.edit' : '.form.new')}}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+
+                <form class="general-form catalog-form" method="post" data-saving
+                    th:action="${item == null} ? @{/admin/{key}(key=${catalog.key()})} : @{/admin/{key}/{id}(key=${catalog.key()}, id=${item.id()})}">
+
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title"
+                                th:text="#{${'catalog.' + catalog.key() + (item != null ? '.form.edit' : '.form.new')}}"></h1>
+                            <p class="general-form-subtitle"
+                                th:text="#{${'catalog.' + catalog.key() + '.form.subtitle'}}"></p>
+                        </div>
+                    </div>
+
+                    <div class="flash flash-error" role="alert" th:if="${!#maps.isEmpty(errors)}"
+                        th:text="#{products.form.validation.summary}"></div>
+
+                    <div class="general-card">
+                        <div class="general-card-body">
+
+                            <div class="form-field" th:each="f : ${fields}"
+                                th:classappend="${errors.containsKey(f.name())} ? 'has-error' : ''">
+
+                                <label th:for="'f-' + ${f.name()}">
+                                    <span th:text="#{${f.labelKey()}}"></span>
+                                    <span class="required-mark" th:if="${f.required()}">*</span>
+                                </label>
+
+                                <th:block th:switch="${f.type().name()}">
+
+                                    <input th:case="'TEXT'" type="text" class="form-input" th:id="'f-' + ${f.name()}"
+                                        th:name="|values[${f.name()}]|" th:value="${catalogForm.values.get(f.name())}"
+                                        th:maxlength="${f.maxLength()}" autocomplete="off">
+
+                                    <textarea th:case="'TEXTAREA'" class="form-input form-textarea" rows="4"
+                                        th:id="'f-' + ${f.name()}" th:name="|values[${f.name()}]|"
+                                        th:maxlength="${f.maxLength()}"
+                                        th:text="${catalogForm.values.get(f.name())}"></textarea>
+
+                                    <input th:case="'COLOR'" type="color" class="color-input" th:id="'f-' + ${f.name()}"
+                                        th:name="|values[${f.name()}]|" th:value="${catalogForm.values.get(f.name())}">
+
+                                    <input th:case="'NUMBER'" type="number" class="form-input" min="0" max="999"
+                                        inputmode="numeric" th:id="'f-' + ${f.name()}" th:name="|values[${f.name()}]|"
+                                        th:value="${catalogForm.values.get(f.name())}">
+                                </th:block>
+
+                                <p class="form-field-hint" th:if="${f.type().name() == 'COLOR'}"
+                                    th:text="#{catalog.hex.hint}"></p>
+                                <p class="form-field-hint" th:if="${f.type().name() == 'NUMBER'}"
+                                    th:text="#{catalog.sortOrder.hint}"></p>
+
+                                <p class="form-field-error" th:if="${errors.containsKey(f.name())}"
+                                    th:text="#{${errors.get(f.name())}}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de guardado siempre visible -->
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/{key}(key=${catalog.key()})}" class="secondary-button"
+                            th:text="#{common.cancel}"></a>
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                    </div>
+                </form>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_catalogo})}">
+        <th:block th:fragment="scripts_catalogo">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

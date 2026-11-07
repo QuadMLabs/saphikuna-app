@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{admins.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/users.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{admins.title}"></h1>
+                        <p class="page-subtitle" th:text="#{admins.subtitle}"></p>
+                    </div>
+                    <a th:href="@{/admin/users/new}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{admins.new}"></span>
+                    </a>
+                </div>
+
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+
+                <div class="user-list">
+                    <article class="user-row" th:each="a : ${admins}" th:classappend="${!a.enabled} ? 'is-off' : ''">
+                        <div class="user-main">
+                            <a class="user-name" th:href="@{/admin/users/{id}/edit(id=${a.adminId})}"
+                                th:text="${a.displayName}"></a>
+                            <span class="user-login" th:text="'@' + ${a.username}"></span>
+                        </div>
+
+                        <div class="user-state">
+                            <span class="tag" th:if="${!a.enabled}" th:text="#{admins.state.disabled}"></span>
+                            <span class="tag badge-soldout" th:if="${a.enabled and a.isLockedAt(now)}"
+                                th:text="#{admins.state.locked}"></span>
+                            <span class="tag badge-available" th:if="${a.enabled and !a.isLockedAt(now)}"
+                                th:text="#{admins.state.active}"></span>
+                            <span class="tag" th:if="${a.adminId == meId}" th:text="#{admins.state.you}"></span>
+                        </div>
+
+                        <div class="user-last">
+                            <small th:if="${a.lastLoginAt != null}"
+                                th:text="#{admins.lastLogin(${#temporals.format(a.lastLoginAt, 'dd/MM/yyyy HH:mm')})}"></small>
+                            <small th:if="${a.lastLoginAt == null}" th:text="#{admins.neverLogged}"></small>
+                        </div>
+
+                        <div class="user-actions">
+                            <a class="icon-button" th:href="@{/admin/users/{id}/edit(id=${a.adminId})}"
+                                th:title="#{common.edit}" th:aria-label="#{common.edit}">
+                                <i data-lucide="pencil"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config"></th:block>
+    </th:block>
+</body>
+
+</html>
