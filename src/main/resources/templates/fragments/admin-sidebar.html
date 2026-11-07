@@ -1,4 +1,7 @@
 <aside class="admin-sidebar" th:fragment="sidebar">
+    <!-- Menú móvil: checkbox oculto + overlay (ver css/layout/mobile.css) -->
+    <input type="checkbox" id="navToggle" class="nav-toggle" aria-hidden="true" tabindex="-1">
+    <label for="navToggle" class="sidebar-overlay" aria-label="Cerrar menú"></label>
     <!-- HEADER -->
     <div class="sidebar-header">
         <div class="sidebar-brand">
@@ -42,11 +45,11 @@
                 </button>
                 <!-- SUB MENU PRODUCTOS -->
                 <div class="sidebar-submenu">
-                    <a th:href="@{/admin/products/list}" class="sidebar-submenu-item"
+                    <a th:href="@{/admin/products}" class="sidebar-submenu-item"
                         th:classappend="${activeSubmenu == 'products-list'} ? ' is-active' : ''"
                         th:text="#{submenu.products.list}">
                     </a>
-                    <a th:href="@{/admin/products/form}" class="sidebar-submenu-item" 
+                    <a th:href="@{/admin/products/new}" class="sidebar-submenu-item" 
                         th:classappend="${activeSubmenu == 'products-new'} ? ' is-active' : ''"
                         th:text="#{submenu.products.add}">
                     </a>

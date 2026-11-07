@@ -3,9 +3,7 @@
 
 <head th:replace="~{fragments/admin-head :: head(title=#{products.title}, additionalStyles=~{::css_exclusivo})}">
     <th:block th:fragment="css_exclusivo">
-        <!-- Solo esta pantalla cargará el CSS de la tabla -->
-        <link rel="stylesheet" th:href="@{/css/components/data-table.css}">
-        <link rel="stylesheet" th:href="@{/css/components/image-zoom.css}">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
     </th:block>
 </head>
 
@@ -19,226 +17,188 @@
             <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
             <!-- Content -->
             <section class="admin-content">
-                <!-- Page header -->
-                <div class="page-header">
-                    <h1 class="page-title" th:text="#{products.title}"></h1>
-                    <p class="page-subtitle" th:text="#{products.subtitle}"></p>
-                </div>
-                <!-- Products table -->
-                <div class="content-surface">
-                    <div class="table-header">
-                        <!-- Show ...records table -->
-                        <div class="table-controls-left">
-                            <div class="table-length">
-                                <label for="pageSize" th:text="#{table.show}"></label>
-                                <select id="pageSize" class="table-select">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                                <span th:text="#{table.records}"></span>
-                            </div>
-                        </div>
-                        <!-- Left elements table -->
-                        <div class="table-controls-right">
-                            <!-- Search table -->
-                            <div class="table-search">
-                                <label for="tableSearch" th:text="#{common.search}"></label>
-                                <div class="table-search-input">
-                                    <i data-lucide="search"></i>
-                                    <input type="search" id="tableSearch" th:placeholder="#{table.search.placeholder}">
-                                </div>
-                            </div>
-                            <!-- Filter table -->
-                            <button type="button" id="toggleTableFilters" class="secondary-button">
-                                <i data-lucide="sliders-horizontal"></i>
-                                <span th:text="#{table.filters}"></span>
-                            </button>
-                            <!-- Add product table -->
-                            <a th:href="@{/admin/products-new}" class="primary-button">
-                                <i data-lucide="plus"></i>
-                                <span th:text="#{products.new}"></span>
-                            </a>
-                        </div>
+
+                <!-- Header -->
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{products.title}"></h1>
+                        <p class="page-subtitle" th:text="#{products.subtitle}"></p>
                     </div>
-                    <!-- FILTERS TABLE -->
-                    <div class="table-filter-panel">
-                        <div class="table-filter-fields">
-                            <!-- Category filter -->
-                            <div class="table-filter-field">
-                                <label for="filterCategory" th:text="#{products.category}"></label>
-                                <select id="filterCategory" class="table-filter-select" data-filter-column="category">
-                                    <option value="">Todas</option>
-                                    <option th:each="category : ${categories}" th:value="${category.name}"
-                                        th:text="${category.name}">
-                                    </option>
-                                </select>
-                            </div>
-                            <!-- Collection filter -->
-                            <div class="table-filter-field">
-                                <label for="filterCategory" th:text="#{products.collection}"></label>
-                                <select id="filterCollection" class="table-filter-select"
-                                    data-filter-column="collection">
-                                    <option value="">Todas</option>
-                                    <option th:each="collection : ${collections}" th:value="${collection.name}"
-                                        th:text="${collection.name}">
-                                    </option>
-                                </select>
-                            </div>
-                            <!-- Size filter -->
-                            <div class="table-filter-field">
-                                <label for="filterTags" th:text="#{products.size}"></label>
-                                <div class="table-multi-filter" id="filterTags" data-filter-column="tags"
-                                    data-filter-match="multi">
-                                    <button type="button" class="table-multi-filter-button">
-                                        <span class="table-multi-filter-label" th:text="#{common.all}"></span>
-                                        <i data-lucide="chevron-down"></i>
-                                    </button>
-                                    <div class="table-multi-filter-options">
-                                        <label class="table-multi-filter-option" th:each="size : ${sizes}">
-                                            <input type="checkbox" th:value="${size.name}">
-                                            <span th:text="${size.name}"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Status filter -->
-                            <div class="table-filter-field">
-                                <label for="filterStatus" th:text="#{products.status}"></label>
-                                <select id="filterStatus" class="table-filter-select" data-filter-column="status">
-                                    <option value="">Todos</option>
-                                    <option value="Activo">Activo</option>
-                                    <option value="Inactivo">Inactivo</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Clear filter -->
-                        <button type="button" id="clearTableFilters" class="secondary-button">
-                            <i data-lucide="rotate-ccw"></i>
-                            <span th:text="#{common.clear}"></span>
+                    <a th:href="@{/admin/products/new}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{products.new}"></span>
+                    </a>
+                </div>
+
+                <!-- Mensajes -->
+                <div class="flash flash-success" role="status" th:if="${flashMessage != null}"
+                    th:text="#{${flashMessage}}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}"
+                    th:text="#{${flashError}}"></div>
+
+                <!-- Filtros: formulario GET normal -->
+                <form class="filter-bar" method="get" th:action="@{/admin/products}">
+                    <div class="filter-search">
+                        <input type="search" name="q" class="form-input" th:value="${q}"
+                            th:placeholder="#{products.filter.search.ph}" th:aria-label="#{common.search}">
+                    </div>
+                    <select name="categoryId" class="form-select" th:aria-label="#{products.category}">
+                        <option value="" th:text="#{products.filter.category.all}"></option>
+                        <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.name}"
+                            th:selected="${c.categoryId.toString() == categoryId}"></option>
+                    </select>
+                    <select name="collectionId" class="form-select" th:aria-label="#{products.collection}">
+                        <option value="" th:text="#{products.filter.collection.all}"></option>
+                        <option th:each="c : ${collections}" th:value="${c.collectionId}" th:text="${c.name}"
+                            th:selected="${c.collectionId.toString() == collectionId}"></option>
+                    </select>
+                    <select name="availability" class="form-select" th:aria-label="#{products.availability}">
+                        <option value="" th:text="#{products.filter.availability.all}"></option>
+                        <option th:each="a : ${T(java.util.List).of('Disponible', 'Agotado', 'Bajo pedido')}"
+                            th:value="${a}" th:text="${a}" th:selected="${a == availability}"></option>
+                    </select>
+                    <select name="status" class="form-select" th:aria-label="#{products.status}">
+                        <option value="" th:text="#{products.filter.status.all}"></option>
+                        <option value="Activo" th:selected="${status == 'Activo'}" th:text="#{products.status.visible}">
+                        </option>
+                        <option value="Inactivo" th:selected="${status == 'Inactivo'}"
+                            th:text="#{products.status.hidden}"></option>
+                    </select>
+                    <div class="filter-actions">
+                        <a th:if="${hasFilters}" th:href="@{/admin/products}" class="secondary-button"
+                            th:text="#{common.clear}"></a>
+                        <button type="submit" class="primary-button">
+                            <i data-lucide="search"></i>
+                            <span th:text="#{common.search}"></span>
                         </button>
                     </div>
-                    <!-- DATA TABLE-->
-                    <div class="table-container">
-                        <table class="data-table"
-                            th:attr="data-empty-message=#{products.table.empty}, data-empty-filtered-message=#{products.table.empty.filtered}">
-                            <thead>
-                                <tr>
-                                    <th th:text="#{products.table.column.image}" data-column-type="image"></th>
-                                    <th th:text="#{products.table.column.name}" data-column-type="text"></th>
-                                    <th th:text="#{products.table.column.category}" data-column-type="category"></th>
-                                    <th th:text="#{products.table.column.collection}" data-column-type="collection">
-                                    </th>
-                                    <th th:text="#{products.table.column.colors}" data-column-type="colors"></th>
-                                    <th th:text="#{products.table.column.sizes}" data-column-type="tags"></th>
-                                    <th th:text="#{products.table.column.price}" data-column-type="currency"></th>
-                                    <th th:text="#{products.table.column.status}" data-column-type="status"></th>
-                                    <th th:text="#{products.table.column.actions}" data-column-type="actions"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="product : ${products}">
-                                    <!-- Imagen -->
-                                    <td data-column-type="image">
-                                        <button type="button" class="table-thumbnail-button"
-                                            th:title="#{products.table.column.image.show}">
-                                            <img th:if="${product.primaryImagePath != null and !product.primaryImagePath.isBlank()}"
-                                                th:src="${product.primaryImagePath}" th:alt="${product.name}"
-                                                class="table-thumbnail">
-                                            <i th:unless="${product.primaryImagePath != null and !product.primaryImagePath.isBlank()}"
-                                                data-lucide="image-off" class="table-thumbnail-placeholder">
-                                            </i>
-                                        </button>
-                                    </td>
-                                    <!-- Producto -->
-                                    <td data-column-type="text" th:text="${product.name}"></td>
-                                    <!-- Categoría -->
-                                    <td data-column-type="category"
-                                        th:text="${product.category != null ? product.category.name : '—'}"></td>
-                                    <!-- Coleccion -->
-                                    <td data-column-type="collection">
-                                        <span th:if="${#lists.isEmpty(product.productCollections)}">—</span>
-                                        <span th:each="productCollection : ${product.productCollections}"
-                                            class="table-tag" th:text="${productCollection.collection.name}">
-                                        </span>
-                                    </td>
-                                    <!-- Colores -->
-                                    <td data-column-type="colors">
-                                        <div class="table-colors">
+                </form>
 
-                                            <span th:each="color : ${product.colors}" class="table-color"
-                                                th:title="${color.name}"
-                                                th:style="'background-color: ' + ${color.hexCode}">
-                                            </span>
+                <!-- Vacío -->
+                <div class="list-empty" th:if="${products.empty}"
+                    th:text="${hasFilters} ? #{products.table.empty.filtered} : #{products.table.empty}"></div>
 
-                                        </div>
-                                    </td>
-                                    <!-- Tallas -->
-                                    <td data-column-type="tags">
-                                        <div class="table-tags">
-                                            <span th:each="size : ${product.sizes}" class="table-tag" th:text="${size}">
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <!-- Precio -->
-                                    <td data-column-type="currency" th:text="${product.generalPrice}"></td>
-                                    <!-- Estado -->
-                                    <td data-column-type="status">
-                                        <span
-                                            th:class="'status-badge ' + (${product.status == 'Activo'} ? 'status-active' : 'status-inactive')"
-                                            th:text="${product.status}">
-                                        </span>
-                                    </td>
-                                    <!-- Acciones -->
-                                    <td data-column-type="actions" class="table-actions">
-                                        <button type="button" class="table-action-button" th:title="#{common.edit}">
-                                            <i data-lucide="pencil"></i>
-                                        </button>
-                                        <button type="button" class="table-action-button" th:title="#{common.delete}">
-                                            <i data-lucide="trash-2"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <!-- RESULTADOS NULOS -->
-                                <tr id="tableEmptyState" class="table-empty-state" style="display: none;">
-                                    <td colspan="100%">
-                                        <div class="table-empty-message">
-                                            <i data-lucide="inbox"></i>
-                                            <span id="tableEmptyMessage"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Lista: tarjetas en celular, tabla en pantallas grandes -->
+                <div class="product-list" th:unless="${products.empty}">
+                    <div class="product-list-head" aria-hidden="true">
+                        <span></span>
+                        <span th:text="#{products.table.column.name}"></span>
+                        <span th:text="#{products.table.column.colors}"></span>
+                        <span th:text="#{products.table.column.sizes}"></span>
+                        <span th:text="#{products.table.column.price}"></span>
+                        <span th:text="#{products.table.column.status}"></span>
+                        <span th:text="#{products.table.column.actions}"></span>
                     </div>
-                    <div class="table-footer">
-                        <div class="table-info">
-                            <span th:text="#{table.showing}">Mostrando</span>
-                            <span id="tableVisibleCount">10</span>
-                            <span th:text="#{table.of}">de</span>
-                            <span id="tableTotalCount">12</span>
-                            <span th:text="#{table.items}">elementos</span>
+
+                    <article class="product-row" th:each="product : ${products.content}">
+                        <!-- Foto principal: miniatura; al tocarla se abre ampliada (popover nativo, sin JS) -->
+                        <div class="pr-thumb">
+                            <th:block th:if="${thumbs.containsKey(product.productId)}">
+                                <button type="button" class="pr-thumb-btn" th:attr="popovertarget='photo-' + ${product.productId}"
+                                    th:title="#{products.table.column.image.show}"
+                                    th:aria-label="#{products.table.column.image.show}">
+                                    <img th:src="${thumbs.get(product.productId)}" alt="" loading="lazy">
+                                </button>
+                                <div class="image-popover" popover th:id="'photo-' + ${product.productId}">
+                                    <img th:src="${fulls.get(product.productId)}" th:alt="${product.name}" loading="lazy">
+                                    <p class="image-popover-caption" th:text="${product.name}"></p>
+                                    <button type="button" class="image-popover-close"
+                                        th:attr="popovertarget='photo-' + ${product.productId},popovertargetaction='hide'"
+                                        th:aria-label="#{common.close}">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                                    </button>
+                                </div>
+                            </th:block>
+                            <span class="pr-thumb-empty" th:unless="${thumbs.containsKey(product.productId)}">
+                                <i data-lucide="image-off"></i>
+                            </span>
                         </div>
-                        <div class="table-pagination">
-                            <button type="button" class="pagination-button" data-page="previous"
-                                th:attr="aria-label=#{table.pagination.previous}">
-                                <i data-lucide="chevron-left"></i>
-                            </button>
-                            <div id="paginationPages"></div>
-                            <button type="button" class="pagination-button" data-page="next"
-                                th:attr="aria-label=#{table.pagination.next}">
-                                <i data-lucide="chevron-right"></i>
-                            </button>
+
+                        <!-- Nombre, código, categoría -->
+                        <div class="pr-main">
+                            <a class="pr-name" th:href="@{/admin/products/{id}/edit(id=${product.productId})}"
+                                th:text="${product.name}"></a>
+                            <span class="pr-sub">
+                                <span th:if="${product.code != null}" th:text="${product.code}"></span>
+                                <span th:if="${product.code != null and product.category != null}"> · </span>
+                                <span th:if="${product.category != null}" th:text="${product.category.name}"></span>
+                                <span th:each="pc : ${product.productCollections}"> · <span
+                                        th:text="${pc.collection.name}"></span></span>
+                            </span>
                         </div>
-                    </div>
+
+                        <!-- Colores y tallas (columnas separadas en pantallas grandes) -->
+                        <div class="pr-attrs">
+                            <div class="pr-colors">
+                                <span class="color-dot" th:each="pcolor : ${product.productColors}"
+                                    th:title="${pcolor.color.name}"
+                                    th:style="'background:' + ${pcolor.color.hexCode}"></span>
+                                <span class="muted pr-none" th:if="${#lists.isEmpty(product.productColors)}">—</span>
+                            </div>
+                            <div class="pr-sizes">
+                                <span class="tag" th:each="ps : ${product.productSizes}"
+                                    th:text="${ps.size.name}"></span>
+                                <span class="muted pr-none" th:if="${#lists.isEmpty(product.productSizes)}">—</span>
+                            </div>
+                        </div>
+
+                        <!-- Precio -->
+                        <div class="pr-price">
+                            <s th:if="${product.hasDiscount()}"
+                                th:text="'$' + ${#numbers.formatDecimal(product.generalPrice, 1, 'COMMA', 2, 'POINT')}"></s>
+                            <span
+                                th:text="'$' + ${#numbers.formatDecimal(product.finalPrice, 1, 'COMMA', 2, 'POINT')}"></span>
+                            <span class="tag badge-request" th:if="${product.hasDiscount()}"
+                                th:text="'-' + ${#numbers.formatDecimal(product.discountPercent, 1, 0)} + '%'"></span>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="pr-state">
+                            <span class="tag"
+                                th:classappend="${product.availability == 'Disponible'} ? 'badge-available' : (${product.availability == 'Agotado'} ? 'badge-soldout' : 'badge-request')"
+                                th:text="${product.availability}"></span>
+                            <span class="tag" th:unless="${product.active}" th:text="#{products.status.hidden}"></span>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="pr-actions">
+                            <a class="icon-button" th:href="@{/admin/products/{id}/edit(id=${product.productId})}"
+                                th:title="#{common.edit}" th:aria-label="#{common.edit}">
+                                <i data-lucide="pencil"></i>
+                            </a>
+                            <details class="row-delete">
+                                <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                    th:aria-label="#{common.delete}">
+                                    <i data-lucide="trash-2"></i>
+                                </summary>
+                                <form class="row-delete-pop" method="post" data-saving
+                                    th:action="@{/admin/products/{id}/delete(id=${product.productId})}">
+                                    <p th:text="#{products.delete.confirm(${product.name})}"></p>
+                                    <button type="submit" class="danger-button" data-saving-button
+                                        th:attr="data-saving-text=#{products.deleting}"
+                                        th:text="#{products.delete.confirm.button}"></button>
+                                </form>
+                            </details>
+                        </div>
+                    </article>
                 </div>
-                <div id="imageModal" class="image-modal">
-                    <button type="button" id="imageModalClose" class="image-modal-close" aria-label="Cerrar">
-                        <i data-lucide="x"></i>
-                    </button>
-                    <img id="imageModalImage" class="image-modal-image" src="" alt="">
-                </div>
+
+                <!-- Paginación -->
+                <nav class="pager" th:if="${products.totalPages > 1}" aria-label="Paginación">
+                    <a th:if="${products.hasPrevious()}"
+                        th:href="@{/admin/products(page=${products.number - 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability})}"
+                        th:text="#{table.pagination.previous}"></a>
+                    <span class="is-disabled" th:unless="${products.hasPrevious()}"
+                        th:text="#{table.pagination.previous}"></span>
+
+                    <span th:text="#{products.pager(${products.number + 1}, ${products.totalPages})}"></span>
+
+                    <a th:if="${products.hasNext()}"
+                        th:href="@{/admin/products(page=${products.number + 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability})}"
+                        th:text="#{table.pagination.next}"></a>
+                    <span class="is-disabled" th:unless="${products.hasNext()}"
+                        th:text="#{table.pagination.next}"></span>
+                </nav>
             </section>
             <!-- Footer -->
             <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
@@ -246,8 +206,7 @@
     </div>
     <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_productos})}">
         <th:block th:fragment="scripts_productos">
-            <script th:src="@{/js/components/data-table.js}"></script>
-            <script th:src="@{/js/components/image-zoom.js}"></script>
+            <script th:src="@{/js/form-saving.js}"></script>
         </th:block>
     </th:block>
 </body>

@@ -1,0 +1,108 @@
+/*
+ * Navegación móvil (sin JavaScript).
+ * El menú se abre con un checkbox oculto (#navToggle) y un <label> en la barra superior.
+ */
+
+.nav-toggle {
+    display: none;
+}
+
+.topbar-menu-button {
+    display: none;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
+@media (max-width: 900px) {
+
+    .admin-layout {
+        display: block;
+    }
+
+    .admin-main {
+        min-height: 100vh;
+        padding: 10px;
+    }
+
+    .admin-content {
+        padding: 16px 0 8px;
+    }
+
+    .admin-topbar {
+        padding: 0 12px;
+    }
+
+    .topbar-menu-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 44px;
+        height: 44px;
+
+        margin-right: 8px;
+
+        border-radius: 8px;
+
+        color: #4b465c;
+        cursor: pointer;
+    }
+
+    .topbar-menu-button:active {
+        background: #f3f4f6;
+    }
+
+    .topbar-user-name,
+    .topbar-user-arrow {
+        display: none;
+    }
+
+    /* El sidebar pasa a ser un panel que se desliza */
+    .admin-sidebar,
+    .admin-sidebar.is-collapsed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        width: 280px;
+        min-width: 0;
+        max-width: 85vw;
+        height: 100%;
+
+        z-index: 50;
+
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+
+        overflow-y: auto;
+    }
+
+    .admin-sidebar:has(.nav-toggle:checked) {
+        transform: none;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .admin-sidebar:has(.nav-toggle:checked) .sidebar-overlay {
+        display: block;
+
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: min(280px, 85vw);
+        right: 0;
+
+        background: rgba(30, 27, 46, 0.45);
+    }
+
+    /* Colapsar el sidebar no tiene sentido en móvil */
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .admin-sidebar.is-collapsed .sidebar-brand-name {
+        display: inline;
+    }
+}

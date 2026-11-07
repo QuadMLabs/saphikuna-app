@@ -1,0 +1,1197 @@
+/*
+ * Productos: listado y formulario.
+ * Diseño mobile-first: una columna en celular, dos en pantallas grandes.
+ * No requiere JavaScript.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Utilidades                                                          */
+/* ------------------------------------------------------------------ */
+
+.flash {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.flash-success {
+    background: #e8f7ee;
+    border-color: #c7ebd3;
+    color: #1e7e34;
+}
+
+.flash-error {
+    background: #fdecec;
+    border-color: #f5c6c6;
+    color: #b42318;
+}
+
+.page-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.page-header-row .page-header {
+    margin: 0;
+}
+
+a.primary-button,
+a.secondary-button {
+    text-decoration: none;
+}
+
+.danger-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    min-height: 40px;
+    padding: 0 14px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #dc3545;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.danger-button:hover {
+    opacity: 0.9;
+}
+
+.muted {
+    color: #8a8797;
+}
+
+/* ------------------------------------------------------------------ */
+/* Chips (checkbox / radio con aspecto de botón)                       */
+/* ------------------------------------------------------------------ */
+
+.chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    position: relative;
+    display: inline-flex;
+}
+
+.chip input {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    opacity: 0;
+    cursor: pointer;
+}
+
+.chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 44px;
+    padding: 0 16px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    font-size: 14px;
+    line-height: 1;
+}
+
+.chip input:checked + span {
+    border-color: #7367f0;
+    background: rgba(115, 103, 240, 0.12);
+    color: #4b3fd1;
+    font-weight: 600;
+}
+
+.chip input:focus-visible + span {
+    outline: 2px solid #7367f0;
+    outline-offset: 2px;
+}
+
+.color-dot {
+    display: inline-block;
+
+    width: 16px;
+    height: 16px;
+
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 50%;
+
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Listado                                                             */
+/* ------------------------------------------------------------------ */
+
+.filter-bar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+
+    margin-bottom: 16px;
+    padding: 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+.filter-bar .form-input,
+.filter-bar .form-select {
+    height: 44px;
+    font-size: 16px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-actions .primary-button,
+.filter-actions .secondary-button {
+    flex: 1;
+    justify-content: center;
+    height: 44px;
+}
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-list-head {
+    display: none;
+}
+
+.product-row {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    grid-template-areas:
+        "thumb main  actions"
+        "thumb attrs attrs"
+        "price state state";
+    gap: 8px 12px;
+    align-items: center;
+
+    padding: 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+.pr-thumb {
+    grid-area: thumb;
+    align-self: start;
+
+    width: 72px;
+    height: 72px;
+
+    border-radius: 8px;
+    background: #f3f2f7;
+
+    overflow: hidden;
+}
+
+.pr-thumb img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.pr-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    color: #b5b2c0;
+}
+
+.pr-main {
+    grid-area: main;
+    min-width: 0;
+}
+
+.pr-name {
+    display: block;
+
+    color: #4b465c;
+
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    overflow-wrap: anywhere;
+}
+
+.pr-name:hover {
+    color: #7367f0;
+}
+
+.pr-sub {
+    display: block;
+    margin-top: 2px;
+
+    color: #8a8797;
+    font-size: 12px;
+}
+
+.pr-attrs {
+    grid-area: attrs;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+}
+
+.pr-colors,
+.pr-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+/* En celular no se muestra el guion de "sin datos" */
+.pr-none {
+    display: none;
+}
+
+.pr-price {
+    grid-area: price;
+
+    font-size: 15px;
+    font-weight: 600;
+    color: #4b465c;
+}
+
+.pr-price s {
+    display: block;
+
+    color: #a8aaae;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.pr-state {
+    grid-area: state;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.pr-actions {
+    grid-area: actions;
+
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 3px 9px;
+
+    border-radius: 999px;
+
+    background: #f1f0f6;
+    color: #6f6b7d;
+
+    font-size: 12px;
+}
+
+.badge-available {
+    background: #e8f7ee;
+    color: #1e7e34;
+}
+
+.badge-soldout {
+    background: #fdecec;
+    color: #b42318;
+}
+
+.badge-request {
+    background: #fff4e0;
+    color: #a15c00;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #6f6b7d;
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.icon-button::-webkit-details-marker {
+    display: none;
+}
+
+.icon-button:hover {
+    background: #f3f4f6;
+}
+
+.icon-button.is-danger {
+    color: #dc3545;
+}
+
+/* Confirmación de borrado con <details> (sin JS) */
+.row-delete {
+    position: relative;
+}
+
+.row-delete summary {
+    list-style: none;
+}
+
+.row-delete-pop {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+
+    width: 230px;
+    padding: 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+
+    font-size: 13px;
+    color: #4b465c;
+}
+
+.row-delete-pop p {
+    margin: 0 0 10px;
+}
+
+.row-delete-pop .danger-button {
+    width: 100%;
+}
+
+.list-empty {
+    padding: 40px 16px;
+
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #8a8797;
+
+    text-align: center;
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 16px;
+
+    font-size: 14px;
+    color: #6f6b7d;
+}
+
+.pager a,
+.pager span.is-disabled {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 44px;
+    padding: 0 16px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #4b465c;
+
+    text-decoration: none;
+}
+
+.pager span.is-disabled {
+    opacity: 0.45;
+}
+
+@media (min-width: 640px) {
+    .filter-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-bar .filter-search,
+    .filter-bar .filter-actions {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 1180px) {
+
+    .filter-bar {
+        grid-template-columns: 2fr repeat(4, 1fr);
+        align-items: center;
+    }
+
+    .filter-bar .filter-search {
+        grid-column: auto;
+    }
+
+    .filter-bar .filter-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+    }
+
+    .filter-actions .primary-button,
+    .filter-actions .secondary-button {
+        flex: 0 0 auto;
+    }
+}
+
+/* Tabla solo cuando hay ancho de sobra (el menú lateral ocupa 260px) */
+@media (min-width: 1180px) {
+
+    .product-list {
+        gap: 0;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+
+        background: #ffffff;
+        overflow: visible;
+    }
+
+    .product-list-head,
+    .product-row {
+        grid-template-columns: 72px minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.9fr) 120px 170px 100px;
+        grid-template-areas: "thumb main colors sizes price state actions";
+        gap: 16px;
+    }
+
+    /* Colores y tallas pasan a ser columnas propias */
+    .pr-attrs {
+        display: contents;
+    }
+
+    .pr-colors {
+        grid-area: colors;
+    }
+
+    .pr-sizes {
+        grid-area: sizes;
+    }
+
+    .pr-none {
+        display: inline;
+    }
+
+    .product-list-head {
+        display: grid;
+
+        padding: 12px 16px;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        color: #8a8797;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .product-row {
+        padding: 12px 16px;
+
+        border: none;
+        border-bottom: 1px solid #f0f0f4;
+        border-radius: 0;
+    }
+
+    .product-row:last-child {
+        border-bottom: none;
+    }
+
+    .pr-thumb {
+        align-self: center;
+        width: 56px;
+        height: 56px;
+    }
+
+    .pr-state {
+        justify-content: flex-start;
+    }
+
+    .pr-actions {
+        justify-content: flex-end;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Formulario                                                          */
+/* ------------------------------------------------------------------ */
+
+.product-form .form-input,
+.product-form .form-select {
+    height: 44px;
+    font-size: 16px;
+}
+
+.product-form .form-textarea {
+    height: auto;
+    min-height: 120px;
+}
+
+.product-form .form-field-error {
+    display: block;
+}
+
+.product-form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-col {
+    display: contents;
+}
+
+.card-photos { order: 1; }
+.card-info   { order: 2; }
+.card-price  { order: 3; }
+.card-colors { order: 4; }
+.card-sizes  { order: 5; }
+.card-org    { order: 6; }
+.card-specs  { order: 7; }
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.field-row > .form-field {
+    margin-bottom: 0;
+}
+
+.field-hint {
+    margin: 0 0 12px;
+
+    font-size: 13px;
+    color: #8a8797;
+}
+
+.field-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b465c;
+}
+
+.field-block {
+    margin-bottom: 18px;
+}
+
+.field-block:last-child {
+    margin-bottom: 0;
+}
+
+/* Fotos */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+
+    margin-bottom: 16px;
+}
+
+.photo-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.photo-card img {
+    display: block;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    object-fit: cover;
+}
+
+
+
+
+.file-input {
+    width: 100%;
+
+    padding: 10px;
+
+    border: 2px dashed #cfcbe0;
+    border-radius: 8px;
+
+    background: #faf9fd;
+    color: #4b465c;
+
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.file-input::file-selector-button {
+    min-height: 44px;
+    margin-right: 12px;
+    padding: 0 16px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #7367f0;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+/* Tallas */
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.size-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.size-cell .chip {
+    display: flex;
+}
+
+.size-cell .chip span {
+    flex: 1;
+    justify-content: center;
+}
+
+.size-cell .form-input {
+    height: 40px;
+    font-size: 14px;
+}
+
+/* Especificaciones */
+.spec-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid #f0f0f4;
+}
+
+.spec-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+
+    border-bottom: none;
+}
+
+/* Barra de guardado fija abajo */
+.form-actions-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+
+    margin: 20px -10px -8px;
+    padding: 12px 10px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: rgba(248, 247, 250, 0.96);
+    backdrop-filter: blur(6px);
+}
+
+.form-actions-bar .primary-button,
+.form-actions-bar .secondary-button {
+    flex: 1;
+    justify-content: center;
+
+    height: 48px;
+}
+
+.product-form .general-form-header {
+    margin-bottom: 16px;
+}
+
+@media (min-width: 640px) {
+
+    .field-row.two {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .spec-row {
+        grid-template-columns: 1fr 2fr;
+    }
+
+    .form-actions-bar .primary-button,
+    .form-actions-bar .secondary-button {
+        flex: 0 0 auto;
+        min-width: 140px;
+    }
+}
+
+@media (min-width: 901px) {
+
+    .product-form-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+        align-items: start;
+        gap: 20px;
+    }
+
+    .form-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        min-width: 0;
+    }
+
+    .product-form .form-input,
+    .product-form .form-select {
+        height: 40px;
+        font-size: 14px;
+    }
+
+    .form-actions-bar {
+        margin: 20px 0 0;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Correcciones: Thymeleaf agrega un <input hidden> después de cada     */
+/* checkbox (th:field), así que "+" no sirve: se usa "~".               */
+/* ------------------------------------------------------------------ */
+
+.chip input:checked ~ span {
+    border-color: #7367f0;
+    background: rgba(115, 103, 240, 0.12);
+    color: #4b3fd1;
+    font-weight: 600;
+}
+
+.chip input:focus-visible ~ span {
+    outline: 2px solid #7367f0;
+    outline-offset: 2px;
+}
+
+.form-switch input:checked ~ .form-switch-slider {
+    background: var(--primary-color);
+}
+
+.form-switch input:checked ~ .form-switch-slider::before {
+    transform: translateX(16px);
+}
+
+.form-switch input {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fotos: botón de agregar y vista previa                              */
+/* ------------------------------------------------------------------ */
+
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.photo-previews {
+    display: contents;
+}
+
+.photo-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    aspect-ratio: 1;
+    min-height: 100px;
+
+    border: 2px dashed #cfcbe0;
+    border-radius: 8px;
+
+    background: #faf9fd;
+    color: #7367f0;
+
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+
+    cursor: pointer;
+}
+
+.photo-add[hidden] {
+    display: none;
+}
+
+.photo-add:hover {
+    background: #f1effc;
+}
+
+.photo-card {
+    position: relative;
+}
+
+
+
+.special-size {
+    margin-top: 20px;
+    padding-top: 18px;
+
+    border-top: 1px solid #f0f0f4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Guardando...                                                         */
+/* ------------------------------------------------------------------ */
+
+.is-loading {
+    position: relative;
+
+    opacity: 0.85;
+    pointer-events: none;
+    cursor: progress;
+}
+
+.is-loading::before {
+    content: "";
+
+    width: 16px;
+    height: 16px;
+
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+
+    animation: saving-spin 0.7s linear infinite;
+}
+
+form.is-saving .secondary-button {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+@keyframes saving-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Tarjeta de foto: ★ principal y ✕ quitar sobre la imagen             */
+/* ------------------------------------------------------------------ */
+
+.photo-card {
+    position: relative;
+}
+
+.photo-card img {
+    transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.photo-btn {
+    position: absolute;
+    top: 6px;
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #6f6b7d;
+
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+
+    cursor: pointer;
+}
+
+.photo-btn svg {
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.photo-star {
+    left: 6px;
+}
+
+.photo-x {
+    right: 6px;
+}
+
+button.photo-btn {
+    padding: 0;
+}
+
+/* Estrella llena = foto principal */
+.photo-star:has(input:checked) {
+    background: #fff7dd;
+    color: #e6a100;
+}
+
+.photo-star:has(input:checked) svg {
+    fill: #f5b301;
+    stroke: #e6a100;
+}
+
+.photo-x:hover,
+button.photo-btn:hover {
+    background: #fdecec;
+    color: #b42318;
+}
+
+.photo-btn:has(input:focus-visible) {
+    outline: 2px solid #7367f0;
+    outline-offset: 2px;
+}
+
+/* Foto marcada para quitar */
+.photo-removed-note {
+    display: none;
+}
+
+.photo-card:has(.photo-x input:checked) img {
+    opacity: 0.25;
+    filter: grayscale(1);
+}
+
+.photo-card:has(.photo-x input:checked) .photo-removed-note {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 52px;
+
+    color: #b42318;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+
+    pointer-events: none;
+}
+
+.photo-card:has(.photo-x input:checked) .photo-x {
+    background: #b42318;
+    color: #ffffff;
+}
+
+.photo-card:has(.photo-x input:checked) .photo-star {
+    display: none;
+}
+
+/* Campos de solo lectura (ej. código del producto) */
+.form-input.is-readonly {
+    background: #f3f2f7;
+    color: #6f6b7d;
+    cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------ */
+/* Foto ampliada de la tabla (popover nativo, sin JS)                  */
+/* ------------------------------------------------------------------ */
+
+.pr-thumb-btn {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+    padding: 0;
+
+    border: 0;
+    background: none;
+
+    cursor: zoom-in;
+}
+
+.pr-thumb-btn:focus-visible {
+    outline: 2px solid #7367f0;
+    outline-offset: 2px;
+}
+
+.image-popover {
+    max-width: min(94vw, 760px);
+    max-height: 94vh;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+    overflow: visible;
+}
+
+.image-popover::backdrop {
+    background: rgba(20, 18, 30, 0.75);
+}
+
+.image-popover img {
+    display: block;
+
+    max-width: 100%;
+    max-height: 82vh;
+    margin: 0 auto;
+
+    border-radius: 10px;
+    background: #ffffff;
+
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.image-popover-caption {
+    margin: 10px 0 0;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    text-align: center;
+}
+
+.image-popover-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #4b465c;
+
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+}
+
+.image-popover-close svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

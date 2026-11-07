@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Saphikuna</title>
-    <link rel="icon" type="image/png" th:href="@{/images/favicom_saphikuna.png}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+<head th:replace="~{fragments/admin-head :: head(title=#{products.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+    </th:block>
 </head>
 
 <body>
@@ -41,10 +35,7 @@
     </div>
 
 
-    <script th:src="@{/js/sidebar.js}"></script>
-    <script th:src="@{/js/topbar.js}"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>lucide.createIcons();</script>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{})}"></th:block>
 
 </body>
 

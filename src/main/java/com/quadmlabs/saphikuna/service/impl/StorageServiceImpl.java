@@ -2,24 +2,39 @@ package com.quadmlabs.saphikuna.service.impl;
 
 import com.quadmlabs.saphikuna.service.StorageService;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Almacena imágenes en Supabase Storage (plan free: 1 GB).
+ * Cada imagen se redimensiona y se comprime a WebP hasta quedar bajo
+ * {@code supabase.storage.max-bytes}; además se genera una miniatura.
+ */
 @Service("storageService")
 public class StorageServiceImpl implements StorageService {
 
-        private final RestClient restClient;
+        private static final Logger log = LoggerFactory.getLogger(StorageServiceImpl.class);
+
+        private static final float MIN_QUALITY = 0.65f;
+        private static final int MAX_ATTEMPTS = 8;
+
+        private final RestClient restClient = RestClient.builder().build();
 
         private final String supabaseUrl;
         private final String serviceKey;
@@ -29,6 +44,8 @@ public class StorageServiceImpl implements StorageService {
         private final int maxHeight;
         private final long maxOriginalSize;
         private final float webpQuality;
+        private final int maxBytes;
+        private final int thumbSize;
 
         public StorageServiceImpl(
                         @Value("${supabase.url}") String supabaseUrl,
@@ -37,186 +54,197 @@ public class StorageServiceImpl implements StorageService {
                         @Value("${supabase.storage.max-width}") int maxWidth,
                         @Value("${supabase.storage.max-height}") int maxHeight,
                         @Value("${supabase.storage.max-original-size}") long maxOriginalSize,
-                        @Value("${supabase.storage.webp-quality}") float webpQuality) {
+                        @Value("${supabase.storage.webp-quality}") float webpQuality,
+                        @Value("${supabase.storage.max-bytes:61440}") int maxBytes,
+                        @Value("${supabase.storage.thumb-size:240}") int thumbSize) {
 
                 this.supabaseUrl = supabaseUrl;
                 this.serviceKey = serviceKey;
                 this.bucket = bucket;
-
                 this.maxWidth = maxWidth;
                 this.maxHeight = maxHeight;
                 this.maxOriginalSize = maxOriginalSize;
                 this.webpQuality = webpQuality;
-
-                this.restClient = RestClient.builder().build();
+                this.maxBytes = maxBytes;
+                this.thumbSize = thumbSize;
         }
 
         @Override
         public String upload(MultipartFile file, String path) {
 
                 if (file == null || file.isEmpty()) {
-                        throw new IllegalArgumentException(
-                                        "El archivo está vacío");
+                        throw new IllegalArgumentException("El archivo está vacío");
                 }
 
                 if (path == null || path.isBlank()) {
-                        throw new IllegalArgumentException(
-                                        "La ruta del archivo es obligatoria");
+                        throw new IllegalArgumentException("La ruta del archivo es obligatoria");
                 }
 
                 if (file.getSize() > maxOriginalSize) {
-                        throw new IllegalArgumentException(
-                                        "La imagen supera el tamaño máximo permitido");
+                        throw new IllegalArgumentException("La imagen supera el tamaño máximo permitido");
                 }
 
                 try {
+                        Processed processed = process(file.getBytes());
+                        byte[] main = processed.main();
+                        byte[] thumb = processed.thumb();
 
-                        BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-                        if (originalImage == null) {
-                                throw new IllegalArgumentException(
-                                                "El archivo no es una imagen válida");
+                        send(path, main);
+                        try {
+                                send(thumbPath(path), thumb);
+                        } catch (RuntimeException e) {
+                                delete(path);
+                                throw e;
                         }
 
-                        BufferedImage processedImage = resizeImage(originalImage);
+                        log.info("Imagen {} subida: {} KB (miniatura {} KB)",
+                                        path, main.length / 1024, thumb.length / 1024);
 
-                        byte[] imageBytes = convertToWebp(processedImage);
-
-                        String storageUrl = supabaseUrl
-                                        + "/storage/v1/object/"
-                                        + bucket
-                                        + "/"
-                                        + path;
-
-                        restClient.post()
-                                        .uri(storageUrl)
-                                        .header(
-                                                        HttpHeaders.AUTHORIZATION,
-                                                        "Bearer " + serviceKey)
-                                        .header(
-                                                        "apikey",
-                                                        serviceKey)
-                                        .header(
-                                                        HttpHeaders.CONTENT_TYPE,
-                                                        "image/webp")
-                                        .body(imageBytes)
-                                        .retrieve()
-                                        .toBodilessEntity();
-
-                        return supabaseUrl
-                                        + "/storage/v1/object/public/"
-                                        + bucket
-                                        + "/"
-                                        + path;
+                        return getPublicUrl(path);
 
                 } catch (IOException e) {
-
-                        throw new IllegalStateException(
-                                        "No fue posible procesar la imagen",
-                                        e);
+                        throw new IllegalStateException("No fue posible procesar la imagen", e);
                 }
         }
 
-        private BufferedImage resizeImage(
-                        BufferedImage originalImage) {
-
-                int originalWidth = originalImage.getWidth();
-
-                int originalHeight = originalImage.getHeight();
-
-                if (originalWidth <= maxWidth
-                                && originalHeight <= maxHeight) {
-
-                        return originalImage;
+        @Override
+        public ImageStats inspect(MultipartFile file) {
+                try {
+                        Processed processed = process(file.getBytes());
+                        BufferedImage main = ImageIO.read(new java.io.ByteArrayInputStream(processed.main()));
+                        return new ImageStats(
+                                        main == null ? 0 : main.getWidth(),
+                                        main == null ? 0 : main.getHeight(),
+                                        processed.main().length,
+                                        processed.thumb().length);
+                } catch (IOException e) {
+                        throw new IllegalStateException("No fue posible procesar la imagen", e);
                 }
-
-                double scale = Math.min(
-                                (double) maxWidth / originalWidth,
-                                (double) maxHeight / originalHeight);
-
-                int newWidth = (int) Math.round(originalWidth * scale);
-
-                int newHeight = (int) Math.round(originalHeight * scale);
-
-                BufferedImage resizedImage = new BufferedImage(
-                                newWidth,
-                                newHeight,
-                                BufferedImage.TYPE_INT_RGB);
-
-                Graphics2D graphics = resizedImage.createGraphics();
-
-                graphics.setRenderingHint(
-                                RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-                graphics.setRenderingHint(
-                                RenderingHints.KEY_RENDERING,
-                                RenderingHints.VALUE_RENDER_QUALITY);
-
-                graphics.setRenderingHint(
-                                RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
-
-                graphics.drawImage(
-                                originalImage,
-                                0,
-                                0,
-                                newWidth,
-                                newHeight,
-                                null);
-
-                graphics.dispose();
-
-                return resizedImage;
         }
 
-        private byte[] convertToWebp(
-                        BufferedImage image)
+        /** Resultado de optimizar una foto: imagen principal y miniatura, ambas WebP. */
+        record Processed(byte[] main, byte[] thumb) {
+        }
+
+        /**
+         * Lee la foto, aplica la rotación del EXIF (celulares), y genera la imagen
+         * principal y la miniatura. No toca la red: se puede probar sola.
+         */
+        Processed process(byte[] raw) throws IOException {
+
+                BufferedImage original = ImageIO.read(new java.io.ByteArrayInputStream(raw));
+
+                if (original == null) {
+                        throw new IllegalArgumentException("El archivo no es una imagen válida");
+                }
+
+                // Sin esto, una foto vertical del celular queda girada 90° en la tienda
+                original = ImageOrientation.apply(original, ImageOrientation.read(raw));
+
+                return new Processed(
+                                encodeUnderLimit(original, maxWidth, maxHeight, maxBytes),
+                                encodeUnderLimit(original, thumbSize, thumbSize, maxBytes / 4));
+        }
+
+        /**
+         * Redimensiona y comprime; si supera {@code limit}, baja la calidad y luego
+         * las dimensiones hasta cumplirlo (o agotar los intentos).
+         */
+        private byte[] encodeUnderLimit(BufferedImage original, int boxW, int boxH, int limit)
                         throws IOException {
+
+                float quality = webpQuality;
+                double scale = fitScale(original, boxW, boxH);
+                byte[] bytes = null;
+
+                for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+                        bytes = toWebp(scaled(original, scale), quality);
+
+                        if (bytes.length <= limit) {
+                                return bytes;
+                        }
+
+                        if (quality - 0.10f >= MIN_QUALITY) {
+                                quality -= 0.10f;
+                        } else {
+                                scale *= 0.90;
+                        }
+                }
+
+                return bytes;
+        }
+
+        private double fitScale(BufferedImage image, int boxW, int boxH) {
+                return Math.min(1.0, Math.min(
+                                (double) boxW / image.getWidth(),
+                                (double) boxH / image.getHeight()));
+        }
+
+        /** Siempre devuelve RGB (fondo blanco) para evitar problemas con transparencias. */
+        private BufferedImage scaled(BufferedImage source, double scale) {
+
+                int w = Math.max(1, (int) Math.round(source.getWidth() * scale));
+                int h = Math.max(1, (int) Math.round(source.getHeight() * scale));
+
+                BufferedImage target = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = target.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0, w, h);
+                g.drawImage(source, 0, 0, w, h, null);
+                g.dispose();
+
+                return target;
+        }
+
+        private byte[] toWebp(BufferedImage image, float quality) throws IOException {
 
                 var writers = ImageIO.getImageWritersByFormatName("webp");
 
                 if (!writers.hasNext()) {
-                        throw new IllegalStateException(
-                                        "No hay un ImageIO writer disponible para WebP");
+                        throw new IllegalStateException("No hay un ImageIO writer disponible para WebP");
                 }
 
                 var writer = writers.next();
 
                 try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-                        var writeParam = writer.getDefaultWriteParam();
+                        ImageWriteParam param = writer.getDefaultWriteParam();
 
-                        if (writeParam.canWriteCompressed()) {
-
-                                writeParam.setCompressionMode(
-                                                javax.imageio.ImageWriteParam.MODE_EXPLICIT);
-
-                                writeParam.setCompressionType("Lossy");
-
-                                writeParam.setCompressionQuality(
-                                                webpQuality);
+                        if (param.canWriteCompressed()) {
+                                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                                param.setCompressionType("Lossy");
+                                param.setCompressionQuality(quality);
                         }
 
                         try (var imageOutput = ImageIO.createImageOutputStream(output)) {
-
                                 writer.setOutput(imageOutput);
-
-                                writer.write(
-                                                null,
-                                                new javax.imageio.IIOImage(
-                                                                image,
-                                                                null,
-                                                                null),
-                                                writeParam);
+                                writer.write(null, new IIOImage(image, null, null), param);
                         }
 
                         return output.toByteArray();
 
                 } finally {
-
                         writer.dispose();
                 }
+        }
+
+        private void send(String path, byte[] bytes) {
+                restClient.post()
+                                .uri(objectUrl(path))
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+                                .header("apikey", serviceKey)
+                                .header(HttpHeaders.CONTENT_TYPE, "image/webp")
+                                // Cache de 1 año: reduce el egress (el free tiene cupo limitado)
+                                .header(HttpHeaders.CACHE_CONTROL, "max-age=31536000")
+                                .body(bytes)
+                                .retrieve()
+                                .toBodilessEntity();
+        }
+
+        private String objectUrl(String path) {
+                return supabaseUrl + "/storage/v1/object/" + bucket + "/" + path;
         }
 
         @Override
@@ -226,11 +254,7 @@ public class StorageServiceImpl implements StorageService {
                         return null;
                 }
 
-                return supabaseUrl
-                                + "/storage/v1/object/public/"
-                                + bucket
-                                + "/"
-                                + path;
+                return supabaseUrl + "/storage/v1/object/public/" + bucket + "/" + path;
         }
 
         @Override
@@ -240,21 +264,17 @@ public class StorageServiceImpl implements StorageService {
                         return;
                 }
 
-                String storageUrl = supabaseUrl
-                                + "/storage/v1/object/"
-                                + bucket
-                                + "/"
-                                + path;
-
-                restClient.delete()
-                                .uri(storageUrl)
-                                .header(
-                                                HttpHeaders.AUTHORIZATION,
-                                                "Bearer " + serviceKey)
-                                .header(
-                                                "apikey",
-                                                serviceKey)
-                                .retrieve()
-                                .toBodilessEntity();
+                for (String p : new String[] { path, thumbPath(path) }) {
+                        try {
+                                restClient.delete()
+                                                .uri(objectUrl(p))
+                                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+                                                .header("apikey", serviceKey)
+                                                .retrieve()
+                                                .toBodilessEntity();
+                        } catch (RuntimeException e) {
+                                log.warn("No se pudo borrar {} del storage: {}", p, e.getMessage());
+                        }
+                }
         }
 }

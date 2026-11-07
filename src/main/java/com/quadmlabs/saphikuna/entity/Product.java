@@ -1,21 +1,61 @@
 package com.quadmlabs.saphikuna.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "products")
 public class Product {
 
+    public static final String ACTIVE = "Activo";
+    public static final String INACTIVE = "Inactivo";
+
+    public static final String AVAILABLE = "Disponible";
+    public static final String SOLD_OUT = "Agotado";
+    public static final String ON_REQUEST = "Bajo pedido";
+
     @Id
     @Column(name = "producttId")
     private UUID productId;
+
+    /** Código visible (ej. SPK-001). */
+    @Column(name = "code")
+    private String code;
+
+    /** Etiqueta opcional para la tienda (ej. NEW, OFERTA). */
+    @Column(name = "label")
+    private String label;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
+    private String description;
+
+    /** Activo / Inactivo: si se muestra o no en la tienda. */
+    @Column(name = "status")
+    private String status;
+
+    /** Disponible / Agotado / Bajo pedido. */
+    @Column(name = "availability")
+    private String availability = AVAILABLE;
+
+    /** Precio normal (sin descuento). */
+    @Column(name = "generalPrice")
+    private BigDecimal generalPrice;
+
+    @Column(name = "discountPercent")
+    private BigDecimal discountPercent = BigDecimal.ZERO;
 
     @Column(name = "primaryImagePath")
     private String primaryImagePath;
@@ -24,184 +64,47 @@ public class Product {
     @JoinColumn(name = "categoryId")
     private Category category;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "generalPrice")
-    private BigDecimal generalPrice;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "createdAt")
     private OffsetDateTime createdAt;
 
     @Column(name = "updatedAt")
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductCollection> productCollections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductVariant> productVariants = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductColor> productColors = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSize> productSizes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sortOrder ASC")
+    private List<ProductSpecification> productSpecifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sortOrder ASC")
     private List<ProductImage> productImages = new ArrayList<>();
 
-    public List<ProductCollection> getProductCollections() {
-        return productCollections;
+    public boolean hasDiscount() {
+        return discountPercent != null && discountPercent.signum() > 0;
     }
 
-    public void setProductCollections(
-            List<ProductCollection> productCollections) {
-
-        this.productCollections = productCollections;
-    }
-
-    public List<ProductVariant> getProductVariants() {
-        return productVariants;
-    }
-
-    public void setProductVariants(
-            List<ProductVariant> productVariants) {
-
-        this.productVariants = productVariants;
-    }
-
-    public List<ProductImage> getProductImages() {
-        return productImages;
-    }
-
-    public void setProductImages(List<ProductImage> productImages) {
-        this.productImages = productImages;
-    }
-
-    public List<Color> getColors() {
-
-        return productVariants.stream()
-                .map(ProductVariant::getColor)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-    }
-
-    public List<String> getSizes() {
-
-        return productVariants.stream()
-                .map(ProductVariant::getSize)
-                .filter(Objects::nonNull)
-                .map(Size::getName)
-                .distinct()
-                .toList();
-    }
-
-    public String getPriceDisplay() {
-
-        List<BigDecimal> prices = productVariants.stream()
-                .map(ProductVariant::getPrice)
-                .filter(Objects::nonNull)
-                .distinct()
-                .sorted()
-                .toList();
-
-        if (prices.isEmpty()) {
-            return "—";
+    /** Precio con el descuento aplicado (o el normal si no hay descuento). */
+    public BigDecimal getFinalPrice() {
+        if (generalPrice == null) {
+            return null;
         }
-
-        if (prices.size() == 1) {
-            return "$"
-                    + prices.get(0)
-                            .setScale(2)
-                            .toPlainString();
+        if (!hasDiscount()) {
+            return generalPrice;
         }
-
-        return "$"
-                + prices.get(0)
-                        .setScale(2)
-                        .toPlainString()
-                + " – $"
-                + prices.get(prices.size() - 1)
-                        .setScale(2)
-                        .toPlainString();
+        BigDecimal factor = BigDecimal.ONE.subtract(
+                discountPercent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+        return generalPrice.multiply(factor).setScale(2, RoundingMode.HALF_UP);
     }
 
-    public UUID getProductId() {
-        return productId;
-    }
-
-    public void setProductId(UUID productId) {
-        this.productId = productId;
-    }
-
-    public String getPrimaryImagePath() {
-        return primaryImagePath;
-    }
-
-    public void setPrimaryImagePath(String primaryImagePath) {
-        this.primaryImagePath = primaryImagePath;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getGeneralPrice() {
-        String gPrice = generalPrice.toString();
-        return "$" + gPrice;
-    }
-
-    public BigDecimal getGeneralPriceValue() {
-        return generalPrice;
-    }
-
-    public void setGeneralPrice(BigDecimal generalPrice) {
-        this.generalPrice = generalPrice;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public boolean isActive() {
+        return ACTIVE.equals(status);
     }
 }
