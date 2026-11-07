@@ -2,9 +2,16 @@ package com.quadmlabs.saphikuna.controller;
 
 import com.quadmlabs.saphikuna.service.CommissionService;
 
+import com.quadmlabs.saphikuna.security.AdminPrincipal;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -18,9 +25,12 @@ public class AdminNavAdvice {
 
     private final ObjectProvider<CommissionService> commissions;
     private final AtomicBoolean warned = new AtomicBoolean();
+    private final String storeUrl;
 
-    public AdminNavAdvice(ObjectProvider<CommissionService> commissions) {
+    public AdminNavAdvice(ObjectProvider<CommissionService> commissions,
+            @Value("${app.store-url:}") String storeUrl) {
         this.commissions = commissions;
+        this.storeUrl = storeUrl;
     }
 
     /**
@@ -29,9 +39,9 @@ public class AdminNavAdvice {
      * panel sigue funcionando sin contador.
      */
     @ModelAttribute("urgentCommissions")
-    public long urgentCommissions() {
+    public long urgentCommissions(HttpServletRequest request) {
         CommissionService service = commissions.getIfAvailable();
-        if (service == null) {
+        if (service == null || !isAdminPage(request)) {
             return 0;
         }
         try {
@@ -43,5 +53,26 @@ public class AdminNavAdvice {
             }
             return 0;
         }
+    }
+
+    /** Nombre de quien tiene la sesión abierta, para la barra superior. */
+    @ModelAttribute("adminName")
+    public String adminName(Authentication authentication) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return authentication.getPrincipal() instanceof AdminPrincipal p ? p.displayName() : authentication.getName();
+    }
+
+    /** Enlace a la app de ventas (vacío si no está configurado). */
+    @ModelAttribute("storeUrl")
+    public String storeUrl() {
+        return storeUrl;
+    }
+
+    /** Las pantallas públicas (login, catálogo) no consultan nada para el menú. */
+    private static boolean isAdminPage(HttpServletRequest request) {
+        String path = request.getRequestURI().substring(request.getContextPath().length());
+        return path.startsWith("/admin");
     }
 }

@@ -1,0 +1,60 @@
+/* Pantalla de inicio de sesión: una tarjeta centrada, pensada primero para el celular */
+.login-body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--page-bg);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 28px 24px 26px;
+    background: #fff;
+    border: 1px solid var(--primary-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(var(--primary-rgb), .10);
+}
+
+.login-logo {
+    display: block;
+    width: 200px;
+    max-width: 70%;
+    height: auto;
+    margin: 0 auto 6px;
+}
+
+.login-title {
+    margin: 0 0 18px;
+    text-align: center;
+    font-size: 1.15rem;
+    color: var(--ink);
+}
+
+.login-card .form-field {
+    margin-bottom: 14px;
+}
+
+.login-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 18px;
+    color: var(--muted);
+    font-size: .92rem;
+    cursor: pointer;
+}
+
+.login-remember input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.login-submit {
+    width: 100%;
+    justify-content: center;
+}

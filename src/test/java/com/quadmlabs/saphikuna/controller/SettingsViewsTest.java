@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /** Pantalla de Configuración: tarjetas independientes. */
 @WebMvcTest(SettingsController.class)
+@Import(PermissiveSecurity.class)
 class SettingsViewsTest {
 
     @Autowired
@@ -82,8 +84,8 @@ class SettingsViewsTest {
 
         org.junit.jupiter.api.Assertions.assertTrue(html.contains("action=\"/admin/settings/new-days\""));
         org.junit.jupiter.api.Assertions.assertTrue(html.contains("action=\"/admin/settings/store\""));
-        // el estado es solo lectura: ninguna otra acción
-        org.junit.jupiter.api.Assertions.assertEquals(2, html.split("method=\"post\"", -1).length - 1);
+        // el estado es solo lectura: solo las dos tarjetas más "Cerrar sesión" de la barra superior
+        org.junit.jupiter.api.Assertions.assertEquals(3, html.split("method=\"post\"", -1).length - 1);
     }
 
     @Test

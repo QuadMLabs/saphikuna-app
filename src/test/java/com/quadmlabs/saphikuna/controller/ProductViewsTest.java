@@ -15,6 +15,7 @@ import com.quadmlabs.saphikuna.service.StorageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /** Verifica que las vistas de productos se renderizan (sin base de datos). */
 @WebMvcTest(ProductController.class)
+@Import(PermissiveSecurity.class)
 class ProductViewsTest {
 
     @Autowired

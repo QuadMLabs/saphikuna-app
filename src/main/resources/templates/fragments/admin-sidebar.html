@@ -42,6 +42,11 @@
                 <span class="sidebar-item-icon"><i data-lucide="shirt"></i></span>
                 <span class="sidebar-item-label" th:text="#{menu.products}"></span>
             </a>
+            <a th:href="@{/admin/catalogo}" class="sidebar-item"
+                th:classappend="${activeMenu == 'brochure'} ? ' is-active' : ''" th:title="#{menu.brochure}">
+                <span class="sidebar-item-icon"><i data-lucide="book-open"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.brochure}"></span>
+            </a>
             <a th:href="@{/admin/collections}" class="sidebar-item"
                 th:classappend="${activeMenu == 'collections'} ? ' is-active' : ''" th:title="#{menu.collections}">
                 <span class="sidebar-item-icon"><i data-lucide="shopping-bag"></i></span>
@@ -74,6 +79,17 @@
                 th:classappend="${activeMenu == 'settings'} ? ' is-active' : ''" th:title="#{menu.settings}">
                 <span class="sidebar-item-icon"><i data-lucide="settings"></i></span>
                 <span class="sidebar-item-label" th:text="#{menu.settings}"></span>
+            </a>
+            <a th:href="@{/admin/users}" class="sidebar-item"
+                th:classappend="${activeMenu == 'users'} ? ' is-active' : ''" th:title="#{menu.admins}">
+                <span class="sidebar-item-icon"><i data-lucide="users"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.admins}"></span>
+            </a>
+            <!-- Enlace a la app de ventas (solo si está configurada: app.store-url) -->
+            <a th:if="${storeUrl != null and !storeUrl.isBlank()}" th:href="${storeUrl}" class="sidebar-item"
+                target="_blank" rel="noopener" th:title="#{menu.store}">
+                <span class="sidebar-item-icon"><i data-lucide="store"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.store}"></span>
             </a>
         </div>
     </nav>

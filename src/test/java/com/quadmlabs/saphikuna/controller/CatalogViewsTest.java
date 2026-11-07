@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /** Pantallas genéricas de catálogos, probadas con un catálogo de colores en memoria. */
 @WebMvcTest(CatalogController.class)
+@Import(PermissiveSecurity.class)
 class CatalogViewsTest {
 
     static final UUID ROJO = UUID.fromString("00000000-0000-0000-0000-000000000001");

@@ -25,15 +25,25 @@ Java 21, Spring Boot 4, Thymeleaf, JPA/Hibernate, PostgreSQL y Supabase Storage 
 ./mvnw spring-boot:run
 ```
 
-La configuración (base de datos y Supabase) está en `src/main/resources/application.properties`.
+Las credenciales **no están en el código**. Copia [`.env.example`](.env.example) como `.env` (en la
+carpeta del proyecto, no se sube a git) y completa los valores; en un servidor se definen las mismas
+variables de entorno. Sin ellas la app no arranca.
 
-> Pendiente antes de publicar: las claves de Supabase están en ese archivo. Rotarlas y
-> pasarlas a variables de entorno.
+| Variable | Para qué |
+|---|---|
+| `SUPABASE_DB_URL`, `SUPABASE_DB_USER`, `SUPABASE_DB_PASSWORD` | Base de datos |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | Almacenamiento de fotos |
+| `SAPHIKUNA_REMEMBER_KEY` | Firma de la cookie "Recordarme" (cadena larga al azar) |
+| `SAPHIKUNA_ADMIN_PASSWORD` | Opcional: clave del primer administrador |
+| `SAPHIKUNA_STORE_URL` | Opcional: enlace a la app de ventas |
+
+Al arrancar con la tabla `admins` vacía se crea el usuario `admin`; si no definiste
+`SAPHIKUNA_ADMIN_PASSWORD`, la clave temporal sale una sola vez en el log.
 
 ## Base de datos
 
 Los cambios del esquema están en [`db/`](db). Se ejecutan en el SQL Editor de Supabase, **en orden**
-(son repetibles): `001` a `005`.
+(son repetibles): `001` a `006`.
 
 ## Pruebas
 

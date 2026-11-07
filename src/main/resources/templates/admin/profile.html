@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{profile.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/users.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <form class="general-form user-form" method="post" data-saving th:object="${profileForm}"
+                    th:action="@{/admin/profile}">
+
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title" th:text="#{profile.title}"></h1>
+                            <p class="general-form-subtitle" th:text="#{profile.subtitle}"></p>
+                        </div>
+                    </div>
+
+                    <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{profile.section.data}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="form-field">
+                                <label for="username" th:text="#{admins.field.username}"></label>
+                                <input type="text" id="username" class="form-input" readonly th:value="${username}">
+                            </div>
+                            <div class="form-field" th:classappend="${#fields.hasErrors('displayName')} ? 'has-error' : ''">
+                                <label for="displayName">
+                                    <span th:text="#{admins.field.name}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="displayName" th:field="*{displayName}" class="form-input"
+                                    maxlength="60" autocomplete="off">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('displayName')}"
+                                    th:errors="*{displayName}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{profile.section.password}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <p class="field-hint" th:text="#{profile.password.hint}"></p>
+
+                            <div class="form-field"
+                                th:classappend="${#fields.hasErrors('currentPassword')} ? 'has-error' : ''">
+                                <label for="currentPassword" th:text="#{profile.field.current}"></label>
+                                <input type="password" id="currentPassword" name="currentPassword" class="form-input"
+                                    autocomplete="current-password">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('currentPassword')}"
+                                    th:errors="*{currentPassword}"></p>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('newPassword')} ? 'has-error' : ''">
+                                    <label for="newPassword" th:text="#{admins.field.password.new}"></label>
+                                    <input type="password" id="newPassword" name="newPassword" class="form-input"
+                                        autocomplete="new-password">
+                                    <p class="form-field-hint" th:text="#{admins.field.password.hint(${minPassword})}"></p>
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('newPassword')}"
+                                        th:errors="*{newPassword}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('confirmPassword')} ? 'has-error' : ''">
+                                    <label for="confirmPassword" th:text="#{admins.field.confirm}"></label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword"
+                                        class="form-input" autocomplete="new-password">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                                        th:errors="*{confirmPassword}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bar">
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                    </div>
+                </form>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>
