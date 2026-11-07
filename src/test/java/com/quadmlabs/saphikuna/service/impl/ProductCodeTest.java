@@ -18,8 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -173,16 +171,6 @@ class ProductCodeTest {
 
         assertEquals(null, lastSaved().getNewUntil());
         assertEquals(false, lastSaved().isNewOn(TODAY));
-    }
-
-    @Test
-    void importedProductsAreNotNewBecauseTheImporterNeverSetsTheDate() {
-        // el importador arma su propio formulario y no usa newForm(): newUntil queda vacío
-        when(products.nextCodeNumber()).thenReturn(21L);
-
-        service.create(form(), "SPK-005");
-
-        assertEquals(null, lastSaved().getNewUntil());
     }
 
     @Test

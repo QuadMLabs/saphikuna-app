@@ -5,6 +5,7 @@
     <th:block th:fragment="css_exclusivo">
         <link rel="stylesheet" th:href="@{/css/products/products.css}">
         <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/settings.css}">
     </th:block>
 </head>
 
@@ -17,30 +18,33 @@
             <!-- Topbar -->
             <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
             <!-- Content -->
-            <section class="admin-content">
+            <section class="admin-content settings-page">
 
-                <form class="general-form catalog-form" method="post" data-saving th:object="${settingsForm}"
-                    th:action="@{/admin/settings}">
+                <div class="page-header">
+                    <h1 class="page-title" th:text="#{settings.title}"></h1>
+                    <p class="page-subtitle" th:text="#{settings.subtitle}"></p>
+                </div>
 
-                    <div class="general-form-header">
-                        <div>
-                            <h1 class="general-form-title" th:text="#{settings.title}"></h1>
-                            <p class="general-form-subtitle" th:text="#{settings.subtitle}"></p>
-                        </div>
-                    </div>
+                <!-- Atajos a cada tarjeta -->
+                <nav class="settings-index" th:attr="aria-label=#{settings.title}">
+                    <a href="#new-days" th:text="#{settings.section.new}"></a>
+                    <a href="#store" th:text="#{settings.section.store}"></a>
+                    <a href="#status" th:text="#{settings.section.status}"></a>
+                </nav>
 
-                    <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}">
-                    </div>
-                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
-                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
-                    </div>
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
 
-                    <!-- Productos nuevos -->
+                <!-- ============ Productos nuevos ============ -->
+                <form class="general-form settings-card" id="new-days" method="post" data-saving
+                    th:object="${newDaysForm}" th:action="@{/admin/settings/new-days}">
                     <div class="general-card">
                         <div class="general-card-header">
                             <h3 th:text="#{settings.section.new}"></h3>
                         </div>
                         <div class="general-card-body">
+                            <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                            </div>
                             <div class="form-field"
                                 th:classappend="${#fields.hasErrors('newProductDays')} ? 'has-error' : ''">
                                 <label for="newProductDays">
@@ -54,14 +58,170 @@
                                     th:errors="*{newProductDays}"></p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Barra de guardado siempre visible -->
-                    <div class="form-actions-bar">
-                        <button type="submit" class="primary-button" data-saving-button
-                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                        <div class="settings-card-footer">
+                            <button type="submit" class="primary-button" data-saving-button
+                                th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                        </div>
                     </div>
                 </form>
+
+                <!-- ============ Datos de la tienda ============ -->
+                <form class="general-form settings-card" id="store" method="post" data-saving
+                    th:object="${storeForm}" th:action="@{/admin/settings/store}">
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{settings.section.store}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <p class="field-hint" th:text="#{settings.store.hint}"></p>
+
+                            <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('storeName')} ? 'has-error' : ''">
+                                    <label for="storeName">
+                                        <span th:text="#{settings.field.store.name}"></span>
+                                        <span class="required-mark">*</span>
+                                    </label>
+                                    <input type="text" id="storeName" th:field="*{storeName}" class="form-input"
+                                        maxlength="80" autocomplete="off">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('storeName')}"
+                                        th:errors="*{storeName}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('tagline')} ? 'has-error' : ''">
+                                    <label for="tagline" th:text="#{settings.field.store.tagline}"></label>
+                                    <input type="text" id="tagline" th:field="*{tagline}" class="form-input"
+                                        maxlength="120" autocomplete="off">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('tagline')}"
+                                        th:errors="*{tagline}"></p>
+                                </div>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('whatsapp')} ? 'has-error' : ''">
+                                    <label for="whatsapp" th:text="#{settings.field.whatsapp}"></label>
+                                    <input type="tel" id="whatsapp" th:field="*{whatsapp}" class="form-input"
+                                        maxlength="25" inputmode="tel" placeholder="+593 99 123 4567">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('whatsapp')}"
+                                        th:errors="*{whatsapp}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('phone')} ? 'has-error' : ''">
+                                    <label for="phone" th:text="#{settings.field.phone}"></label>
+                                    <input type="tel" id="phone" th:field="*{phone}" class="form-input" maxlength="25"
+                                        inputmode="tel">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('phone')}"
+                                        th:errors="*{phone}"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('email')} ? 'has-error' : ''">
+                                <label for="email" th:text="#{settings.field.email}"></label>
+                                <input type="email" id="email" th:field="*{email}" class="form-input" maxlength="120"
+                                    inputmode="email" autocomplete="off">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                </p>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('instagram')} ? 'has-error' : ''">
+                                    <label for="instagram" th:text="#{settings.field.instagram}"></label>
+                                    <input type="text" id="instagram" th:field="*{instagram}" class="form-input"
+                                        maxlength="200" autocapitalize="none" autocomplete="off"
+                                        placeholder="@saphikuna">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('instagram')}"
+                                        th:errors="*{instagram}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('facebook')} ? 'has-error' : ''">
+                                    <label for="facebook" th:text="#{settings.field.facebook}"></label>
+                                    <input type="text" id="facebook" th:field="*{facebook}" class="form-input"
+                                        maxlength="200" autocapitalize="none" autocomplete="off">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('facebook')}"
+                                        th:errors="*{facebook}"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('address')} ? 'has-error' : ''">
+                                <label for="address" th:text="#{settings.field.address}"></label>
+                                <input type="text" id="address" th:field="*{address}" class="form-input"
+                                    maxlength="200" autocomplete="off"
+                                    th:placeholder="#{settings.field.address.ph}">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('address')}"
+                                    th:errors="*{address}"></p>
+                            </div>
+                        </div>
+                        <div class="settings-card-footer">
+                            <button type="submit" class="primary-button" data-saving-button
+                                th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- ============ Estado del sistema (solo lectura) ============ -->
+                <div class="general-card settings-card" id="status">
+                    <div class="general-card-header status-header">
+                        <h3 th:text="#{settings.section.status}"></h3>
+                        <span class="tag" th:classappend="${status.allOk} ? 'badge-available' : 'badge-soldout'"
+                            th:text="${status.allOk} ? #{settings.status.allok} : #{settings.status.problem}"></span>
+                    </div>
+                    <div class="general-card-body">
+                        <ul class="status-list">
+                            <li class="status-row">
+                                <span class="status-dot" th:classappend="${status.dbOk} ? 'is-ok' : 'is-bad'"></span>
+                                <span class="status-label" th:text="#{settings.status.db}"></span>
+                                <span class="status-value"
+                                    th:text="${status.dbOk} ? #{settings.status.ok(${status.dbMillis})} : #{settings.status.fail}"></span>
+                            </li>
+                            <li class="status-row">
+                                <span class="status-dot" th:classappend="${status.storageOk} ? 'is-ok' : 'is-bad'"></span>
+                                <span class="status-label" th:text="#{settings.status.storage}"></span>
+                                <span class="status-value"
+                                    th:text="${status.storageOk} ? #{settings.status.ok(${status.storageMillis})} : #{settings.status.fail}"></span>
+                            </li>
+                            <li class="status-row">
+                                <span class="status-dot is-info"></span>
+                                <span class="status-label" th:text="#{settings.status.products}"></span>
+                                <span class="status-value"
+                                    th:text="${status.products >= 0} ? ${status.products} : '—'"></span>
+                            </li>
+                            <li class="status-row">
+                                <span class="status-dot is-info"></span>
+                                <span class="status-label" th:text="#{settings.status.images}"></span>
+                                <span class="status-value"
+                                    th:text="${status.images >= 0} ? ${status.images} : '—'"></span>
+                            </li>
+                            <li class="status-row">
+                                <span class="status-dot is-info"></span>
+                                <span class="status-label" th:text="#{settings.status.zone}"></span>
+                                <span class="status-value"
+                                    th:text="${status.zone} + ' · ' + ${#temporals.format(status.today, 'dd/MM/yyyy')}"></span>
+                            </li>
+                        </ul>
+
+                        <!-- Espacio estimado de fotos en Supabase (plan gratuito: 1 GB) -->
+                        <div class="storage-meter" th:if="${status.images >= 0}">
+                            <div class="storage-meter-label">
+                                <span th:text="#{settings.status.space}"></span>
+                                <b th:text="#{settings.status.space.value(${#numbers.formatDecimal(status.estimatedStorageMb, 1, 'COMMA', 1, 'POINT')})}"></b>
+                            </div>
+                            <div class="meter" role="img"
+                                th:attr="aria-label=${#numbers.formatDecimal(status.estimatedStoragePercent, 1, 1, 'POINT')} + '%'">
+                                <span th:style="'width:' + ${#numbers.formatDecimal(status.estimatedStoragePercent < 1 ? 1 : status.estimatedStoragePercent, 1, 1, 'POINT')} + '%'"></span>
+                            </div>
+                            <p class="field-hint" th:text="#{settings.status.space.hint}"></p>
+                        </div>
+
+                        <p class="field-hint status-problem" th:unless="${status.allOk}"
+                            th:text="#{settings.status.problem.hint}"></p>
+                    </div>
+                </div>
             </section>
             <!-- Footer -->
             <footer th:replace="~{fragments/admin-footer :: footer}"></footer>

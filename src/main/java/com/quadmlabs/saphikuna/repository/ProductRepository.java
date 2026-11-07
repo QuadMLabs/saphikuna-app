@@ -15,6 +15,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     long countByAvailability(String availability);
 
+    /** Total de fotos guardadas (de todos los productos). */
+    @Query("select count(i) from ProductImage i")
+    long countImages();
+
     long countByNewUntilGreaterThanEqual(java.time.LocalDate date);
 
     long countByDiscountPercentGreaterThan(java.math.BigDecimal percent);

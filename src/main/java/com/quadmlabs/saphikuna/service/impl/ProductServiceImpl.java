@@ -306,23 +306,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public UUID create(ProductForm form) {
-        return create(form, null);
-    }
-
-    @Override
-    @Transactional
-    public UUID create(ProductForm form, String code) {
         Product product = new Product();
         product.setProductId(UUID.randomUUID());
         product.setCreatedAt(OffsetDateTime.now());
-
-        if (code != null && !code.isBlank()) {
-            if (productRepository.existsByCodeIgnoreCase(code.trim())) {
-                throw new IllegalArgumentException("El código " + code.trim() + " ya está en uso");
-            }
-            product.setCode(code.trim());
-        }
-
         apply(product, form);
         return product.getProductId();
     }

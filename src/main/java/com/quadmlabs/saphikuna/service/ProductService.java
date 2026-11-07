@@ -40,12 +40,6 @@ public interface ProductService {
     /** Crea un producto y devuelve su id. */
     UUID create(ProductForm form);
 
-    /**
-     * Crea un producto con un código ya definido (por ejemplo, al importar los
-     * productos de la tienda). No consume números de la secuencia.
-     */
-    UUID create(ProductForm form, String code);
-
     void update(UUID productId, ProductForm form);
 
     /** Borra el producto con sus datos relacionados y sus imágenes del storage. */

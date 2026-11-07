@@ -107,18 +107,32 @@ public class StorageServiceImpl implements StorageService {
                 }
         }
 
+        /** Cliente aparte con tiempos límite cortos: la pantalla de estado no debe quedarse esperando. */
+        private final RestClient pingClient = RestClient.builder()
+                        .requestFactory(pingFactory())
+                        .build();
+
+        private static org.springframework.http.client.JdkClientHttpRequestFactory pingFactory() {
+                var factory = new org.springframework.http.client.JdkClientHttpRequestFactory(
+                                java.net.http.HttpClient.newBuilder()
+                                                .connectTimeout(java.time.Duration.ofSeconds(3)).build());
+                factory.setReadTimeout(java.time.Duration.ofSeconds(3));
+                return factory;
+        }
+
         @Override
-        public ImageStats inspect(MultipartFile file) {
+        public boolean ping() {
                 try {
-                        Processed processed = process(file.getBytes());
-                        BufferedImage main = ImageIO.read(new java.io.ByteArrayInputStream(processed.main()));
-                        return new ImageStats(
-                                        main == null ? 0 : main.getWidth(),
-                                        main == null ? 0 : main.getHeight(),
-                                        processed.main().length,
-                                        processed.thumb().length);
-                } catch (IOException e) {
-                        throw new IllegalStateException("No fue posible procesar la imagen", e);
+                        pingClient.get()
+                                        .uri(supabaseUrl + "/storage/v1/bucket/" + bucket)
+                                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+                                        .header("apikey", serviceKey)
+                                        .retrieve()
+                                        .toBodilessEntity();
+                        return true;
+                } catch (RuntimeException e) {
+                        log.warn("Supabase Storage no responde: {}", e.getMessage());
+                        return false;
                 }
         }
 

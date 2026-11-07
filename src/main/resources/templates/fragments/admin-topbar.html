@@ -16,9 +16,7 @@
                 <i data-lucide="user"></i>
             </span>
 
-            <span class="topbar-user-name">
-                Usuario
-            </span>
+            <span class="topbar-user-name" th:text="#{topbar.user}"></span>
 
             <span class="topbar-user-arrow">
                 <i data-lucide="chevron-down"></i>
@@ -30,13 +28,13 @@
 
             <a href="#" class="topbar-user-menu-item">
                 <i data-lucide="user"></i>
-                <span>Mi perfil</span>
+                <span th:text="#{topbar.profile}"></span>
             </a>
 
             <button type="button"
                     class="topbar-user-menu-item">
                 <i data-lucide="log-out"></i>
-                <span>Cerrar sesión</span>
+                <span th:text="#{topbar.logout}"></span>
             </button>
 
         </div>

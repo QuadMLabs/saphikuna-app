@@ -475,7 +475,7 @@ a.secondary-button {
     }
 
     .filter-bar .filter-search,
-    .filter-bar .filter-actions {
+.filter-bar .filter-actions {
         grid-column: 1 / -1;
     }
 }
@@ -497,7 +497,7 @@ a.secondary-button {
     }
 
     .filter-actions .primary-button,
-    .filter-actions .secondary-button {
+.filter-actions .secondary-button {
         flex: 0 0 auto;
     }
 }
@@ -516,7 +516,7 @@ a.secondary-button {
     }
 
     .product-list-head,
-    .product-row {
+.product-row {
         grid-template-columns: 72px minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.9fr) 120px 170px 100px;
         grid-template-areas: "thumb main colors sizes price state actions";
         gap: 16px;
@@ -610,12 +610,12 @@ a.secondary-button {
 }
 
 .card-photos { order: 1; }
-.card-info   { order: 2; }
-.card-price  { order: 3; }
+.card-info { order: 2; }
+.card-price { order: 3; }
 .card-colors { order: 4; }
-.card-sizes  { order: 5; }
-.card-org    { order: 6; }
-.card-specs  { order: 7; }
+.card-sizes { order: 5; }
+.card-org { order: 6; }
+.card-specs { order: 7; }
 
 .field-row {
     display: grid;
@@ -676,69 +676,6 @@ a.secondary-button {
     aspect-ratio: 1;
 
     object-fit: cover;
-}
-
-
-
-
-.file-input {
-    width: 100%;
-
-    padding: 10px;
-
-    border: 2px dashed var(--primary-border);
-    border-radius: 8px;
-
-    background: var(--primary-tint);
-    color: var(--ink);
-
-    font-family: inherit;
-    font-size: 14px;
-}
-
-.file-input::file-selector-button {
-    min-height: 44px;
-    margin-right: 12px;
-    padding: 0 16px;
-
-    border: none;
-    border-radius: 6px;
-
-    background: var(--primary-color);
-    color: #ffffff;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-
-    cursor: pointer;
-}
-
-/* Tallas */
-.size-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-}
-
-.size-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.size-cell .chip {
-    display: flex;
-}
-
-.size-cell .chip span {
-    flex: 1;
-    justify-content: center;
-}
-
-.size-cell .form-input {
-    height: 40px;
-    font-size: 14px;
 }
 
 /* Especificaciones */
@@ -802,7 +739,7 @@ a.secondary-button {
     }
 
     .form-actions-bar .primary-button,
-    .form-actions-bar .secondary-button {
+.form-actions-bar .secondary-button {
         flex: 0 0 auto;
         min-width: 140px;
     }
@@ -826,7 +763,7 @@ a.secondary-button {
     }
 
     .product-form .form-input,
-    .product-form .form-select {
+.product-form .form-select {
         height: 40px;
         font-size: 14px;
     }
@@ -933,8 +870,6 @@ a.secondary-button {
 .photo-card {
     position: relative;
 }
-
-
 
 .special-size {
     margin-top: 20px;

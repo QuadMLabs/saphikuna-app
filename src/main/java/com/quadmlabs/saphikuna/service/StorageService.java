@@ -10,11 +10,8 @@ public interface StorageService {
      */
     String upload(MultipartFile file, String path);
 
-    /** Tamaño final de una foto ya optimizada (sin subirla). Sirve para simular importaciones. */
-    ImageStats inspect(MultipartFile file);
-
-    record ImageStats(int width, int height, int mainBytes, int thumbBytes) {
-    }
+    /** ¿Responde Supabase Storage con la clave configurada? No lanza excepciones (máx. ~3 s). */
+    boolean ping();
 
     String getPublicUrl(String path);
 
