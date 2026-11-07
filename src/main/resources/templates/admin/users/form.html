@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=${admin != null ? #messages.msg('admins.form.edit') : #messages.msg('admins.form.new')}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/users.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <form class="general-form user-form" method="post" data-saving th:object="${adminForm}"
+                    th:action="${admin == null} ? @{/admin/users} : @{/admin/users/{id}(id=${admin.adminId})}">
+
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title"
+                                th:text="${admin != null} ? #{admins.form.edit} : #{admins.form.new}"></h1>
+                            <p class="general-form-subtitle" th:text="#{admins.form.subtitle}"></p>
+                        </div>
+                    </div>
+
+                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+
+                    <div class="general-card">
+                        <div class="general-card-body">
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('username')} ? 'has-error' : ''">
+                                <label for="username">
+                                    <span th:text="#{admins.field.username}"></span>
+                                    <span class="required-mark" th:if="${admin == null}">*</span>
+                                </label>
+                                <input type="text" id="username" th:field="*{username}" class="form-input"
+                                    maxlength="30" autocomplete="off" autocapitalize="none" autocorrect="off"
+                                    spellcheck="false" th:readonly="${admin != null}">
+                                <p class="form-field-hint" th:if="${admin == null}" th:text="#{admins.field.username.hint}"></p>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('username')}"
+                                    th:errors="*{username}"></p>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('displayName')} ? 'has-error' : ''">
+                                <label for="displayName">
+                                    <span th:text="#{admins.field.name}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="displayName" th:field="*{displayName}" class="form-input"
+                                    maxlength="60" autocomplete="off">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('displayName')}"
+                                    th:errors="*{displayName}"></p>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field" th:classappend="${#fields.hasErrors('password')} ? 'has-error' : ''">
+                                    <label for="password">
+                                        <span th:text="${admin == null} ? #{admins.field.password} : #{admins.field.password.new}"></span>
+                                        <span class="required-mark" th:if="${admin == null}">*</span>
+                                    </label>
+                                    <input type="password" id="password" name="password" class="form-input"
+                                        autocomplete="new-password">
+                                    <p class="form-field-hint"
+                                        th:text="${admin == null} ? #{admins.field.password.hint(${minPassword})} : #{admins.field.password.keep}"></p>
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('password')}"
+                                        th:errors="*{password}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('confirmPassword')} ? 'has-error' : ''">
+                                    <label for="confirmPassword" th:text="#{admins.field.confirm}"></label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword"
+                                        class="form-input" autocomplete="new-password">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                                        th:errors="*{confirmPassword}"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-field" th:if="${admin != null}"
+                                th:classappend="${#fields.hasErrors('enabled')} ? 'has-error' : ''">
+                                <label class="user-enabled">
+                                    <input type="checkbox" name="enabled" value="true" th:checked="*{enabled}">
+                                    <span th:text="#{admins.field.enabled}"></span>
+                                </label>
+                                <p class="form-field-hint" th:text="#{admins.field.enabled.hint}"></p>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('enabled')}"
+                                    th:errors="*{enabled}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/users}" class="secondary-button" th:text="#{common.cancel}"></a>
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                    </div>
+                </form>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

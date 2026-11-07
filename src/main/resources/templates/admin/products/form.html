@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=${productId != null ? #messages.msg('products.form.title.edit') : #messages.msg('products.form.title')}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+
+                <form class="general-form product-form" method="post" enctype="multipart/form-data" data-saving
+                    th:object="${productForm}"
+                    th:action="${productId == null} ? @{/admin/products} : @{/admin/products/{id}(id=${productId})}">
+
+                    <!-- Título -->
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title"
+                                th:text="${productId != null} ? #{products.form.title.edit} : #{products.form.title}">
+                            </h1>
+                            <p class="general-form-subtitle"
+                                th:text="${productId != null} ? #{products.form.subtitle.edit} : #{products.form.subtitle}">
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Errores generales (guardado, etc.) -->
+                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+                    <div class="flash flash-error" role="alert"
+                        th:if="${#fields.hasErrors('*') and !#fields.hasGlobalErrors()}"
+                        th:text="#{products.form.validation.summary}"></div>
+
+                    <div class="product-form-grid">
+
+                        <!-- ============ Columna principal ============ -->
+                        <div class="form-col">
+
+                            <!-- FOTOS -->
+                            <div class="general-card card-photos">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.images}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <p class="field-hint" th:text="#{products.form.images.hint(${4})}"></p>
+
+                                    <div class="photo-grid" id="photoGrid">
+                                        <!-- Fotos ya guardadas -->
+                                        <div class="photo-card" data-existing th:each="img, st : *{images}">
+                                            <input type="hidden" th:field="*{images[__${st.index}__].id}">
+                                            <img th:src="${img.thumbUrl}" alt="" loading="lazy">
+
+                                            <!-- ★ principal -->
+                                            <label class="photo-btn photo-star" th:title="#{products.form.images.primary.set}">
+                                                <input type="radio" class="visually-hidden" name="primary"
+                                                    th:value="'existing:' + ${img.id}"
+                                                    th:checked="${productForm.primary == 'existing:' + img.id}"
+                                                    th:aria-label="#{products.form.images.primary.set}">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                </svg>
+                                            </label>
+
+                                            <!-- ✕ quitar (se aplica al guardar) -->
+                                            <label class="photo-btn photo-x" th:title="#{products.form.images.remove}">
+                                                <input type="checkbox" class="visually-hidden"
+                                                    th:name="|images[${st.index}].delete|" value="true"
+                                                    th:checked="${img.delete}"
+                                                    th:aria-label="#{products.form.images.remove}">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M18 6 6 18" />
+                                                    <path d="m6 6 12 12" />
+                                                </svg>
+                                            </label>
+
+                                            <span class="photo-removed-note"
+                                                th:text="#{products.form.images.removed.note}"></span>
+                                        </div>
+
+                                        <!-- Vista previa de las fotos nuevas (la arma product-photos.js) -->
+                                        <div class="photo-previews" id="photoPreviews"
+                                            th:attr="data-primary-label=#{products.form.images.primary.set},data-remove-label=#{products.form.images.remove}"></div>
+
+                                        <!-- Botón para agregar: en el celular abre cámara o galería -->
+                                        <label class="photo-add" for="newImages" id="photoAdd">
+                                            <i data-lucide="image-plus"></i>
+                                            <span th:text="#{products.form.section.images.add}"></span>
+                                        </label>
+                                    </div>
+
+                                    <input type="file" id="newImages" class="visually-hidden" name="newImages"
+                                        accept="image/*" multiple data-max="4"
+                                        th:attr="data-max-message=#{products.form.validation.images.max}">
+                                    <p class="field-hint" id="photoMessage" role="status"></p>
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('newImages')}"
+                                        th:errors="*{newImages}"></p>
+                                </div>
+                            </div>
+
+                            <!-- INFORMACIÓN -->
+                            <div class="general-card card-info">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.information}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <div class="form-field"
+                                        th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
+                                        <label for="name">
+                                            <span th:text="#{products.form.section.information.name}"></span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+                                        <input type="text" id="name" th:field="*{name}" class="form-input"
+                                            maxlength="150" autocomplete="off"
+                                            th:placeholder="#{products.form.section.information.name.ph}">
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('name')}"
+                                            th:errors="*{name}"></p>
+                                    </div>
+
+                                    <div class="field-row two" style="margin-bottom: 18px;">
+                                        <div class="form-field">
+                                            <label for="code" th:text="#{products.form.section.information.code}"></label>
+                                            <input type="text" id="code" class="form-input is-readonly"
+                                                th:value="${productForm.code}" readonly tabindex="-1"
+                                                th:placeholder="#{products.form.section.information.code.auto}"
+                                                th:aria-describedby="codeHelp">
+                                            <p class="field-hint" id="codeHelp" style="margin: 0;"
+                                                th:text="#{products.form.section.information.code.hint}"></p>
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="label" th:text="#{products.form.section.information.label}"></label>
+                                            <input type="text" id="label" th:field="*{label}" class="form-input"
+                                                maxlength="20" list="labelOptions" autocomplete="off"
+                                                th:placeholder="#{products.form.section.information.label.ph}">
+                                            <datalist id="labelOptions">
+                                                <option value="OFERTA"></option>
+                                            </datalist>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field"
+                                        th:classappend="${#fields.hasErrors('description')} ? 'has-error' : ''">
+                                        <label for="description"
+                                            th:text="#{products.form.section.information.description}"></label>
+                                        <textarea id="description" th:field="*{description}"
+                                            class="form-input form-textarea" rows="5" maxlength="2000"
+                                            th:placeholder="#{products.form.section.information.description.ph}"></textarea>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('description')}"
+                                            th:errors="*{description}"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ESPECIFICACIONES -->
+                            <div class="general-card card-specs">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.specs}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <p class="field-hint" th:text="#{products.form.section.specs.hint}"></p>
+                                    <datalist id="specNames">
+                                        <option value="Material"></option>
+                                        <option value="Técnica"></option>
+                                        <option value="Diseño"></option>
+                                        <option value="Cuidado"></option>
+                                    </datalist>
+                                    <div class="spec-row" th:each="spec, st : *{specs}">
+                                        <input type="text" class="form-input" list="specNames" maxlength="60"
+                                            th:field="*{specs[__${st.index}__].name}"
+                                            th:placeholder="#{products.form.section.specs.name.ph}"
+                                            autocomplete="off">
+                                        <input type="text" class="form-input" maxlength="200"
+                                            th:field="*{specs[__${st.index}__].value}"
+                                            th:placeholder="#{products.form.section.specs.value.ph}"
+                                            autocomplete="off">
+                                    </div>
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('specs')}"
+                                        th:errors="*{specs}"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ============ Columna lateral ============ -->
+                        <div class="form-col">
+
+                            <!-- PRECIO Y ESTADO -->
+                            <div class="general-card card-price">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.price}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <div class="field-row two" style="margin-bottom: 18px;">
+                                        <div class="form-field"
+                                            th:classappend="${#fields.hasErrors('generalPrice')} ? 'has-error' : ''">
+                                            <label for="generalPrice">
+                                                <span th:text="#{products.form.section.price}"></span>
+                                                <span class="required-mark">*</span>
+                                            </label>
+                                            <input type="number" id="generalPrice" th:field="*{generalPrice}"
+                                                class="form-input" placeholder="0.00" step="0.01" min="0"
+                                                inputmode="decimal">
+                                            <p class="form-field-error" th:if="${#fields.hasErrors('generalPrice')}"
+                                                th:errors="*{generalPrice}"></p>
+                                        </div>
+                                        <div class="form-field"
+                                            th:classappend="${#fields.hasErrors('discountPercent')} ? 'has-error' : ''">
+                                            <label for="discountPercent"
+                                                th:text="#{products.form.section.price.discount}"></label>
+                                            <input type="number" id="discountPercent" th:field="*{discountPercent}"
+                                                class="form-input" placeholder="0" step="1" min="0" max="90"
+                                                inputmode="numeric">
+                                            <p class="form-field-error" th:if="${#fields.hasErrors('discountPercent')}"
+                                                th:errors="*{discountPercent}"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-block">
+                                        <span class="field-label" th:text="#{products.form.section.availability}"></span>
+                                        <div class="chip-group">
+                                            <label class="chip"
+                                                th:each="opt : ${T(java.util.List).of('Disponible', 'Agotado', 'Bajo pedido')}">
+                                                <input type="radio" name="availability" th:value="${opt}"
+                                                    th:checked="${productForm.availability == opt}">
+                                                <span th:text="${opt}"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field" style="margin-top: 4px;"
+                                        th:classappend="${#fields.hasErrors('newUntil')} ? 'has-error' : ''">
+                                        <label for="newUntil" th:text="#{products.form.section.new}"></label>
+                                        <input type="date" id="newUntil" th:field="*{newUntil}" class="form-input">
+                                        <p class="form-field-hint" th:text="#{products.form.section.new.hint}"></p>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('newUntil')}"
+                                            th:errors="*{newUntil}"></p>
+                                    </div>
+
+                                    <div class="form-toggle-field" style="margin-top: 4px;">
+                                        <div>
+                                            <span class="form-toggle-label"
+                                                th:text="#{products.form.section.price.status}"></span>
+                                            <span class="form-toggle-description"
+                                                th:text="#{products.form.section.price.status.description}"></span>
+                                        </div>
+                                        <label class="form-switch">
+                                            <input type="checkbox" th:field="*{active}">
+                                            <span class="form-switch-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- COLORES -->
+                            <div class="general-card card-colors">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.colors}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <div class="field-block">
+                                        <span class="field-label" th:text="#{products.form.section.colors.primary}"></span>
+                                        <div class="chip-group">
+                                            <label class="chip" th:each="color : ${colors}">
+                                                <input type="checkbox" name="primaryColorIds" th:value="${color.colorId}"
+                                                    th:checked="${#lists.contains(productForm.primaryColorIds, color.colorId)}">
+                                                <span>
+                                                    <i class="color-dot"
+                                                        th:style="'background:' + ${color.hexCode}"></i>
+                                                    <b th:text="${color.name}" style="font-weight: inherit;"></b>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="field-block">
+                                        <span class="field-label"
+                                            th:text="#{products.form.section.colors.secondary}"></span>
+                                        <div class="chip-group">
+                                            <label class="chip" th:each="color : ${colors}">
+                                                <input type="checkbox" name="secondaryColorIds" th:value="${color.colorId}"
+                                                    th:checked="${#lists.contains(productForm.secondaryColorIds, color.colorId)}">
+                                                <span>
+                                                    <i class="color-dot"
+                                                        th:style="'background:' + ${color.hexCode}"></i>
+                                                    <b th:text="${color.name}" style="font-weight: inherit;"></b>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TALLAS -->
+                            <div class="general-card card-sizes">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.sizes}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <p class="field-hint" th:text="#{products.form.section.sizes.hint}"></p>
+                                    <div class="chip-group">
+                                        <label class="chip" th:each="size : ${sizes}">
+                                            <input type="checkbox" name="sizeIds" th:value="${size.sizeId}"
+                                                th:checked="${#lists.contains(productForm.sizeIds, size.sizeId)}">
+                                            <span th:text="${size.name}"></span>
+                                        </label>
+                                    </div>
+
+                                    <div class="field-block special-size">
+                                        <span class="field-label" th:text="#{products.form.section.sizes.special}"></span>
+                                        <p class="field-hint" th:text="#{products.form.section.sizes.special.hint}"></p>
+                                        <div class="field-row two">
+                                            <select th:field="*{specialSizeId}" class="form-select"
+                                                th:aria-label="#{products.form.section.sizes.special}">
+                                                <option value="" th:text="#{products.form.section.sizes.special.none}"></option>
+                                                <option th:each="size : ${sizes}" th:value="${size.sizeId}"
+                                                    th:text="${size.name}"></option>
+                                            </select>
+                                            <input type="number" th:field="*{specialSizePrice}" class="form-input"
+                                                step="0.01" min="0" inputmode="decimal"
+                                                th:placeholder="#{products.form.section.sizes.price.ph}"
+                                                th:aria-label="#{products.form.section.sizes.price.ph}">
+                                        </div>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('specialSizePrice')}"
+                                            th:errors="*{specialSizePrice}"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ORGANIZACIÓN -->
+                            <div class="general-card card-org">
+                                <div class="general-card-header">
+                                    <h3 th:text="#{products.form.section.organization}"></h3>
+                                </div>
+                                <div class="general-card-body">
+                                    <div class="form-field">
+                                        <label for="categoryId"
+                                            th:text="#{products.form.section.organization.category}"></label>
+                                        <select id="categoryId" th:field="*{categoryId}" class="form-select">
+                                            <option value=""
+                                                th:text="#{products.form.section.organization.category.ph}"></option>
+                                            <option th:each="category : ${categories}" th:value="${category.categoryId}"
+                                                th:text="${category.name}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="collectionId"
+                                            th:text="#{products.form.section.organization.collection}"></label>
+                                        <select id="collectionId" th:field="*{collectionId}" class="form-select">
+                                            <option value=""
+                                                th:text="#{products.form.section.organization.collection.ph}"></option>
+                                            <option th:each="collection : ${collections}"
+                                                th:value="${collection.collectionId}" th:text="${collection.name}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de guardado siempre visible -->
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/products}" class="secondary-button" th:text="#{common.cancel}"></a>
+                        <button type="submit" class="primary-button" data-saving-button th:attr="data-saving-text=#{common.saving}"
+                            th:text="#{common.save}"></button>
+                    </div>
+                </form>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_productos})}">
+        <th:block th:fragment="scripts_productos">
+            <script th:src="@{/js/product-photos.js}"></script>
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

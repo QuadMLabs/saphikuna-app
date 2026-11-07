@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{login.title} + ' - ' + #{app.title}"></title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/icon.svg}">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
+    <meta name="theme-color" content="#6C47FF">
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/products/products.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+
+<body class="login-body">
+    <main class="login-card">
+        <img class="login-logo" th:src="@{/images/logo.png}" alt="Saphikuna">
+        <h1 class="login-title" th:text="#{login.title}"></h1>
+
+        <div class="flash flash-error" role="alert" th:if="${param.error != null}" th:text="#{login.error}"></div>
+        <div class="flash flash-success" role="status" th:if="${param.logout != null}" th:text="#{login.logout}"></div>
+
+        <form method="post" th:action="@{/login}" data-saving>
+            <div class="form-field">
+                <label for="username" th:text="#{login.username}"></label>
+                <input type="text" id="username" name="username" class="form-input" required autofocus
+                    autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+            </div>
+            <div class="form-field">
+                <label for="password" th:text="#{login.password}"></label>
+                <input type="password" id="password" name="password" class="form-input" required
+                    autocomplete="current-password">
+            </div>
+            <label class="login-remember">
+                <input type="checkbox" name="remember-me">
+                <span th:text="#{login.remember}"></span>
+            </label>
+            <button type="submit" class="primary-button login-submit" data-saving-button
+                th:attr="data-saving-text=#{login.submitting}" th:text="#{login.submit}"></button>
+        </form>
+    </main>
+    <script th:src="@{/js/form-saving.js}"></script>
+</body>
+
+</html>

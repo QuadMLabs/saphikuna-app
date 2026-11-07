@@ -1,0 +1,23 @@
+<!-- templates/fragments/scripts.html -->
+<th:block th:fragment="global-scripts(aditionalScripts)">
+    <!-- 1. Lo que SÍ se usa en TODO el sistema -->
+    <script th:src="@{/js/layout/sidebar.js}"></script>
+    <script th:src="@{/js/layout/topbar.js}"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
+    <script>
+        // Escuchamos cuando el usuario escribe en cualquier input o textarea del formulario
+        document.addEventListener('input', function (event) {
+            // Buscamos el contenedor .form-field más cercano hacia arriba
+            const formField = event.target.closest('.form-field');
+
+            // Si el contenedor existe y tiene la clase de error, se la quitamos
+            if (formField && formField.classList.contains('has-error')) {
+                formField.classList.remove('has-error');
+            }
+        });
+    </script>
+
+    <!-- 2. Aquí Thymeleaf inyectará automáticamente lo que le pidas desde cada pantalla -->
+    <th:block th:replace="${aditionalScripts}"></th:block>
+</th:block>

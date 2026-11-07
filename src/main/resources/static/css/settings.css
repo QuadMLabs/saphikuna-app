@@ -1,0 +1,193 @@
+/*
+ * Configuración: tarjetas independientes en una sola pantalla.
+ */
+
+.settings-page {
+    max-width: 760px;
+}
+
+.settings-index {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+.settings-index a {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 36px;
+    padding: 0 14px;
+
+    border: 1px solid var(--primary-border);
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: var(--primary-dark);
+
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.settings-index a:hover {
+    background: var(--primary-soft);
+}
+
+.settings-card {
+    margin-bottom: 16px;
+
+    /* al saltar a una tarjeta no queda pegada al borde superior */
+    scroll-margin-top: 16px;
+}
+
+.settings-card .general-card-body .field-hint:first-child {
+    margin-top: 0;
+}
+
+.settings-card-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 12px 20px;
+
+    border-top: 1px solid #f0f0f4;
+
+    background: var(--primary-tint);
+}
+
+.settings-card-footer .primary-button {
+    justify-content: center;
+
+    min-width: 140px;
+    height: 44px;
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.status-list {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.status-row {
+    display: grid;
+    grid-template-columns: 12px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+
+    min-height: 44px;
+
+    border-top: 1px solid #f0f0f4;
+}
+
+.status-row:first-child {
+    border-top: none;
+}
+
+.status-label {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.status-value {
+    color: var(--ink);
+
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #c9c6d8;
+}
+
+.status-dot.is-ok {
+    background: #28a745;
+}
+
+.status-dot.is-bad {
+    background: #dc3545;
+}
+
+.status-dot.is-info {
+    background: var(--primary-border);
+}
+
+.storage-meter {
+    margin-top: 16px;
+    padding-top: 16px;
+
+    border-top: 1px solid #f0f0f4;
+}
+
+.storage-meter-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 8px;
+
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.storage-meter-label b {
+    color: var(--ink);
+}
+
+.meter {
+    height: 10px;
+
+    border-radius: 999px;
+
+    background: var(--primary-soft);
+    overflow: hidden;
+}
+
+.meter span {
+    display: block;
+
+    height: 100%;
+    min-width: 4px;
+
+    border-radius: 999px;
+
+    background: var(--primary-color);
+}
+
+.status-problem {
+    margin: 14px 0 0;
+
+    color: #b42318;
+}
+
+@media (max-width: 639px) {
+
+    .settings-card-footer .primary-button {
+        width: 100%;
+    }
+}
+
+/* Aire entre las filas de dos campos y lo que sigue */
+.settings-card .field-row {
+    margin-bottom: 18px;
+}
+
+.settings-card .field-row:last-child {
+    margin-bottom: 0;
+}

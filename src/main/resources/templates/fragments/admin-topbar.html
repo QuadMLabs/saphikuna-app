@@ -1,0 +1,47 @@
+<header class="admin-topbar" th:fragment="topbar">
+
+    <label for="navToggle" class="topbar-menu-button" aria-label="Abrir menú">
+        <i data-lucide="menu"></i>
+    </label>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="topbar-user">
+
+        <button type="button"
+                class="topbar-user-button"
+                title="Cuenta de usuario">
+
+            <span class="topbar-user-icon">
+                <i data-lucide="user"></i>
+            </span>
+
+            <span class="topbar-user-name" th:text="${adminName != null} ? ${adminName} : #{topbar.user}"></span>
+
+            <span class="topbar-user-arrow">
+                <i data-lucide="chevron-down"></i>
+            </span>
+
+        </button>
+
+        <div class="topbar-user-menu">
+
+            <a th:href="@{/admin/profile}" class="topbar-user-menu-item">
+                <i data-lucide="user"></i>
+                <span th:text="#{topbar.profile}"></span>
+            </a>
+
+            <!-- Cerrar sesión: POST con CSRF (th:action agrega el token) -->
+            <form method="post" th:action="@{/logout}">
+                <button type="submit"
+                        class="topbar-user-menu-item">
+                    <i data-lucide="log-out"></i>
+                    <span th:text="#{topbar.logout}"></span>
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</header>

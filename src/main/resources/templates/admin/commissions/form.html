@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=${row != null ? #messages.msg('commissions.form.edit') : #messages.msg('commissions.form.new')}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/commissions.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+
+                <form class="general-form commission-form" method="post" data-saving th:object="${commissionForm}"
+                    th:action="${row == null} ? @{/admin/commissions} : @{/admin/commissions/{id}(id=${row.commission().commissionId})}">
+
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title"
+                                th:text="${row != null} ? #{commissions.form.edit} : #{commissions.form.new}"></h1>
+                            <p class="general-form-subtitle" th:text="#{commissions.form.subtitle}"></p>
+                        </div>
+                    </div>
+
+                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+                    <div class="flash flash-error" role="alert"
+                        th:if="${#fields.hasErrors('*') and !#fields.hasGlobalErrors()}"
+                        th:text="#{products.form.validation.summary}"></div>
+
+                    <!-- Quién y qué -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{commissions.form.section.work}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="form-field" th:classappend="${#fields.hasErrors('clientName')} ? 'has-error' : ''">
+                                <label for="clientName">
+                                    <span th:text="#{commissions.field.client}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="clientName" th:field="*{clientName}" class="form-input"
+                                    maxlength="120" list="clientList" autocomplete="off"
+                                    th:placeholder="#{commissions.field.client.ph}">
+                                <datalist id="clientList">
+                                    <option th:each="c : ${clients}" th:value="${c}"></option>
+                                </datalist>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('clientName')}"
+                                    th:errors="*{clientName}"></p>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''">
+                                <label for="title">
+                                    <span th:text="#{commissions.field.title}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="title" th:field="*{title}" class="form-input" maxlength="150"
+                                    autocomplete="off" th:placeholder="#{commissions.field.title.ph}">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                                </p>
+                            </div>
+
+                            <div class="form-field"
+                                th:classappend="${#fields.hasErrors('description')} ? 'has-error' : ''">
+                                <label for="description" th:text="#{commissions.field.description}"></label>
+                                <textarea id="description" th:field="*{description}" class="form-input form-textarea"
+                                    rows="4" maxlength="2000"
+                                    th:placeholder="#{commissions.field.description.ph}"></textarea>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('description')}"
+                                    th:errors="*{description}"></p>
+                            </div>
+
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('quantity')} ? 'has-error' : ''">
+                                    <label for="quantity">
+                                        <span th:text="#{commissions.field.quantity}"></span>
+                                        <span class="required-mark">*</span>
+                                    </label>
+                                    <input type="number" id="quantity" th:field="*{quantity}" class="form-input"
+                                        min="1" step="1" inputmode="numeric">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('quantity')}"
+                                        th:errors="*{quantity}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('dueDate')} ? 'has-error' : ''">
+                                    <label for="dueDate">
+                                        <span th:text="#{commissions.field.due}"></span>
+                                        <span class="required-mark">*</span>
+                                    </label>
+                                    <input type="date" id="dueDate" th:field="*{dueDate}" class="form-input">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('dueDate')}"
+                                        th:errors="*{dueDate}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{commissions.field.status}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="chip-group">
+                                <label class="chip" th:each="s : ${statuses}">
+                                    <input type="radio" th:field="*{status}" th:value="${s}">
+                                    <span th:text="${s}"></span>
+                                </label>
+                            </div>
+                            <p class="form-field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Dinero -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{commissions.form.section.money}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="field-row two">
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('agreedPrice')} ? 'has-error' : ''">
+                                    <label for="agreedPrice" th:text="#{commissions.field.price}"></label>
+                                    <input type="number" id="agreedPrice" th:field="*{agreedPrice}" class="form-input"
+                                        min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('agreedPrice')}"
+                                        th:errors="*{agreedPrice}"></p>
+                                </div>
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('advancePaid')} ? 'has-error' : ''">
+                                    <label for="advancePaid" th:text="#{commissions.field.advance}"></label>
+                                    <input type="number" id="advancePaid" th:field="*{advancePaid}" class="form-input"
+                                        min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('advancePaid')}"
+                                        th:errors="*{advancePaid}"></p>
+                                </div>
+                            </div>
+                            <p class="field-hint" style="margin: 12px 0 0;" th:text="#{commissions.field.money.hint}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{commissions.field.notes}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="form-field" th:classappend="${#fields.hasErrors('notes')} ? 'has-error' : ''">
+                                <textarea id="notes" th:field="*{notes}" class="form-input form-textarea" rows="3"
+                                    maxlength="2000" th:placeholder="#{commissions.field.notes.ph}"
+                                    th:aria-label="#{commissions.field.notes}"></textarea>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de guardado siempre visible -->
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/commissions}" class="secondary-button" th:text="#{common.cancel}"></a>
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                    </div>
+                </form>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_encargos})}">
+        <th:block th:fragment="scripts_encargos">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<aside class="admin-sidebar" th:fragment="sidebar">
+    <!-- Menú móvil: checkbox oculto + overlay (ver css/layout/mobile.css) -->
+    <input type="checkbox" id="navToggle" class="nav-toggle" aria-hidden="true" tabindex="-1">
+    <label for="navToggle" class="sidebar-overlay" aria-label="Cerrar menú"></label>
+    <!-- HEADER -->
+    <div class="sidebar-header">
+        <div class="sidebar-brand">
+            <span class="sidebar-logo">
+                <img th:src="@{/images/icon-96.png}" alt="Saphikuna">
+            </span>
+            <span class="sidebar-brand-name" th:text="#{app.title}"></span>
+        </div>
+
+        <button type="button" class="sidebar-toggle" aria-label="Toggle sidebar">
+            <i data-lucide="menu"></i>
+        </button>
+    </div>
+    <!-- NAVIGATION: menú plano, un solo ítem por sección (el "Nuevo" está en cada tabla) -->
+    <nav class="sidebar-navigation">
+        <div class="sidebar-section">
+            <span class="sidebar-section-title" th:text="#{menu.groups.home}"></span>
+            <a th:href="@{/admin}" class="sidebar-item" th:classappend="${activeMenu == 'home'} ? ' is-active' : ''"
+                th:title="#{menu.home}">
+                <span class="sidebar-item-icon"><i data-lucide="home"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.home}"></span>
+            </a>
+            <a th:href="@{/admin/commissions}" class="sidebar-item"
+                th:classappend="${activeMenu == 'commissions'} ? ' is-active' : ''" th:title="#{menu.commissions}">
+                <span class="sidebar-item-icon"><i data-lucide="calendar-clock"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.commissions}"></span>
+                <!-- Entregas vencidas, de hoy o de esta semana -->
+                <span class="menu-badge" th:if="${urgentCommissions != null and urgentCommissions > 0}"
+                    th:text="${urgentCommissions}"
+                    th:title="#{home.deliveries.title}"></span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-section-title" th:text="#{menu.groups.catalog}"></span>
+            <a th:href="@{/admin/products}" class="sidebar-item"
+                th:classappend="${activeMenu == 'products'} ? ' is-active' : ''" th:title="#{menu.products}">
+                <span class="sidebar-item-icon"><i data-lucide="shirt"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.products}"></span>
+            </a>
+            <a th:href="@{/admin/catalogo}" class="sidebar-item"
+                th:classappend="${activeMenu == 'brochure'} ? ' is-active' : ''" th:title="#{menu.brochure}">
+                <span class="sidebar-item-icon"><i data-lucide="book-open"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.brochure}"></span>
+            </a>
+            <a th:href="@{/admin/collections}" class="sidebar-item"
+                th:classappend="${activeMenu == 'collections'} ? ' is-active' : ''" th:title="#{menu.collections}">
+                <span class="sidebar-item-icon"><i data-lucide="shopping-bag"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.collections}"></span>
+            </a>
+            <a th:href="@{/admin/categories}" class="sidebar-item"
+                th:classappend="${activeMenu == 'categories'} ? ' is-active' : ''" th:title="#{menu.categories}">
+                <span class="sidebar-item-icon"><i data-lucide="tag"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.categories}"></span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-section-title" th:text="#{menu.groups.attributes}"></span>
+            <a th:href="@{/admin/colors}" class="sidebar-item"
+                th:classappend="${activeMenu == 'colors'} ? ' is-active' : ''" th:title="#{menu.colors}">
+                <span class="sidebar-item-icon"><i data-lucide="palette"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.colors}"></span>
+            </a>
+            <a th:href="@{/admin/sizes}" class="sidebar-item"
+                th:classappend="${activeMenu == 'sizes'} ? ' is-active' : ''" th:title="#{menu.size}">
+                <span class="sidebar-item-icon"><i data-lucide="ruler"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.size}"></span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-section-title" th:text="#{menu.groups.settings}"></span>
+            <a th:href="@{/admin/settings}" class="sidebar-item"
+                th:classappend="${activeMenu == 'settings'} ? ' is-active' : ''" th:title="#{menu.settings}">
+                <span class="sidebar-item-icon"><i data-lucide="settings"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.settings}"></span>
+            </a>
+            <a th:href="@{/admin/users}" class="sidebar-item"
+                th:classappend="${activeMenu == 'users'} ? ' is-active' : ''" th:title="#{menu.admins}">
+                <span class="sidebar-item-icon"><i data-lucide="users"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.admins}"></span>
+            </a>
+            <!-- Enlace a la app de ventas (solo si está configurada: app.store-url) -->
+            <a th:if="${storeUrl != null and !storeUrl.isBlank()}" th:href="${storeUrl}" class="sidebar-item"
+                target="_blank" rel="noopener" th:title="#{menu.store}">
+                <span class="sidebar-item-icon"><i data-lucide="store"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.store}"></span>
+            </a>
+        </div>
+    </nav>
+</aside>

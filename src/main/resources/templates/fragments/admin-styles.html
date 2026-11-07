@@ -1,0 +1,11 @@
+<!-- templates/admin/layout/styles.html -->
+<th:block th:fragment="global-styles(additionalStyles)">
+    <!-- 1. Los estilos que se usan en TODO el panel de administración -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/topbar.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/mobile.css}">
+    
+    <!-- 2. Aquí se inyectarán dinámicamente los CSS específicos de cada pantalla -->
+    <th:block th:replace="${additionalStyles}"></th:block>
+</th:block>
