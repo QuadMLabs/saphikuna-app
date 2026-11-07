@@ -16,6 +16,7 @@ import com.quadmlabs.saphikuna.repository.ColorRepository;
 import com.quadmlabs.saphikuna.repository.ProductRepository;
 import com.quadmlabs.saphikuna.repository.SizeRepository;
 import com.quadmlabs.saphikuna.service.ProductService;
+import com.quadmlabs.saphikuna.service.SettingsService;
 import com.quadmlabs.saphikuna.service.StorageService;
 
 import jakarta.persistence.criteria.Predicate;
@@ -33,6 +34,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +60,8 @@ public class ProductServiceImpl implements ProductService {
     private final ColorRepository colorRepository;
     private final SizeRepository sizeRepository;
     private final StorageService storageService;
+    private final SettingsService settingsService;
+    private final Clock clock;
     private final int maxImages;
 
     public ProductServiceImpl(
@@ -66,6 +71,8 @@ public class ProductServiceImpl implements ProductService {
             ColorRepository colorRepository,
             SizeRepository sizeRepository,
             StorageService storageService,
+            SettingsService settingsService,
+            Clock clock,
             @Value("${app.products.max-images:4}") int maxImages) {
 
         this.productRepository = productRepository;
@@ -74,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
         this.colorRepository = colorRepository;
         this.sizeRepository = sizeRepository;
         this.storageService = storageService;
+        this.settingsService = settingsService;
+        this.clock = clock;
         this.maxImages = maxImages;
     }
 
@@ -112,6 +121,15 @@ public class ProductServiceImpl implements ProductService {
             if (f.availability() != null && !f.availability().isBlank()) {
                 where.add(cb.equal(root.get("availability"), f.availability()));
             }
+            if (f.onlyNew()) {
+                where.add(cb.greaterThanOrEqualTo(root.<LocalDate>get("newUntil"), LocalDate.now(clock)));
+            }
+            if (f.missing() != null && !f.missing().isBlank()) {
+                Predicate missing = missingPredicate(f.missing(), root, cb);
+                if (missing != null) {
+                    where.add(missing);
+                }
+            }
             return cb.and(where.toArray(new Predicate[0]));
         };
 
@@ -130,6 +148,53 @@ public class ProductServiceImpl implements ProductService {
         return page;
     }
 
+    /** Lo que le falta al producto; null si el criterio no existe. */
+    private static Predicate missingPredicate(String kind,
+            jakarta.persistence.criteria.Root<Product> root, jakarta.persistence.criteria.CriteriaBuilder cb) {
+        return switch (kind) {
+            case "photo" -> cb.or(cb.isNull(root.get("primaryImagePath")), cb.equal(cb.trim(root.<String>get("primaryImagePath")), ""));
+            case "description" -> cb.or(cb.isNull(root.get("description")), cb.equal(cb.trim(root.<String>get("description")), ""));
+            case "category" -> cb.isNull(root.get("category"));
+            case "colors" -> cb.isEmpty(root.<java.util.Collection<?>>get("productColors"));
+            case "sizes" -> cb.isEmpty(root.<java.util.Collection<?>>get("productSizes"));
+            default -> null;
+        };
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countMissing(String kind) {
+        return productRepository.count((root, query, cb) -> {
+            Predicate p = missingPredicate(kind, root, cb);
+            return p == null ? cb.disjunction() : p;
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductStats stats() {
+        long total = productRepository.count();
+        long visible = productRepository.countByStatus(Product.ACTIVE);
+        return new ProductStats(
+                total,
+                visible,
+                total - visible,
+                productRepository.countByAvailability(Product.AVAILABLE),
+                productRepository.countByAvailability(Product.ON_REQUEST),
+                productRepository.countByAvailability(Product.SOLD_OUT),
+                productRepository.countByDiscountPercentGreaterThan(BigDecimal.ZERO),
+                productRepository.countByNewUntilGreaterThanEqual(LocalDate.now(clock)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> recent(int limit) {
+        return productRepository.findAll(
+                org.springframework.data.domain.PageRequest.of(0, limit,
+                        org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "updatedAt")))
+                .getContent();
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Product findById(UUID productId) {
@@ -146,6 +211,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductForm newForm() {
         ProductForm form = new ProductForm();
         form.setDiscountPercent(BigDecimal.ZERO);
+        // Un producto nuevo se muestra como "nuevo" durante los días configurados (se puede cambiar o vaciar)
+        form.setNewUntil(LocalDate.now(clock).plusDays(settingsService.newProductDays()));
         padSpecs(form, 3);
         return form;
     }
@@ -165,6 +232,7 @@ public class ProductServiceImpl implements ProductService {
         form.setDiscountPercent(p.getDiscountPercent());
         form.setActive(p.isActive());
         form.setAvailability(p.getAvailability());
+        form.setNewUntil(p.getNewUntil());
         form.setCategoryId(p.getCategory() != null ? p.getCategory().getCategoryId() : null);
 
         p.getProductCollections().stream().findFirst()
@@ -277,6 +345,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDiscountPercent(form.getDiscountPercent() == null ? BigDecimal.ZERO : form.getDiscountPercent());
         product.setStatus(form.isActive() ? Product.ACTIVE : Product.INACTIVE);
         product.setAvailability(normalizeAvailability(form.getAvailability()));
+        product.setNewUntil(form.getNewUntil());
         product.setUpdatedAt(now);
 
         product.setCategory(form.getCategoryId() == null ? null

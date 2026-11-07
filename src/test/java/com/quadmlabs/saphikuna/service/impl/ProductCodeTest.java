@@ -29,8 +29,14 @@ import static org.mockito.Mockito.when;
 /** El código del producto lo asigna el servidor, es secuencial y no se puede editar. */
 class ProductCodeTest {
 
+    static final java.time.LocalDate TODAY = java.time.LocalDate.of(2026, 11, 7);
+
     private ProductRepository products;
     private ProductServiceImpl service;
+    private final com.quadmlabs.saphikuna.service.SettingsService settings = mock(com.quadmlabs.saphikuna.service.SettingsService.class);
+    private final java.time.Clock clock = java.time.Clock.fixed(
+            TODAY.atTime(10, 0).atZone(java.time.ZoneId.of("America/Guayaquil")).toInstant(),
+            java.time.ZoneId.of("America/Guayaquil"));
 
     @BeforeEach
     void setUp() {
@@ -42,6 +48,8 @@ class ProductCodeTest {
                 mock(ColorRepository.class),
                 mock(SizeRepository.class),
                 mock(StorageService.class),
+                settings,
+                clock,
                 4);
     }
 
@@ -124,5 +132,65 @@ class ProductCodeTest {
 
         assertEquals("SPK-021", legacy.getCode());
         verify(products, times(1)).nextCodeNumber();
+    }
+
+    // ---------------- "Nuevo hasta" ----------------
+
+    @Test
+    void aNewProductFormDefaultsToTodayPlusTheConfiguredDays() {
+        when(settings.newProductDays()).thenReturn(15);
+
+        ProductForm f = service.newForm();
+
+        assertEquals(TODAY.plusDays(15), f.getNewUntil());
+    }
+
+    @Test
+    void theDefaultFollowsWhateverDaysTheUserConfigured() {
+        when(settings.newProductDays()).thenReturn(45);
+
+        assertEquals(TODAY.plusDays(45), service.newForm().getNewUntil());
+    }
+
+    @Test
+    void createStoresTheNewUntilDateFromTheForm() {
+        when(products.nextCodeNumber()).thenReturn(21L);
+        ProductForm f = form();
+        f.setNewUntil(TODAY.plusDays(20));
+
+        service.create(f);
+
+        assertEquals(TODAY.plusDays(20), lastSaved().getNewUntil());
+    }
+
+    @Test
+    void anEmptyNewUntilMeansTheProductIsNotNew() {
+        when(products.nextCodeNumber()).thenReturn(21L);
+        ProductForm f = form();
+        f.setNewUntil(null);
+
+        service.create(f);
+
+        assertEquals(null, lastSaved().getNewUntil());
+        assertEquals(false, lastSaved().isNewOn(TODAY));
+    }
+
+    @Test
+    void importedProductsAreNotNewBecauseTheImporterNeverSetsTheDate() {
+        // el importador arma su propio formulario y no usa newForm(): newUntil queda vacío
+        when(products.nextCodeNumber()).thenReturn(21L);
+
+        service.create(form(), "SPK-005");
+
+        assertEquals(null, lastSaved().getNewUntil());
+    }
+
+    @Test
+    void isNewOnIncludesTheLastDay() {
+        Product p = new Product();
+        p.setNewUntil(TODAY);
+        assertEquals(true, p.isNewOn(TODAY));
+        assertEquals(false, p.isNewOn(TODAY.plusDays(1)));
+        assertEquals(true, p.isNewOn(TODAY.minusDays(5)));
     }
 }

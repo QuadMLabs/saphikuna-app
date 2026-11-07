@@ -11,6 +11,14 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     boolean existsByCodeIgnoreCase(String code);
 
+    long countByStatus(String status);
+
+    long countByAvailability(String availability);
+
+    long countByNewUntilGreaterThanEqual(java.time.LocalDate date);
+
+    long countByDiscountPercentGreaterThan(java.math.BigDecimal percent);
+
     /** [categoryId, cantidad de productos] por cada categoría en uso. */
     @Query("select p.category.categoryId, count(p) from Product p where p.category is not null group by p.category.categoryId")
     java.util.List<Object[]> countByCategory();

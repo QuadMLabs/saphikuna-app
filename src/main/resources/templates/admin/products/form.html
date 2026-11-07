@@ -143,7 +143,6 @@
                                                 maxlength="20" list="labelOptions" autocomplete="off"
                                                 th:placeholder="#{products.form.section.information.label.ph}">
                                             <datalist id="labelOptions">
-                                                <option value="NEW"></option>
                                                 <option value="OFERTA"></option>
                                             </datalist>
                                         </div>
@@ -235,6 +234,15 @@
                                                 <span th:text="${opt}"></span>
                                             </label>
                                         </div>
+                                    </div>
+
+                                    <div class="form-field" style="margin-top: 4px;"
+                                        th:classappend="${#fields.hasErrors('newUntil')} ? 'has-error' : ''">
+                                        <label for="newUntil" th:text="#{products.form.section.new}"></label>
+                                        <input type="date" id="newUntil" th:field="*{newUntil}" class="form-input">
+                                        <p class="form-field-hint" th:text="#{products.form.section.new.hint}"></p>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('newUntil')}"
+                                            th:errors="*{newUntil}"></p>
                                     </div>
 
                                     <div class="form-toggle-field" style="margin-top: 4px;">

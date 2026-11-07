@@ -55,6 +55,10 @@ public class ProductForm {
     @NotBlank
     private String availability = Product.AVAILABLE;
 
+    /** Hasta cuándo se muestra como nuevo. Vacío = no es nuevo. */
+    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+    private java.time.LocalDate newUntil;
+
     private UUID categoryId;
 
     private UUID collectionId;

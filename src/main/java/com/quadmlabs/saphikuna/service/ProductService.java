@@ -15,6 +15,19 @@ public interface ProductService {
 
     Product findById(UUID productId);
 
+    /** Cifras para el Home. */
+    ProductStats stats();
+
+    /** Cuántos productos tienen pendiente "photo", "description", "category", "colors" o "sizes". */
+    long countMissing(String kind);
+
+    /** Los últimos productos creados o editados. */
+    java.util.List<Product> recent(int limit);
+
+    record ProductStats(long total, long visible, long hidden, long available, long onRequest, long soldOut,
+            long discounted, long news) {
+    }
+
     /** Formulario vacío para un producto nuevo (con código sugerido). */
     ProductForm newForm();
 

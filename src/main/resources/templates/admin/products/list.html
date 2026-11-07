@@ -4,6 +4,7 @@
 <head th:replace="~{fragments/admin-head :: head(title=#{products.title}, additionalStyles=~{::css_exclusivo})}">
     <th:block th:fragment="css_exclusivo">
         <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/home.css}">
     </th:block>
 </head>
 
@@ -36,8 +37,25 @@
                 <div class="flash flash-error" role="alert" th:if="${flashError != null}"
                     th:text="#{${flashError}}"></div>
 
+                <!-- Solo nuevos (viene del Home) -->
+                <div class="filter-note" th:if="${onlyNew}">
+                    <span><b th:text="#{products.filter.new}"></b></span>
+                    <a th:href="@{/admin/products}" th:text="#{common.clear}"></a>
+                </div>
+
+                <!-- Filtro "por completar" (viene del Home) -->
+                <div class="filter-note" th:if="${!#strings.isEmpty(missing)}">
+                    <span>
+                        <b th:text="#{products.filter.missing}"></b>:
+                        <span th:text="#{${'home.attention.' + missing}}"></span>
+                    </span>
+                    <a th:href="@{/admin/products}" th:text="#{common.clear}"></a>
+                </div>
+
                 <!-- Filtros: formulario GET normal -->
                 <form class="filter-bar" method="get" th:action="@{/admin/products}">
+                    <input type="hidden" name="missing" th:if="${!#strings.isEmpty(missing)}" th:value="${missing}">
+                    <input type="hidden" name="news" value="true" th:if="${onlyNew}">
                     <div class="filter-search">
                         <input type="search" name="q" class="form-input" th:value="${q}"
                             th:placeholder="#{products.filter.search.ph}" th:aria-label="#{common.search}">
@@ -154,6 +172,8 @@
 
                         <!-- Estado -->
                         <div class="pr-state">
+                            <span class="tag tag-new" th:if="${product.isNewOn(#temporals.createToday())}"
+                                th:text="#{products.new.tag}"></span>
                             <span class="tag"
                                 th:classappend="${product.availability == 'Disponible'} ? 'badge-available' : (${product.availability == 'Agotado'} ? 'badge-soldout' : 'badge-request')"
                                 th:text="${product.availability}"></span>
@@ -186,7 +206,7 @@
                 <!-- Paginación -->
                 <nav class="pager" th:if="${products.totalPages > 1}" aria-label="Paginación">
                     <a th:if="${products.hasPrevious()}"
-                        th:href="@{/admin/products(page=${products.number - 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability})}"
+                        th:href="@{/admin/products(page=${products.number - 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability}, missing=${missing}, news=${onlyNew ? 'true' : null})}"
                         th:text="#{table.pagination.previous}"></a>
                     <span class="is-disabled" th:unless="${products.hasPrevious()}"
                         th:text="#{table.pagination.previous}"></span>
@@ -194,7 +214,7 @@
                     <span th:text="#{products.pager(${products.number + 1}, ${products.totalPages})}"></span>
 
                     <a th:if="${products.hasNext()}"
-                        th:href="@{/admin/products(page=${products.number + 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability})}"
+                        th:href="@{/admin/products(page=${products.number + 1}, q=${q}, categoryId=${categoryId}, collectionId=${collectionId}, status=${status}, availability=${availability}, missing=${missing}, news=${onlyNew ? 'true' : null})}"
                         th:text="#{table.pagination.next}"></a>
                     <span class="is-disabled" th:unless="${products.hasNext()}"
                         th:text="#{table.pagination.next}"></span>

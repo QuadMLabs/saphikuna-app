@@ -1195,3 +1195,10 @@ button.photo-btn:hover {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+/* Etiqueta "Nuevo" (producto dentro de su fecha de "nuevo hasta") */
+.tag-new {
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    font-weight: 600;
+}

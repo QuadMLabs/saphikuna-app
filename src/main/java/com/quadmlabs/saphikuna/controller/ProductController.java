@@ -75,6 +75,8 @@ public class ProductController {
             @RequestParam(required = false) String collectionId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String availability,
+            @RequestParam(required = false) String missing,
+            @RequestParam(required = false) Boolean news,
             @RequestParam(defaultValue = "0") String page,
             Model model) {
 
@@ -83,7 +85,9 @@ public class ProductController {
         UUID collection = parseUuid(collectionId);
         int pageNumber = Math.max(parseInt(page), 0);
 
-        ProductFilter filter = new ProductFilter(q, category, collection, status, availability);
+        String missingKind = missing != null && ProductFilter.MISSING.contains(missing) ? missing : null;
+        boolean onlyNew = Boolean.TRUE.equals(news);
+        ProductFilter filter = new ProductFilter(q, category, collection, status, availability, missingKind, onlyNew);
         // En orden: SPK-001, SPK-002... (los sin código al final) y, a igual código, por fecha de creación
         Sort sort = Sort.by(Sort.Order.asc("code"), Sort.Order.asc("createdAt"));
 
@@ -117,7 +121,9 @@ public class ProductController {
         model.addAttribute("collectionId", collection == null ? "" : collection.toString());
         model.addAttribute("status", status == null ? "" : status);
         model.addAttribute("availability", availability == null ? "" : availability);
-        model.addAttribute("hasFilters", q != null && !q.isBlank() || category != null || collection != null
+        model.addAttribute("missing", missingKind == null ? "" : missingKind);
+        model.addAttribute("onlyNew", onlyNew);
+        model.addAttribute("hasFilters", onlyNew || missingKind != null || q != null && !q.isBlank() || category != null || collection != null
                 || status != null && !status.isBlank() || availability != null && !availability.isBlank());
 
         menu(model);

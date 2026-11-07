@@ -24,6 +24,15 @@
                 <span class="sidebar-item-icon"><i data-lucide="home"></i></span>
                 <span class="sidebar-item-label" th:text="#{menu.home}"></span>
             </a>
+            <a th:href="@{/admin/commissions}" class="sidebar-item"
+                th:classappend="${activeMenu == 'commissions'} ? ' is-active' : ''" th:title="#{menu.commissions}">
+                <span class="sidebar-item-icon"><i data-lucide="calendar-clock"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.commissions}"></span>
+                <!-- Entregas vencidas, de hoy o de esta semana -->
+                <span class="menu-badge" th:if="${urgentCommissions != null and urgentCommissions > 0}"
+                    th:text="${urgentCommissions}"
+                    th:title="#{home.deliveries.title}"></span>
+            </a>
         </div>
 
         <div class="sidebar-section">
@@ -61,7 +70,8 @@
 
         <div class="sidebar-section">
             <span class="sidebar-section-title" th:text="#{menu.groups.settings}"></span>
-            <a href="#" class="sidebar-item" th:title="#{menu.settings}">
+            <a th:href="@{/admin/settings}" class="sidebar-item"
+                th:classappend="${activeMenu == 'settings'} ? ' is-active' : ''" th:title="#{menu.settings}">
                 <span class="sidebar-item-icon"><i data-lucide="settings"></i></span>
                 <span class="sidebar-item-label" th:text="#{menu.settings}"></span>
             </a>

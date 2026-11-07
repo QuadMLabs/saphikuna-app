@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{commissions.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/commissions.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
+
+                <!-- Encabezado + Nuevo -->
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{commissions.title}"></h1>
+                        <p class="page-subtitle" th:text="#{commissions.subtitle}"></p>
+                    </div>
+                    <a th:href="@{/admin/commissions/new}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{commissions.new}"></span>
+                    </a>
+                </div>
+
+                <!-- Mensajes -->
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+
+                <!-- Búsqueda y filtro: formulario GET normal -->
+                <form class="catalog-search commission-filter" method="get" th:action="@{/admin/commissions}">
+                    <input type="search" name="q" class="form-input" th:value="${q}"
+                        th:placeholder="#{commissions.search.ph}" th:aria-label="#{common.search}">
+                    <select name="status" class="form-select" th:aria-label="#{commissions.filter.status}">
+                        <option value="active" th:selected="${status == 'active'}"
+                            th:text="#{commissions.filter.active}"></option>
+                        <option value="all" th:selected="${status == 'all'}" th:text="#{commissions.filter.all}">
+                        </option>
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${status == s}"></option>
+                    </select>
+                    <button type="submit" class="primary-button">
+                        <i data-lucide="search"></i>
+                        <span th:text="#{common.search}"></span>
+                    </button>
+                </form>
+
+                <!-- Vacío -->
+                <div class="list-empty" th:if="${#lists.isEmpty(rows)}"
+                    th:text="${#strings.isEmpty(q) and status == 'active'} ? #{commissions.empty} : #{commissions.empty.filtered}">
+                </div>
+
+                <!-- Lista: tarjetas en celular, tabla en pantallas grandes -->
+                <div class="commission-list" th:unless="${#lists.isEmpty(rows)}">
+                    <div class="commission-list-head" aria-hidden="true">
+                        <span th:text="#{commissions.column.due}"></span>
+                        <span th:text="#{commissions.column.work}"></span>
+                        <span th:text="#{commissions.column.quantity}"></span>
+                        <span th:text="#{commissions.column.money}"></span>
+                        <span th:text="#{commissions.column.status}"></span>
+                        <span></span>
+                    </div>
+
+                    <article class="commission-row" th:each="row : ${rows}" th:classappend="'is-' + ${row.level()}">
+
+                        <!-- Entrega -->
+                        <div class="cm-due">
+                            <span class="due-chip" th:classappend="'due-' + ${row.level()}">
+                                <th:block th:switch="${row.level()}">
+                                    <span th:case="'overdue'" th:text="#{commissions.due.overdue(${row.days()})}"></span>
+                                    <span th:case="'today'" th:text="#{commissions.due.today}"></span>
+                                    <span th:case="'done'" th:text="#{commissions.due.done}"></span>
+                                    <span th:case="*" th:text="#{commissions.due.in(${row.days()})}"></span>
+                                </th:block>
+                            </span>
+                            <span class="cm-date"
+                                th:text="${#temporals.format(row.commission().dueDate, 'dd/MM/yyyy')}"></span>
+                        </div>
+
+                        <!-- Cliente y qué se hace -->
+                        <div class="cm-main">
+                            <a class="cm-client" th:href="@{/admin/commissions/{id}/edit(id=${row.commission().commissionId})}"
+                                th:text="${row.commission().clientName}"></a>
+                            <span class="cm-title" th:text="${row.commission().title}"></span>
+                        </div>
+
+                        <!-- Cantidad -->
+                        <div class="cm-qty">
+                            <span th:text="${row.commission().quantity}"></span>
+                            <small th:text="#{commissions.units}"></small>
+                        </div>
+
+                        <!-- Dinero -->
+                        <div class="cm-money">
+                            <th:block th:if="${row.commission().agreedPrice != null}">
+                                <span class="cm-price"
+                                    th:text="'$' + ${#numbers.formatDecimal(row.commission().agreedPrice, 1, 'COMMA', 2, 'POINT')}"></span>
+                                <small th:if="${row.commission().balance > 0}"
+                                    th:text="#{commissions.balance('$' + ${#numbers.formatDecimal(row.commission().balance, 1, 'COMMA', 2, 'POINT')})}"></small>
+                                <small class="cm-paid" th:unless="${row.commission().balance > 0}"
+                                    th:text="#{commissions.paid}"></small>
+                            </th:block>
+                            <span class="muted" th:if="${row.commission().agreedPrice == null}">—</span>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="cm-status">
+                            <span class="tag" th:text="${row.commission().status}"
+                                th:classappend="${row.commission().status == 'Entregado'} ? 'badge-available' : (${row.commission().status == 'Listo'} ? 'badge-available' : (${row.commission().status == 'En proceso'} ? 'badge-request' : ''))"></span>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="cm-actions">
+                            <a class="icon-button"
+                                th:href="@{/admin/commissions/{id}/edit(id=${row.commission().commissionId})}"
+                                th:title="#{common.edit}" th:aria-label="#{common.edit}">
+                                <i data-lucide="pencil"></i>
+                            </a>
+                            <details class="row-delete">
+                                <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                    th:aria-label="#{common.delete}">
+                                    <i data-lucide="trash-2"></i>
+                                </summary>
+                                <form class="row-delete-pop" method="post" data-saving
+                                    th:action="@{/admin/commissions/{id}/delete(id=${row.commission().commissionId})}">
+                                    <p th:text="#{commissions.delete.confirm(${row.commission().title})}"></p>
+                                    <button type="submit" class="danger-button" data-saving-button
+                                        th:attr="data-saving-text=#{products.deleting}"
+                                        th:text="#{products.delete.confirm.button}"></button>
+                                </form>
+                            </details>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_encargos})}">
+        <th:block th:fragment="scripts_encargos">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

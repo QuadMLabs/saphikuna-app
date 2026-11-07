@@ -1,42 +1,189 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/admin-head :: head(title=#{products.title}, additionalStyles=~{::css_exclusivo})}">
+<head th:replace="~{fragments/admin-head :: head(title=#{home.title}, additionalStyles=~{::css_exclusivo})}">
     <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/commissions.css}">
+        <link rel="stylesheet" th:href="@{/css/home.css}">
     </th:block>
 </head>
 
 <body>
-
     <div class="admin-layout">
-
         <!-- Sidebar -->
-        <div th:replace="~{fragments/admin-sidebar :: sidebar}">
-        </div>
-
-
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
         <!-- Main -->
-        <div class="admin-main">
-
+        <main class="admin-main">
             <!-- Topbar -->
-            <div th:replace="~{fragments/admin-topbar :: topbar}">
-            </div>
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <!-- Content -->
+            <section class="admin-content">
 
+                <!-- Encabezado y acciones rápidas -->
+                <div class="page-header">
+                    <h1 class="page-title" th:text="#{home.title}"></h1>
+                    <p class="page-subtitle" th:text="#{home.subtitle}"></p>
+                </div>
 
-            <!-- Page content -->
-            <main class="admin-content">
+                <div class="quick-actions">
+                    <a th:href="@{/admin/products/new}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{home.quick.newProduct}"></span>
+                    </a>
+                    <a th:href="@{/admin/commissions/new}" class="secondary-button">
+                        <i data-lucide="calendar-plus"></i>
+                        <span th:text="#{home.quick.newCommission}"></span>
+                    </a>
+                    <form class="quick-search" method="get" th:action="@{/admin/products}">
+                        <input type="search" name="q" class="form-input" th:placeholder="#{home.quick.search.ph}"
+                            th:aria-label="#{common.search}">
+                        <button type="submit" class="icon-button" th:aria-label="#{common.search}">
+                            <i data-lucide="search"></i>
+                        </button>
+                    </form>
+                </div>
 
-                <h1>Admin Dashboard</h1>
+                <div class="home-grid">
 
-            </main>
+                    <!-- ============ Entregas ============ -->
+                    <div class="general-card home-deliveries">
+                        <div class="general-card-header home-card-header">
+                            <h3 th:text="#{home.deliveries.title}"></h3>
+                            <a th:href="@{/admin/commissions}" class="home-link"
+                                th:text="#{home.deliveries.seeAll}"></a>
+                        </div>
+                        <div class="general-card-body">
 
-        </div>
+                            <p class="muted" th:if="${deliveries == null or deliveries.empty}"
+                                th:text="#{home.deliveries.none}"></p>
 
+                            <th:block th:unless="${deliveries == null}"
+                                th:each="group : ${ {'overdue', 'week', 'later'} }">
+                                <th:block
+                                    th:with="items=${group == 'overdue' ? deliveries.overdue : (group == 'week' ? deliveries.thisWeek : deliveries.later)}">
+                                    <div class="delivery-group" th:unless="${#lists.isEmpty(items)}">
+                                        <h4 class="delivery-group-title" th:classappend="'is-' + ${group}"
+                                            th:text="#{${'home.deliveries.' + group}}"></h4>
+                                        <a class="delivery-item" th:each="row : ${items}"
+                                            th:href="@{/admin/commissions/{id}/edit(id=${row.commission().commissionId})}">
+                                            <span class="due-chip" th:classappend="'due-' + ${row.level()}">
+                                                <th:block th:switch="${row.level()}">
+                                                    <span th:case="'overdue'"
+                                                        th:text="#{commissions.due.overdue(${row.days()})}"></span>
+                                                    <span th:case="'today'" th:text="#{commissions.due.today}"></span>
+                                                    <span th:case="*"
+                                                        th:text="#{commissions.due.in(${row.days()})}"></span>
+                                                </th:block>
+                                            </span>
+                                            <span class="delivery-text">
+                                                <b th:text="${row.commission().clientName}"></b>
+                                                <small th:text="${row.commission().title}"></small>
+                                            </span>
+                                            <span class="delivery-date"
+                                                th:text="${#temporals.format(row.commission().dueDate, 'dd/MM')}"></span>
+                                        </a>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <!-- ============ Resumen de productos ============ -->
+                    <div class="general-card home-summary">
+                        <div class="general-card-header home-card-header">
+                            <h3 th:text="#{home.summary.title}"></h3>
+                            <a th:href="@{/admin/products}" class="home-link"
+                                th:text="#{home.recent.seeAll}"></a>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="stat-grid">
+                                <a class="stat-tile" th:href="@{/admin/products}">
+                                    <b th:text="${stats.total}"></b>
+                                    <span th:text="#{home.summary.total}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(status='Activo')}">
+                                    <b th:text="${stats.visible}"></b>
+                                    <span th:text="#{home.summary.visible}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(status='Inactivo')}">
+                                    <b th:text="${stats.hidden}"></b>
+                                    <span th:text="#{home.summary.hidden}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(availability='Disponible')}">
+                                    <b th:text="${stats.available}"></b>
+                                    <span th:text="#{home.summary.available}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(availability='Bajo pedido')}">
+                                    <b th:text="${stats.onRequest}"></b>
+                                    <span th:text="#{home.summary.onRequest}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(availability='Agotado')}">
+                                    <b th:text="${stats.soldOut}"></b>
+                                    <span th:text="#{home.summary.soldOut}"></span>
+                                </a>
+                                <a class="stat-tile" th:href="@{/admin/products(news=true)}">
+                                    <b th:text="${stats.news}"></b>
+                                    <span th:text="#{home.summary.new}"></span>
+                                </a>
+                                <div class="stat-tile is-static">
+                                    <b th:text="${stats.discounted}"></b>
+                                    <span th:text="#{home.summary.discount}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ Por completar ============ -->
+                    <div class="general-card home-attention">
+                        <div class="general-card-header">
+                            <h3 th:text="#{home.attention.title}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <p class="muted" th:if="${#lists.isEmpty(attention)}" th:text="#{home.attention.none}"></p>
+                            <a class="attention-item" th:each="item : ${attention}"
+                                th:href="@{/admin/products(missing=${item.kind})}">
+                                <span th:text="#{${'home.attention.' + item.kind}}"></span>
+                                <b class="tag badge-request" th:text="${item.count}"></b>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ============ Últimos productos ============ -->
+                    <div class="general-card home-recent">
+                        <div class="general-card-header">
+                            <h3 th:text="#{home.recent.title}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <p class="muted" th:if="${#lists.isEmpty(recent)}" th:text="#{home.recent.none}"></p>
+                            <a class="recent-item" th:each="p : ${recent}"
+                                th:href="@{/admin/products/{id}/edit(id=${p.productId})}">
+                                <span class="recent-thumb">
+                                    <img th:if="${thumbs.containsKey(p.productId)}" th:src="${thumbs.get(p.productId)}"
+                                        alt="" loading="lazy">
+                                    <i th:unless="${thumbs.containsKey(p.productId)}" data-lucide="image-off"></i>
+                                </span>
+                                <span class="recent-text">
+                                    <b th:text="${p.name}"></b>
+                                    <small>
+                                        <span th:if="${p.code != null}" th:text="${p.code}"></span>
+                                        <span th:if="${p.updatedAt != null}"
+                                            th:text="' · ' + ${#temporals.format(p.updatedAt, 'dd/MM/yyyy')}"></span>
+                                    </small>
+                                </span>
+                                <span class="tag"
+                                    th:classappend="${p.availability == 'Disponible'} ? 'badge-available' : (${p.availability == 'Agotado'} ? 'badge-soldout' : 'badge-request')"
+                                    th:text="${p.availability}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Footer -->
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
     </div>
-
-
     <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{})}"></th:block>
-
 </body>
 
 </html>

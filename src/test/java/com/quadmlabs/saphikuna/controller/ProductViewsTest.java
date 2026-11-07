@@ -237,4 +237,94 @@ class ProductViewsTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("src=\"https://cdn/foto.webp\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("popover")));
     }
+
+    @Test
+    void missingFilterFromTheHomeIsPassedToTheServiceShownAndKeptInPagerLinks() throws Exception {
+        emptyCatalogs();
+        when(productService.search(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(product("Sin foto")), PageRequest.of(0, 12), 30));
+
+        mvc.perform(get("/admin/products").param("missing", "photo"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Por completar")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Sin foto")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"missing\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("missing=photo")));
+
+        org.mockito.ArgumentCaptor<com.quadmlabs.saphikuna.dto.ProductFilter> captor =
+                org.mockito.ArgumentCaptor.forClass(com.quadmlabs.saphikuna.dto.ProductFilter.class);
+        org.mockito.Mockito.verify(productService).search(captor.capture(), any());
+        org.junit.jupiter.api.Assertions.assertEquals("photo", captor.getValue().missing());
+    }
+
+    @Test
+    void anUnknownMissingValueIsIgnored() throws Exception {
+        emptyCatalogs();
+        when(productService.search(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(product("Chompa")), PageRequest.of(0, 12), 1));
+
+        mvc.perform(get("/admin/products").param("missing", "inventado"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("filter-note\""))));
+
+        org.mockito.ArgumentCaptor<com.quadmlabs.saphikuna.dto.ProductFilter> captor =
+                org.mockito.ArgumentCaptor.forClass(com.quadmlabs.saphikuna.dto.ProductFilter.class);
+        org.mockito.Mockito.verify(productService).search(captor.capture(), any());
+        org.junit.jupiter.api.Assertions.assertNull(captor.getValue().missing());
+    }
+
+    @Test
+    void productFormHasTheNewUntilDatePrefilled() throws Exception {
+        emptyCatalogs();
+        when(colorService.findAll()).thenReturn(List.of());
+        when(sizeService.findAll()).thenReturn(List.of());
+        ProductForm form = new ProductForm();
+        form.setNewUntil(java.time.LocalDate.of(2026, 11, 22));
+        when(productService.newForm()).thenReturn(form);
+
+        mvc.perform(get("/admin/products/new"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"newUntil\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"2026-11-22\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Nuevo hasta")))
+                // "NEW" ya no se sugiere como etiqueta manual
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("<option value=\"NEW\">"))));
+    }
+
+    @Test
+    void listMarksOnlyProductsWhoseNewUntilDateIsStillValid() throws Exception {
+        emptyCatalogs();
+        Product fresh = product("Recién llegado");
+        fresh.setNewUntil(java.time.LocalDate.now().plusDays(3));
+        Product today = product("Vence hoy");
+        today.setNewUntil(java.time.LocalDate.now());
+        Product old = product("Ya no es nuevo");
+        old.setNewUntil(java.time.LocalDate.now().minusDays(1));
+        Product never = product("Migrado");
+        when(productService.search(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(fresh, today, old, never), PageRequest.of(0, 12), 4));
+
+        String html = mvc.perform(get("/admin/products")).andReturn().getResponse().getContentAsString();
+
+        org.junit.jupiter.api.Assertions.assertEquals(2, html.split("tag tag-new", -1).length - 1,
+                "solo 'Recién llegado' y 'Vence hoy' llevan la etiqueta Nuevo");
+    }
+
+    @Test
+    void newFilterIsPassedToTheServiceAndShownAndKept() throws Exception {
+        emptyCatalogs();
+        when(productService.search(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(product("Chompa")), PageRequest.of(0, 12), 30));
+
+        mvc.perform(get("/admin/products").param("news", "true"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Solo productos nuevos")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"news\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("news=true")));
+
+        org.mockito.ArgumentCaptor<com.quadmlabs.saphikuna.dto.ProductFilter> captor =
+                org.mockito.ArgumentCaptor.forClass(com.quadmlabs.saphikuna.dto.ProductFilter.class);
+        org.mockito.Mockito.verify(productService).search(captor.capture(), any());
+        org.junit.jupiter.api.Assertions.assertTrue(captor.getValue().onlyNew());
+    }
 }

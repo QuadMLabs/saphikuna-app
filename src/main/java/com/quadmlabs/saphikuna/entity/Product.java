@@ -60,6 +60,10 @@ public class Product {
     @Column(name = "primaryImagePath")
     private String primaryImagePath;
 
+    /** Hasta esta fecha (inclusive) se muestra como "nuevo" en la tienda; null = no es nuevo. */
+    @Column(name = "newUntil")
+    private java.time.LocalDate newUntil;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
     private Category category;
@@ -102,6 +106,11 @@ public class Product {
         BigDecimal factor = BigDecimal.ONE.subtract(
                 discountPercent.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
         return generalPrice.multiply(factor).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /** ¿Se muestra como nuevo en la fecha dada? */
+    public boolean isNewOn(java.time.LocalDate today) {
+        return newUntil != null && !newUntil.isBefore(today);
     }
 
     public boolean isActive() {
