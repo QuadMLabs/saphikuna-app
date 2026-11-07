@@ -1,0 +1,198 @@
+/*
+ * Catálogos (colores, tallas, categorías, colecciones).
+ * Reutiliza los botones, chips y avisos de products.css.
+ */
+
+.catalog-search {
+    display: flex;
+    gap: 10px;
+
+    margin-bottom: 16px;
+    padding: 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+.catalog-search .form-input {
+    flex: 1;
+
+    height: 44px;
+    font-size: 16px;
+}
+
+.catalog-search .primary-button,
+.catalog-search .secondary-button {
+    height: 44px;
+    justify-content: center;
+}
+
+.catalog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.catalog-list-head {
+    display: none;
+}
+
+.catalog-row {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "main   actions"
+        "detail detail"
+        "usage  usage";
+    gap: 8px 12px;
+    align-items: center;
+
+    padding: 12px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+.cat-main {
+    grid-area: main;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 0;
+}
+
+.cat-name {
+    color: var(--ink);
+
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    overflow-wrap: anywhere;
+}
+
+a.cat-name:hover {
+    color: var(--primary-color);
+}
+
+.cat-swatch {
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 50%;
+}
+
+.cat-detail {
+    grid-area: detail;
+
+    color: var(--muted);
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+}
+
+.cat-usage {
+    grid-area: usage;
+}
+
+.cat-actions {
+    grid-area: actions;
+
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.icon-button[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.icon-button[disabled]:hover {
+    background: transparent;
+}
+
+/* Selector de color nativo */
+.color-input {
+    width: 100%;
+    height: 52px;
+    padding: 4px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+}
+
+.catalog-form .form-field-hint {
+    margin: 0;
+
+    color: #8a8797;
+    font-size: 13px;
+}
+
+.catalog-form {
+    max-width: 640px;
+}
+
+@media (min-width: 901px) {
+
+    .catalog-list {
+        gap: 0;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+
+        background: #ffffff;
+    }
+
+    .catalog-list-head,
+    .catalog-row {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr) 140px 100px;
+        grid-template-areas: "main detail usage actions";
+        gap: 16px;
+    }
+
+    .catalog-list-head {
+        display: grid;
+
+        padding: 12px 16px;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        color: #8a8797;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .catalog-row {
+        padding: 10px 16px;
+
+        border: none;
+        border-bottom: 1px solid #f0f0f4;
+        border-radius: 0;
+    }
+
+    .catalog-row:last-child {
+        border-bottom: none;
+    }
+
+    .cat-actions {
+        justify-content: flex-end;
+    }
+}

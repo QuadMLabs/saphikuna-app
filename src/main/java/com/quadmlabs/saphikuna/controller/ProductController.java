@@ -120,7 +120,7 @@ public class ProductController {
         model.addAttribute("hasFilters", q != null && !q.isBlank() || category != null || collection != null
                 || status != null && !status.isBlank() || availability != null && !availability.isBlank());
 
-        menu(model, "products-list");
+        menu(model);
         return "admin/products/list";
     }
 
@@ -248,12 +248,11 @@ public class ProductController {
                 .sorted(java.util.Comparator.comparing(
                         (com.quadmlabs.saphikuna.entity.Size z) -> z.getSortOrder() == null ? 0 : z.getSortOrder()))
                 .toList());
-        menu(model, productId == null ? "products-new" : "products-list");
+        menu(model);
     }
 
-    private void menu(Model model, String submenu) {
+    private void menu(Model model) {
         model.addAttribute("activeMenu", "products");
-        model.addAttribute("activeSubmenu", submenu);
     }
 
     /** Reglas que no se pueden expresar con anotaciones. */

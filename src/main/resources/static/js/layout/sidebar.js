@@ -1,3 +1,4 @@
+/* Colapsar/expandir el menú lateral en pantallas grandes. */
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.querySelector('.admin-sidebar');
     const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -14,23 +15,4 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.remove('is-collapsed');
         });
     }
-
-    /* Sidebar menus */
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const currentGroup = item.closest('.sidebar-menu-group');
-
-            document
-                .querySelectorAll('.sidebar-menu-group.is-open')
-                .forEach(group => {
-                    if (group !== currentGroup) {
-                        group.classList.remove('is-open');
-                    }
-                });
-
-            if (currentGroup) {
-                currentGroup.classList.toggle('is-open');
-            }
-        });
-    });
 });

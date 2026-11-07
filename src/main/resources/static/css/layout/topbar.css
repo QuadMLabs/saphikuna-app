@@ -58,7 +58,7 @@
 
     background: transparent;
 
-    color: #4b465c;
+    color: var(--ink);
 
     font-family: inherit;
 
@@ -140,7 +140,7 @@
 
     background: transparent;
 
-    color: #4b465c;
+    color: var(--ink);
 
     text-decoration: none;
 

@@ -1,5 +1,15 @@
 :root {
-    --primary-color: #7367f0;
+    /* Paleta A: violeta vivo (ver logo). Cambiar la marca = cambiar este bloque. */
+    --primary-color: #6C47FF;
+    --primary-rgb: 108, 71, 255;
+    --primary-dark: #4B2DD0;       /* texto sobre el tono suave (contraste 6.9) */
+    --primary-soft: #EFEAFF;       /* fondos suaves de selección y hover */
+    --primary-tint: #FAF8FF;       /* fondos de zonas vacías (ej. subir fotos) */
+    --primary-border: #CFC2FF;     /* bordes punteados */
+    --surface-soft: #F1EEFF;       /* marcador de imagen vacía */
+    --ink: #2A2550;                /* texto principal */
+    --muted: #6B6790;              /* texto secundario (contraste 5.3) */
+    --page-bg: #F7F5FF;            /* fondo de la página */
 }
 
 /*
@@ -42,7 +52,7 @@ body {
 
     padding: 16px;
 
-    background: #f8f7fa;
+    background: var(--page-bg);
 }
 
 /*
@@ -63,7 +73,7 @@ body {
 
     font-size: 12px;
 
-    color: #6b6870;
+    color: var(--muted);
 }
 
 /*
@@ -80,7 +90,7 @@ body {
     font-size: 24px;
     font-weight: 600;
 
-    color: #465c49;
+    color: var(--ink);
 }
 
 .page-subtitle {
@@ -88,7 +98,7 @@ body {
 
     font-size: 14px;
 
-    color: #6f6b7d;
+    color: var(--muted);
 }
 
 /*
@@ -121,7 +131,7 @@ body {
     border: none;
     border-radius: 6px;
 
-    background: #7367f0;
+    background: var(--primary-color);
     color: #ffffff;
 
     font-family: inherit;
@@ -157,7 +167,7 @@ body {
     border-radius: 6px;
 
     background: #ffffff;
-    color: #6f6b7d;
+    color: var(--muted);
 
     font-family: inherit;
     font-size: 14px;
@@ -197,7 +207,7 @@ body {
     font-size: 24px;
     font-weight: 600;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .general-form-subtitle {
@@ -205,7 +215,7 @@ body {
 
     font-size: 14px;
 
-    color: #6f6b7d;
+    color: var(--muted);
 }
 
 .general-form-actions {
@@ -255,7 +265,7 @@ body {
     font-size: 15px;
     font-weight: 600;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .general-card-body {
@@ -282,7 +292,7 @@ body {
     font-size: 13px;
     font-weight: 500;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .form-input {
@@ -296,7 +306,7 @@ body {
 
     background: #ffffff;
 
-    color: #4b465c;
+    color: var(--ink);
 
     font-family: inherit;
     font-size: 14px;
@@ -311,7 +321,7 @@ body {
 
     border-color: var(--primary-color);
 
-    box-shadow: 0 0 0 2px rgba(115, 103, 240, 0.08);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.08);
 }
 
 .form-textarea {
@@ -334,7 +344,7 @@ body {
     border-radius: 6px;
 
     background: #ffffff;
-    color: #4b465c;
+    color: var(--ink);
 
     font-family: inherit;
     font-size: 14px;
@@ -372,7 +382,7 @@ body {
 .form-checkbox-field label {
     font-size: 13px;
 
-    color: #4b465c;
+    color: var(--ink);
 
     cursor: pointer;
 }
@@ -399,7 +409,7 @@ body {
     font-size: 13px;
     font-weight: 500;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .form-toggle-description {

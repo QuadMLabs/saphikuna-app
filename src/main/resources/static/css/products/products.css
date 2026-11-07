@@ -116,21 +116,21 @@ a.secondary-button {
     border-radius: 999px;
 
     background: #ffffff;
-    color: #4b465c;
+    color: var(--ink);
 
     font-size: 14px;
     line-height: 1;
 }
 
 .chip input:checked + span {
-    border-color: #7367f0;
-    background: rgba(115, 103, 240, 0.12);
-    color: #4b3fd1;
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.12);
+    color: var(--primary-dark);
     font-weight: 600;
 }
 
 .chip input:focus-visible + span {
-    outline: 2px solid #7367f0;
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
 
@@ -220,7 +220,7 @@ a.secondary-button {
     height: 72px;
 
     border-radius: 8px;
-    background: #f3f2f7;
+    background: var(--surface-soft);
 
     overflow: hidden;
 }
@@ -253,7 +253,7 @@ a.secondary-button {
 .pr-name {
     display: block;
 
-    color: #4b465c;
+    color: var(--ink);
 
     font-size: 15px;
     font-weight: 600;
@@ -263,7 +263,7 @@ a.secondary-button {
 }
 
 .pr-name:hover {
-    color: #7367f0;
+    color: var(--primary-color);
 }
 
 .pr-sub {
@@ -301,7 +301,7 @@ a.secondary-button {
 
     font-size: 15px;
     font-weight: 600;
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .pr-price s {
@@ -338,7 +338,7 @@ a.secondary-button {
     border-radius: 999px;
 
     background: #f1f0f6;
-    color: #6f6b7d;
+    color: var(--muted);
 
     font-size: 12px;
 }
@@ -370,7 +370,7 @@ a.secondary-button {
     border-radius: 8px;
 
     background: transparent;
-    color: #6f6b7d;
+    color: var(--muted);
 
     cursor: pointer;
     list-style: none;
@@ -413,7 +413,7 @@ a.secondary-button {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 
     font-size: 13px;
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .row-delete-pop p {
@@ -445,7 +445,7 @@ a.secondary-button {
     margin-top: 16px;
 
     font-size: 14px;
-    color: #6f6b7d;
+    color: var(--muted);
 }
 
 .pager a,
@@ -460,7 +460,7 @@ a.secondary-button {
     border-radius: 8px;
 
     background: #ffffff;
-    color: #4b465c;
+    color: var(--ink);
 
     text-decoration: none;
 }
@@ -641,7 +641,7 @@ a.secondary-button {
 
     font-size: 13px;
     font-weight: 500;
-    color: #4b465c;
+    color: var(--ink);
 }
 
 .field-block {
@@ -686,11 +686,11 @@ a.secondary-button {
 
     padding: 10px;
 
-    border: 2px dashed #cfcbe0;
+    border: 2px dashed var(--primary-border);
     border-radius: 8px;
 
-    background: #faf9fd;
-    color: #4b465c;
+    background: var(--primary-tint);
+    color: var(--ink);
 
     font-family: inherit;
     font-size: 14px;
@@ -704,7 +704,7 @@ a.secondary-button {
     border: none;
     border-radius: 6px;
 
-    background: #7367f0;
+    background: var(--primary-color);
     color: #ffffff;
 
     font-family: inherit;
@@ -845,14 +845,14 @@ a.secondary-button {
 /* ------------------------------------------------------------------ */
 
 .chip input:checked ~ span {
-    border-color: #7367f0;
-    background: rgba(115, 103, 240, 0.12);
-    color: #4b3fd1;
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.12);
+    color: var(--primary-dark);
     font-weight: 600;
 }
 
 .chip input:focus-visible ~ span {
-    outline: 2px solid #7367f0;
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
 
@@ -909,11 +909,11 @@ a.secondary-button {
     aspect-ratio: 1;
     min-height: 100px;
 
-    border: 2px dashed #cfcbe0;
+    border: 2px dashed var(--primary-border);
     border-radius: 8px;
 
-    background: #faf9fd;
-    color: #7367f0;
+    background: var(--primary-tint);
+    color: var(--primary-color);
 
     font-size: 13px;
     font-weight: 500;
@@ -927,7 +927,7 @@ a.secondary-button {
 }
 
 .photo-add:hover {
-    background: #f1effc;
+    background: var(--primary-soft);
 }
 
 .photo-card {
@@ -1007,7 +1007,7 @@ form.is-saving .secondary-button {
     border-radius: 50%;
 
     background: rgba(255, 255, 255, 0.92);
-    color: #6f6b7d;
+    color: var(--muted);
 
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 
@@ -1055,7 +1055,7 @@ button.photo-btn:hover {
 }
 
 .photo-btn:has(input:focus-visible) {
-    outline: 2px solid #7367f0;
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
 
@@ -1099,8 +1099,8 @@ button.photo-btn:hover {
 
 /* Campos de solo lectura (ej. código del producto) */
 .form-input.is-readonly {
-    background: #f3f2f7;
-    color: #6f6b7d;
+    background: var(--surface-soft);
+    color: var(--muted);
     cursor: not-allowed;
 }
 
@@ -1122,7 +1122,7 @@ button.photo-btn:hover {
 }
 
 .pr-thumb-btn:focus-visible {
-    outline: 2px solid #7367f0;
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
 
@@ -1178,7 +1178,7 @@ button.photo-btn:hover {
     border-radius: 50%;
 
     background: rgba(255, 255, 255, 0.92);
-    color: #4b465c;
+    color: var(--ink);
 
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 

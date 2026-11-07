@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DashboardController {
 
     @GetMapping
-    public String dashboard() {
+    public String dashboard(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "home");
         return "admin/dashboard";
     }
     

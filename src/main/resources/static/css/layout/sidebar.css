@@ -91,7 +91,7 @@
     font-size: 18px;
     font-weight: 600;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 /*
@@ -110,7 +110,7 @@
 
     padding: 6px;
 
-    color: #6f6b7d;
+    color: var(--muted);
 }
 
 .sidebar-toggle svg {
@@ -169,7 +169,7 @@
 
     border-radius: 6px;
 
-    color: #4b465c;
+    color: var(--ink);
 
     text-decoration: none;
 
@@ -202,98 +202,24 @@
     font-size: 15px;
     font-weight: 500;
 
-    color: #4b465c;
+    color: var(--ink);
 }
 
 /*
- * Parent menu
+ * Active item
  */
 
-.sidebar-item-parent {
-    border: none;
-    background: transparent;
-
-    cursor: pointer;
-
-    text-align: left;
-}
-
-.sidebar-item-main {
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-}
-
-.sidebar-item-arrow {
-    margin-left: auto;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sidebar-item-arrow svg {
-    width: 18px;
-    height: 18px;
-
-    transition: transform 0.2s ease;
-}
-
-/*
- * Submenu
- */
-
-.sidebar-submenu {
-    display: none;
-
-    padding-left: 44px;
-}
-
-.sidebar-submenu-item {
-    display: block;
-
-    padding: 7px 12px;
-
-    border-radius: 6px;
-
-    color: #6f6b7d;
-
-    text-decoration: none;
-
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.sidebar-submenu-item:hover {
-    background: #f3f4f6;
-}
-
-.sidebar-menu-group.is-open > .sidebar-item-parent {
-    background: #f3f4f6;
-}
-
-.sidebar-submenu-item.is-active {
+.sidebar-item.is-active {
     background: var(--primary-color);
-    color: #ffffff;
-    font-weight: 500;
 }
 
-.sidebar-submenu-item.is-active:hover {
-    background: #7367f0;
+.sidebar-item.is-active .sidebar-item-label,
+.sidebar-item.is-active .sidebar-item-icon {
     color: #ffffff;
 }
 
-/*
- * Open submenu
- */
-
-.sidebar-menu-group.is-open .sidebar-submenu {
-    display: block;
-}
-
-.sidebar-menu-group.is-open .sidebar-item-arrow svg {
-    transform: rotate(90deg);
+.sidebar-item.is-active:hover {
+    background: var(--primary-color);
 }
 
 /*
@@ -333,18 +259,9 @@
     justify-content: center;
 }
 
-.admin-sidebar.is-collapsed .sidebar-item-main {
-    justify-content: center;
-}
 
 .admin-sidebar.is-collapsed .sidebar-item-label {
     display: none;
 }
 
-.admin-sidebar.is-collapsed .sidebar-item-arrow {
-    display: none;
-}
 
-.admin-sidebar.is-collapsed .sidebar-submenu {
-    display: none;
-}
