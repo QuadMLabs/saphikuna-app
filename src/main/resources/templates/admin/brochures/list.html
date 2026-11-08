@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{brochures.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/brochures.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{brochures.title}"></h1>
+                        <p class="page-subtitle" th:text="#{brochures.subtitle}"></p>
+                    </div>
+                    <a th:href="@{/admin/catalogos/nuevo}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{brochures.new}"></span>
+                    </a>
+                </div>
+
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+
+                <div class="list-empty" th:if="${#lists.isEmpty(brochures)}">
+                    <p th:text="#{brochures.empty}"></p>
+                    <a th:href="@{/admin/catalogos/nuevo}" class="primary-button" th:text="#{brochures.empty.cta}"></a>
+                </div>
+
+                <div class="bro-cards" th:unless="${#lists.isEmpty(brochures)}">
+                    <article class="bro-card" th:each="b : ${brochures}">
+                        <a class="bro-card-media" th:href="@{/admin/catalogos/{id}(id=${b.id})}" th:attr="aria-label=${b.name}">
+                            <img th:if="${b.thumbUrl != null}" th:src="${b.thumbUrl}" alt="" loading="lazy">
+                            <span class="bro-card-empty" th:unless="${b.thumbUrl != null}"><i data-lucide="book-open"></i></span>
+                        </a>
+                        <div class="bro-card-body">
+                            <a class="bro-card-name" th:href="@{/admin/catalogos/{id}(id=${b.id})}" th:text="${b.name}"></a>
+                            <span class="bro-card-meta"
+                                th:text="#{brochures.card.meta(${b.itemCount}, ${#temporals.format(b.updatedAt, 'dd/MM/yyyy')})}"></span>
+                            <div class="bro-card-actions">
+                                <a class="primary-button bro-small" th:href="@{/admin/catalogos/{id}(id=${b.id})}"
+                                    th:text="#{brochures.card.open}"></a>
+                                <form method="post" th:action="@{/admin/catalogos/{id}/duplicar(id=${b.id})}" data-saving>
+                                    <button type="submit" class="secondary-button bro-small" data-saving-button
+                                        th:attr="data-saving-text=#{common.saving}" th:text="#{brochures.card.duplicate}"></button>
+                                </form>
+                                <details class="row-delete">
+                                    <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                        th:aria-label="#{common.delete}">
+                                        <i data-lucide="trash-2"></i>
+                                    </summary>
+                                    <form class="row-delete-pop" method="post" data-saving
+                                        th:action="@{/admin/catalogos/{id}/eliminar(id=${b.id})}">
+                                        <p th:text="#{brochures.delete.confirm(${b.name})}"></p>
+                                        <button type="submit" class="danger-button" data-saving-button
+                                            th:attr="data-saving-text=#{products.deleting}"
+                                            th:text="#{products.delete.confirm.button}"></button>
+                                    </form>
+                                </details>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <p class="bro-legacy">
+                    <a th:href="@{/admin/catalogo}" th:text="#{brochures.legacy}"></a>
+                </p>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

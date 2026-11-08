@@ -45,7 +45,11 @@ public class BrochureImageService {
         /** Vertical 3:4, para la foto principal. 600x800 son más de 300 ppp en una columna de 48 mm. */
         PORTRAIT(600, 800),
         /** Cuadrada, para las fotos pequeñas (17,5 mm: 240 px bastan). */
-        SQUARE(240, 240);
+        SQUARE(240, 240),
+        /** Foto principal de una ficha de catálogo (118 x 152 mm: 900 px de ancho dan unos 190 ppp). */
+        HERO(900, 1160),
+        /** Fotos de apoyo de una ficha de catálogo (58 x 74 mm). */
+        SUPPORT(480, 612);
 
         final int width;
         final int height;
@@ -124,6 +128,43 @@ public class BrochureImageService {
             }
         }
         return result;
+    }
+
+    private final Map<Integer, String> logos = new ConcurrentHashMap<>();
+
+    /**
+     * El logo reducido a {@code width} px de ancho (PNG con fondo transparente) como data URI.
+     * El original pesa 170 KB: en un catálogo que lo repite en cada página, el reducido pesa unas 10 veces menos.
+     */
+    public String logoDataUri(int width) {
+        return logos.computeIfAbsent(width, w -> {
+            try {
+                BufferedImage source = ImageIO.read(new ClassPathResource("static/images/logo.png").getInputStream());
+                int h = Math.max(1, source.getHeight() * w / source.getWidth());
+                BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = out.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                // por pasos para que la reducción no deje dientes de sierra
+                BufferedImage step = source;
+                while (step.getWidth() / 2 >= w) {
+                    BufferedImage half = new BufferedImage(step.getWidth() / 2, step.getHeight() / 2, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D hg = half.createGraphics();
+                    hg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    hg.drawImage(step, 0, 0, half.getWidth(), half.getHeight(), null);
+                    hg.dispose();
+                    step = half;
+                }
+                g.drawImage(step, 0, 0, w, h, null);
+                g.dispose();
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                ImageIO.write(out, "png", bytes);
+                return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes.toByteArray());
+            } catch (IOException e) {
+                log.warn("No se pudo preparar el logo: {}", e.getMessage());
+                return null;
+            }
+        });
     }
 
     /** El logo (PNG con fondo transparente) como data URI; null si no está. */

@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${catalog.name}">Catálogo</title>
+    <style>
+        /* Cada página se arma con posiciones fijas (en mm) para que todas queden iguales:
+           logo siempre en la esquina superior izquierda, pie con el nombre y el número de página. */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 9.5pt;
+            color: #2a2550;
+        }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            height: 296mm;
+            overflow: hidden;
+            page-break-after: always;
+            background-color: #ffffff;
+        }
+
+        .page.last {
+            page-break-after: auto;
+        }
+
+        .tint {
+            background-color: #f3efff;
+        }
+
+        /* ------------------------------------------------ elementos comunes */
+        .logo {
+            position: absolute;
+            left: 14mm;
+            top: 11mm;
+            width: 38mm;
+        }
+
+        .foot {
+            position: absolute;
+            left: 14mm;
+            top: 284mm;
+            width: 182mm;
+            font-size: 7.5pt;
+            color: #8a86a0;
+            border-top: 0.2mm solid #e6e1f5;
+            padding-top: 2.5mm;
+        }
+
+        .foot table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .foot td {
+            padding: 0;
+        }
+
+        .foot-brand {
+            font-family: "Playfair Display", serif;
+            font-size: 9pt;
+        }
+
+        .foot-no {
+            text-align: right;
+            letter-spacing: 1pt;
+        }
+
+        .eyebrow {
+            font-size: 7.5pt;
+            letter-spacing: 2.2pt;
+            text-transform: uppercase;
+            color: #6c47ff;
+            font-weight: bold;
+        }
+
+        .rule {
+            width: 22mm;
+            height: 0.9mm;
+            background-color: #6c47ff;
+        }
+
+        /* ------------------------------------------------ portada */
+        .cover-logo {
+            position: absolute;
+            left: 16mm;
+            top: 16mm;
+            width: 70mm;
+        }
+
+        .cover-title-box {
+            position: absolute;
+            left: 16mm;
+            top: 84mm;
+            width: 178mm;
+        }
+
+        .cover-title {
+            margin: 4mm 0 7mm 0;
+            font-family: "Playfair Display", serif;
+            font-weight: bold;
+            font-size: 38pt;
+            line-height: 1.08;
+            color: #2a2550;
+        }
+
+        .cover-tagline {
+            margin-top: 7mm;
+            font-family: "Playfair Display", serif;
+            font-size: 14pt;
+            color: #6c47ff;
+        }
+
+        .cover-date {
+            margin-top: 2.5mm;
+            font-size: 8.5pt;
+            letter-spacing: 1.5pt;
+            text-transform: uppercase;
+            color: #6b6790;
+        }
+
+        .cover-photo {
+            position: absolute;
+            width: 56mm;
+            height: 71.4mm;
+            border: 1.2mm solid #ffffff;
+            background-color: #e6e1f5;
+        }
+
+        .cover-contact {
+            position: absolute;
+            left: 16mm;
+            top: 268mm;
+            width: 178mm;
+            font-size: 8.5pt;
+            color: #6b6790;
+        }
+
+        /* ------------------------------------------------ página de inicio */
+        .intro-box {
+            position: absolute;
+            left: 26mm;
+            top: 96mm;
+            width: 158mm;
+        }
+
+        .intro-mark {
+            font-family: "Playfair Display", serif;
+            font-weight: bold;
+            font-size: 70pt;
+            line-height: 0.7;
+            color: #6c47ff;
+        }
+
+        .intro-text {
+            margin: 4mm 0 9mm 0;
+            font-family: "Playfair Display", serif;
+            font-size: 24pt;
+            line-height: 1.32;
+            color: #2a2550;
+        }
+
+        .intro-brand {
+            margin-top: 6mm;
+            font-family: "Playfair Display", serif;
+            font-size: 12pt;
+            color: #6c47ff;
+        }
+
+        /* ------------------------------------------------ ficha de una prenda */
+        .head {
+            position: absolute;
+            left: 100mm;
+            top: 13mm;
+            width: 96mm;
+            text-align: right;
+        }
+
+        .code {
+            font-size: 8pt;
+            letter-spacing: 2pt;
+            font-weight: bold;
+            color: #6c47ff;
+        }
+
+        .cat {
+            margin-top: 1mm;
+            font-size: 8pt;
+            letter-spacing: 1.4pt;
+            text-transform: uppercase;
+            color: #8a86a0;
+        }
+
+        .badge {
+            display: inline-block;
+            white-space: nowrap;
+            margin-top: 2mm;
+            margin-left: 1.5mm;
+            padding: 0.8mm 2.6mm;
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 1pt;
+            background-color: #efeaff;
+            color: #4b2dd0;
+        }
+
+        .badge.request {
+            background-color: #fff1cc;
+            color: #7a4e00;
+        }
+
+        .badge.soldout {
+            background-color: #2a2550;
+            color: #ffffff;
+        }
+
+        .main-photo {
+            position: absolute;
+            left: 14mm;
+            top: 40mm;
+            width: 118mm;
+            height: 152mm;
+            background-color: #f3efff;
+        }
+
+        .extra-photo {
+            position: absolute;
+            left: 138mm;
+            width: 58mm;
+            height: 74mm;
+            background-color: #f3efff;
+        }
+
+        .no-photo {
+            position: absolute;
+            background-color: #f3efff;
+            text-align: center;
+            color: #a59fc4;
+            font-size: 9pt;
+            padding-top: 68mm;
+        }
+
+        .name-box {
+            position: absolute;
+            left: 14mm;
+            top: 199mm;
+            width: 100mm;
+            max-height: 82mm;
+            overflow: hidden;
+        }
+
+        .name-box.wide {
+            width: 182mm;
+        }
+
+        .name {
+            margin: 0 0 3.5mm 0;
+            font-family: "Playfair Display", serif;
+            font-weight: bold;
+            font-size: 21pt;
+            line-height: 1.12;
+            color: #2a2550;
+        }
+
+        .name-rule {
+            width: 14mm;
+            height: 0.7mm;
+            margin-bottom: 4mm;
+            background-color: #6c47ff;
+        }
+
+        .para {
+            margin: 0 0 2mm 0;
+            font-size: 9.5pt;
+            line-height: 1.5;
+            color: #4a4670;
+        }
+
+        .side-box {
+            position: absolute;
+            left: 120mm;
+            top: 199mm;
+            width: 76mm;
+            max-height: 82mm;
+            overflow: hidden;
+        }
+
+        .side-box.beside {
+            left: 138mm;
+            top: 40mm;
+            width: 58mm;
+            max-height: 152mm;
+        }
+
+        .price-row {
+            margin-bottom: 4mm;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2mm 5mm;
+            font-family: "Playfair Display", serif;
+            font-weight: bold;
+            font-size: 17pt;
+            color: #ffffff;
+            background-color: #6c47ff;
+        }
+
+        .old {
+            margin-left: 3mm;
+            font-size: 9pt;
+            color: #8a86a0;
+            text-decoration: line-through;
+        }
+
+        .off {
+            margin-left: 2mm;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #b42318;
+        }
+
+        .details {
+            padding: 4.5mm 5mm;
+            border-left: 1.2mm solid #6c47ff;
+            background-color: #f6f3ff;
+        }
+
+        .dl {
+            margin: 0 0 1.6mm 0;
+            font-size: 8.5pt;
+            line-height: 1.45;
+            color: #3b3760;
+        }
+
+        /* Letra según el largo del texto: si es corto se agranda, si es largo se achica para que quepa */
+        .dl.big {
+            font-size: 9.5pt;
+            margin-bottom: 2mm;
+        }
+
+        .dl.small {
+            font-size: 7.5pt;
+            line-height: 1.4;
+            margin-bottom: 1.2mm;
+        }
+
+        .para.big {
+            font-size: 11pt;
+            line-height: 1.55;
+        }
+
+        .para.small {
+            font-size: 9pt;
+            line-height: 1.45;
+        }
+
+        /* ------------------------------------------------ cierre */
+        .closing-box {
+            position: absolute;
+            left: 26mm;
+            top: 70mm;
+            width: 158mm;
+        }
+
+        .closing-title {
+            margin: 4mm 0 8mm 0;
+            font-family: "Playfair Display", serif;
+            font-weight: bold;
+            font-size: 28pt;
+            line-height: 1.15;
+            color: #2a2550;
+        }
+
+        .contact-line {
+            margin-bottom: 5.5mm;
+            font-size: 12pt;
+            color: #2a2550;
+        }
+
+        .contact-label {
+            display: block;
+            margin-bottom: 0.8mm;
+            font-size: 7pt;
+            letter-spacing: 1.6pt;
+            text-transform: uppercase;
+            color: #8a86a0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===================== PORTADA ===================== -->
+    <div class="page tint">
+        <img class="cover-logo" th:if="${logo != null}" th:src="${logo}" alt="" />
+
+        <div class="cover-title-box">
+            <div class="eyebrow" th:text="#{catalogpdf.cover.eyebrow}">CATÁLOGO</div>
+            <div class="cover-title" th:text="${catalog.name}">Catálogo</div>
+            <div class="rule"></div>
+            <div class="cover-tagline" th:if="${!#strings.isEmpty(store.tagline)}" th:text="${store.tagline}"></div>
+            <div class="cover-date" th:text="${monthYear}">Noviembre 2026</div>
+        </div>
+
+        <!-- Tres prendas del catálogo -->
+        <th:block th:each="url, st : ${coverUrls}">
+            <img class="cover-photo" th:if="${cover.containsKey(url)}" th:src="${cover.get(url)}" alt=""
+                th:style="'left:' + ${16 + st.index * 61} + 'mm; top:' + ${168 + (st.index % 2) * 9} + 'mm;'" />
+        </th:block>
+
+        <div class="cover-contact">
+            <span th:if="${!#strings.isEmpty(store.storeName)}" th:text="${store.storeName}"></span>
+            <span th:if="${!#strings.isEmpty(store.whatsapp)}" th:text="'  ·  WhatsApp ' + ${store.whatsapp}"></span>
+            <span th:if="${!#strings.isEmpty(store.instagram)}" th:text="'  ·  ' + ${store.instagram}"></span>
+        </div>
+    </div>
+
+    <!-- ===================== TEXTO DE INICIO ===================== -->
+    <div class="page" th:if="${catalog.hasIntro()}">
+        <img class="logo" th:if="${logo != null}" th:src="${logo}" alt="" />
+        <div class="intro-box">
+            <div class="intro-mark">“</div>
+            <div class="intro-text" th:text="${catalog.intro}">Calidad y estilo</div>
+            <div class="rule"></div>
+            <div class="intro-brand" th:text="${store.storeName}">Saphikuna</div>
+        </div>
+        <div class="foot">
+            <table><tr>
+                <td class="foot-brand" th:text="${store.storeName}">Saphikuna</td>
+                <td class="foot-no">2</td>
+            </tr></table>
+        </div>
+    </div>
+
+    <!-- ===================== UNA PRENDA POR PÁGINA ===================== -->
+    <div class="page" th:each="it, st : ${catalog.items}"
+        th:with="hlen=${#strings.length(#strings.listJoin(it.highlight, ' '))}, dlen=${#strings.length(#strings.listJoin(it.details, ' '))}">
+        <img class="logo" th:if="${logo != null}" th:src="${logo}" alt="" />
+
+        <div class="head">
+            <div class="code" th:text="${it.code}">SPK-001</div>
+            <div class="cat" th:if="${!#strings.isEmpty(it.category)}" th:text="${it.category}">Chompas</div>
+            <div>
+                <span class="badge" th:if="${it.isNew()}" th:text="#{catalogpdf.badge.new}">NUEVO</span>
+                <span class="badge request" th:if="${it.isOnRequest()}" th:text="#{catalogpdf.badge.onRequest}">BAJO PEDIDO</span>
+                <span class="badge soldout" th:if="${it.isSoldOut()}" th:text="#{catalogpdf.badge.soldOut}">AGOTADO</span>
+            </div>
+        </div>
+
+        <!-- Foto principal -->
+        <img class="main-photo" th:if="${it.mainUrl != null and mains.containsKey(it.mainUrl)}"
+            th:src="${mains.get(it.mainUrl)}" alt="" />
+        <div class="no-photo main-photo" th:unless="${it.mainUrl != null and mains.containsKey(it.mainUrl)}"
+            th:text="#{catalogpdf.nophoto}">Sin foto</div>
+
+        <!-- Fotos de apoyo (columna derecha) -->
+        <th:block th:each="url, ex : ${it.extraUrls}">
+            <img class="extra-photo" th:if="${extras.containsKey(url)}" th:src="${extras.get(url)}" alt=""
+                th:style="'top:' + ${40 + ex.index * 78} + 'mm;'" />
+        </th:block>
+
+        <!-- Sin fotos de apoyo: la columna derecha lleva el precio y la ficha -->
+        <div class="side-box beside" th:unless="${it.hasExtras()}">
+            <div class="price-row" th:if="${catalog.showPrices and it.finalPrice != null}">
+                <span class="pill" th:text="'$' + ${#numbers.formatDecimal(it.finalPrice, 1, 'COMMA', 2, 'POINT')}">$30.00</span>
+                <span class="old" th:if="${it.hasDiscount()}" th:text="'$' + ${#numbers.formatDecimal(it.price, 1, 'COMMA', 2, 'POINT')}"></span>
+                <span class="off" th:if="${it.hasDiscount()}" th:text="'-' + ${it.discountPercent} + '%'"></span>
+            </div>
+            <div class="details" th:if="${!it.details.isEmpty()}">
+                <div class="dl" th:each="line : ${it.details}" th:text="${line}"
+                    th:classappend="${dlen <= 140} ? 'big' : (${dlen > 300} ? 'small' : '')"></div>
+            </div>
+        </div>
+
+        <!-- Nombre y frase destacada -->
+        <div class="name-box" th:classappend="${it.hasExtras()} ? '' : 'wide'">
+            <div class="name" th:text="${it.name}">Suéter Coral</div>
+            <div class="name-rule"></div>
+            <div class="para" th:each="p : ${it.highlight}" th:text="${p}"
+                th:classappend="${hlen <= 230} ? 'big' : (${hlen > 330} ? 'small' : '')"></div>
+        </div>
+
+        <!-- Con fotos de apoyo: precio y ficha debajo, a la derecha -->
+        <div class="side-box" th:if="${it.hasExtras()}">
+            <div class="price-row" th:if="${catalog.showPrices and it.finalPrice != null}">
+                <span class="pill" th:text="'$' + ${#numbers.formatDecimal(it.finalPrice, 1, 'COMMA', 2, 'POINT')}">$30.00</span>
+                <span class="old" th:if="${it.hasDiscount()}" th:text="'$' + ${#numbers.formatDecimal(it.price, 1, 'COMMA', 2, 'POINT')}"></span>
+                <span class="off" th:if="${it.hasDiscount()}" th:text="'-' + ${it.discountPercent} + '%'"></span>
+            </div>
+            <div class="details" th:if="${!it.details.isEmpty()}">
+                <div class="dl" th:each="line : ${it.details}" th:text="${line}"
+                    th:classappend="${dlen <= 140} ? 'big' : (${dlen > 300} ? 'small' : '')"></div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <table><tr>
+                <td class="foot-brand" th:text="${store.storeName}">Saphikuna</td>
+                <td class="foot-no" th:text="${st.index + 2 + introPage}">3</td>
+            </tr></table>
+        </div>
+    </div>
+
+    <!-- ===================== CIERRE ===================== -->
+    <div class="page tint last">
+        <img class="logo" th:if="${logo != null}" th:src="${logo}" alt="" />
+        <div class="closing-box">
+            <div class="eyebrow" th:text="#{catalogpdf.closing.eyebrow}">Escríbenos</div>
+            <div class="closing-title" th:text="${!#strings.isEmpty(store.tagline)} ? ${store.tagline} : ${store.storeName}">Tejiendo sueños</div>
+            <div class="rule" style="margin-bottom: 11mm;"></div>
+
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.whatsapp)}">
+                <span class="contact-label">WhatsApp</span><span th:text="${store.whatsapp}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.phone)}">
+                <span class="contact-label" th:text="#{brochure.contact.phone}">Teléfono</span><span th:text="${store.phone}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.email)}">
+                <span class="contact-label" th:text="#{brochure.contact.email}">Correo</span><span th:text="${store.email}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.instagram)}">
+                <span class="contact-label">Instagram</span><span th:text="${store.instagram}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.facebook)}">
+                <span class="contact-label">Facebook</span><span th:text="${store.facebook}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(store.address)}">
+                <span class="contact-label" th:text="#{brochure.contact.address}">Dirección</span><span th:text="${store.address}"></span>
+            </div>
+            <div class="contact-line" th:if="${!#strings.isEmpty(storeUrl)}">
+                <span class="contact-label" th:text="#{catalogpdf.closing.store}">Tienda en línea</span><span th:text="${storeUrl}"></span>
+            </div>
+        </div>
+        <div class="foot">
+            <table><tr>
+                <td class="foot-brand" th:text="${store.storeName}">Saphikuna</td>
+                <td class="foot-no" th:text="${catalog.items.size() + 2 + introPage}">9</td>
+            </tr></table>
+        </div>
+    </div>
+
+</body>
+
+</html>

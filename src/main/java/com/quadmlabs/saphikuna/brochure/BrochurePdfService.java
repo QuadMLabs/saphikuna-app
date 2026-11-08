@@ -1,6 +1,9 @@
 package com.quadmlabs.saphikuna.brochure;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.quadmlabs.saphikuna.brochure.builder.BrochureBuilderService.PdfCatalog;
+import com.quadmlabs.saphikuna.brochure.builder.BrochureBuilderService.PdfItem;
+import com.quadmlabs.saphikuna.dto.StoreInfoForm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,9 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +94,64 @@ public class BrochurePdfService {
         context.setVariable("logo", images.logoDataUri());
         context.setVariable("footerText", cssSafe(data.store().getStoreName()));
 
-        String xhtml = engine.process("brochure", context);
+        return toPdf(engine.process("brochure", context), data.productCount(), started);
+    }
 
+    // ------------------------------------------------------------------
+    // Catálogo armado en el panel (nombre, texto de inicio, prendas con sus fotos y textos)
+    // ------------------------------------------------------------------
+
+    /** Una foto por prenda en la portada, como máximo. */
+    private static final int COVER_PHOTOS = 3;
+
+    /** El catálogo armado en PDF. {@code storeUrl} puede ser vacío (entonces no se muestra). */
+    public byte[] renderCatalog(PdfCatalog catalog, StoreInfoForm store, String storeUrl, LocalDate today) {
+        try {
+            rendering.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Se interrumpió la generación del PDF", e);
+        }
+        try {
+            long started = System.nanoTime();
+
+            List<String> mains = catalog.items().stream().map(PdfItem::mainUrl).filter(u -> u != null && !u.isBlank()).toList();
+            List<String> extras = catalog.items().stream().flatMap(i -> i.extraUrls().stream()).toList();
+
+            Context context = new Context(LocaleContextHolder.getLocale());
+            context.setVariable("catalog", catalog);
+            context.setVariable("store", store);
+            context.setVariable("storeUrl", displayUrl(storeUrl));
+            context.setVariable("monthYear", monthYear(today));
+            context.setVariable("mains", images.prepare(mains, BrochureImageService.Shape.HERO));
+            context.setVariable("extras", images.prepare(extras, BrochureImageService.Shape.SUPPORT));
+            // Portada: versiones pequeñas (así las fotos no se guardan dos veces en grande)
+            context.setVariable("cover", images.prepare(mains.stream().limit(COVER_PHOTOS).toList(), BrochureImageService.Shape.SUPPORT));
+            context.setVariable("coverUrls", mains.stream().limit(COVER_PHOTOS).toList());
+            context.setVariable("logo", images.logoDataUri(520));
+            context.setVariable("introPage", catalog.hasIntro() ? 1 : 0);
+
+            return toPdf(engine.process("catalog", context), catalog.items().size(), started);
+        } finally {
+            rendering.release();
+        }
+    }
+
+    /** "saphikuna.netlify.app" a partir de "https://saphikuna.netlify.app/". */
+    static String displayUrl(String url) {
+        if (url == null || url.isBlank()) {
+            return "";
+        }
+        return url.trim().replaceFirst("^https?://", "").replaceFirst("/+$", "");
+    }
+
+    /** "Noviembre 2026". */
+    static String monthYear(LocalDate date) {
+        String month = date.getMonth().getDisplayName(TextStyle.FULL, new Locale("es"));
+        return month.substring(0, 1).toUpperCase(new Locale("es")) + month.substring(1) + " " + date.getYear();
+    }
+
+    private byte[] toPdf(String xhtml, int products, long started) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useFastMode();
@@ -103,7 +165,7 @@ public class BrochurePdfService {
 
             byte[] pdf = out.toByteArray();
             log.info("Catálogo PDF generado: {} productos, {} KB, {} ms",
-                    data.productCount(), pdf.length / 1024, (System.nanoTime() - started) / 1_000_000);
+                    products, pdf.length / 1024, (System.nanoTime() - started) / 1_000_000);
             return pdf;
         } catch (Exception e) {
             throw new IllegalStateException("No se pudo generar el PDF del catálogo", e);

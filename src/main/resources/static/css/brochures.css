@@ -1,0 +1,721 @@
+/* Catálogos: lista, datos, elegir prendas y ficha de cada prenda.
+   Pensado primero para el celular: una columna, botones grandes y los botones de guardar siempre a la vista. */
+
+.bro-page {
+    max-width: 880px;
+    margin: 0 auto;
+}
+
+.bro-block {
+    margin-bottom: 18px;
+}
+
+.bro-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: .92rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.bro-back:hover {
+    color: var(--primary-color);
+}
+
+.bro-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+.bro-small {
+    height: 38px;
+    padding: 0 14px;
+    font-size: .9rem;
+}
+
+.bro-hidden-submit {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.bro-link-button {
+    margin-top: 6px;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: var(--primary-color);
+    font: inherit;
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.bro-link-button:hover {
+    color: var(--primary-dark);
+}
+
+/* ------------------------------------------------------------------ lista de catálogos */
+.bro-cards {
+    display: grid;
+    gap: 14px;
+}
+
+.bro-card {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 14px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid var(--primary-border);
+    border-radius: 14px;
+}
+
+.bro-card-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    aspect-ratio: 3 / 4;
+}
+
+.bro-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bro-card-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bro-card-name {
+    color: var(--ink);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.bro-card-meta {
+    margin: 2px 0 10px;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.bro-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.bro-legacy {
+    margin-top: 26px;
+    text-align: center;
+    font-size: .85rem;
+}
+
+.bro-legacy a {
+    color: var(--muted);
+}
+
+@media (min-width: 640px) {
+    .bro-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1500px) {
+    .bro-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ------------------------------------------------------------------ pasos */
+.bro-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+}
+
+.bro-steps a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid var(--primary-border);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+}
+
+.bro-steps b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    font-size: .8rem;
+}
+
+.bro-steps .is-done a {
+    color: var(--ink);
+}
+
+.bro-steps .is-done b {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.bro-steps .is-next a {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), .12);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ datos */
+.bro-brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--primary-tint);
+    color: var(--ink);
+}
+
+.bro-brand svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    color: var(--primary-color);
+}
+
+.bro-brand div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bro-brand span {
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.bro-brand small {
+    margin-top: 4px;
+    color: var(--muted);
+}
+
+.bro-brand a {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.bro-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.bro-switch input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--primary-color);
+}
+
+/* ------------------------------------------------------------------ prendas del catálogo */
+.bro-items-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bro-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.bro-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 6px 12px;
+    padding: 10px;
+    border: 1px solid var(--primary-border);
+    border-radius: 12px;
+    background: #fff;
+    scroll-margin-top: 80px;
+}
+
+.bro-item:target {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), .15);
+}
+
+.bro-item-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 85px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+}
+
+.bro-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bro-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.bro-item-code {
+    color: var(--muted);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+}
+
+.bro-item-name {
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.bro-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+.bro-ok {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #17703F;
+    font-weight: 600;
+}
+
+.bro-ok svg {
+    width: 14px;
+    height: 14px;
+}
+
+.bro-warn {
+    color: #8A5A00;
+    font-weight: 600;
+}
+
+/* En el celular los botones van debajo, a todo el ancho de la fila */
+.bro-item-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bro-item-actions .primary-button {
+    flex: 1;
+    justify-content: center;
+}
+
+@media (min-width: 640px) {
+    .bro-item {
+        grid-template-columns: 64px 1fr auto;
+        align-items: center;
+    }
+
+    .bro-item-actions {
+        grid-column: auto;
+    }
+
+    .bro-item-actions .primary-button {
+        flex: 0 0 auto;
+    }
+}
+
+/* ------------------------------------------------------------------ elegir prendas */
+.bro-filter {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+@media (min-width: 640px) {
+    .bro-filter {
+        grid-template-columns: 1fr 220px auto;
+    }
+}
+
+.bro-count {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: .88rem;
+}
+
+.pick-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.pick-row {
+    display: grid;
+    grid-template-columns: 26px 56px 1fr;
+    align-items: center;
+    gap: 12px;
+    min-height: 76px;
+    padding: 10px 12px;
+    border: 1px solid var(--primary-border);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.pick-row:has(input:checked:not(:disabled)) {
+    border-color: var(--primary-color);
+    background: var(--primary-tint);
+}
+
+.pick-row.is-in {
+    background: var(--surface-soft);
+    cursor: default;
+}
+
+.pick-row input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--primary-color);
+}
+
+.pick-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 74px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+}
+
+.pick-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pick-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pick-name {
+    font-weight: 600;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.pick-meta {
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+.pick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+@media (min-width: 900px) {
+    .pick-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ------------------------------------------------------------------ ficha de la prenda */
+.bro-product {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.bro-product-thumb {
+    flex-shrink: 0;
+    width: 60px;
+    height: 80px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--primary-soft);
+}
+
+.bro-product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bro-product-pos {
+    color: var(--primary-color);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.bro-product-name {
+    margin: 2px 0;
+    font-size: 1.3rem;
+    line-height: 1.2;
+}
+
+.bro-product-code {
+    color: var(--muted);
+    font-size: .88rem;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 700px) {
+    .photo-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.photo-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border: 2px solid var(--primary-border);
+    border-radius: 14px;
+    background: #fff;
+    transition: border-color .15s, background .15s;
+}
+
+.photo-tile.is-main {
+    border-color: var(--primary-color);
+    background: var(--primary-tint);
+}
+
+.photo-tile.is-extra {
+    border-color: #B9A8FF;
+    background: #FBFAFF;
+}
+
+.photo-img {
+    overflow: hidden;
+    border-radius: 9px;
+    background: var(--primary-soft);
+    aspect-ratio: 3 / 4;
+}
+
+.photo-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Control de tres opciones: No usar | Principal | Apoyo */
+.seg {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.seg input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.seg label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 8px;
+    border: 1px solid var(--primary-border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--muted);
+    font-size: .9rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.seg input:checked + label {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.seg input[value="none"]:checked + label {
+    border-color: var(--line, #E6E1F5);
+    background: #F1EFF8;
+    color: var(--ink);
+}
+
+.seg input[value="extra"]:checked + label {
+    border-color: #8F74FF;
+    background: #8F74FF;
+}
+
+.seg input:focus-visible + label {
+    outline: 3px solid rgba(var(--primary-rgb), .35);
+    outline-offset: 1px;
+}
+
+@media (min-width: 700px) {
+    .seg label {
+        font-size: .82rem;
+    }
+}
+
+/* Barra de botones inferior: en el celular puede partirse en dos filas sin salirse de la pantalla */
+.bro-page .form-actions-bar {
+    flex-wrap: wrap;
+}
+
+.bro-page .form-actions-bar .primary-button,
+.bro-page .form-actions-bar .secondary-button {
+    min-width: 0;
+}
+
+/* Ayudas bajo los campos (el panel solo las estilaba dentro de otras pantallas) */
+.bro-page .form-field-hint {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: .85rem;
+    line-height: 1.4;
+}
+
+.bro-form .form-field-hint {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: .85rem;
+    line-height: 1.4;
+}
+
+/* Cajas de texto: altas para poder escribir cómodamente (el estilo general de los campos las deja de una línea) */
+.bro-page textarea.form-input {
+    height: auto;
+    min-height: 92px;
+    padding: 10px 12px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.bro-page textarea#detailsText {
+    min-height: 150px;
+}
+
+/* Tarjeta "Catálogo en PDF" */
+.bro-pdf .general-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bro-pdf h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+}
+
+.bro-pdf p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.bro-pdf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bro-pdf-actions .primary-button,
+.bro-pdf-actions .secondary-button {
+    flex: 1 1 140px;
+    justify-content: center;
+}
+
+@media (min-width: 640px) {
+    .bro-pdf .general-card-body {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .bro-pdf-actions .primary-button,
+    .bro-pdf-actions .secondary-button {
+        flex: 0 0 auto;
+    }
+}

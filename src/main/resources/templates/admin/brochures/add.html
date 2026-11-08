@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{brochures.add.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/brochures.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content bro-page">
+
+                <a class="bro-back" th:href="@{/admin/catalogos/{id}(id=${brochureId})}">
+                    <i data-lucide="arrow-left"></i>
+                    <span th:text="${brochureName}"></span>
+                </a>
+
+                <div class="page-header">
+                    <h1 class="page-title" th:text="#{brochures.add.title}"></h1>
+                    <p class="page-subtitle" th:text="#{brochures.add.subtitle}"></p>
+                </div>
+
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+
+                <!-- Buscar y filtrar: formulario GET normal -->
+                <form class="bro-filter" method="get" th:action="@{/admin/catalogos/{id}/agregar(id=${brochureId})}">
+                    <input type="search" name="q" class="form-input" th:value="${q}" th:placeholder="#{brochures.add.search.ph}"
+                        th:aria-label="#{common.search}">
+                    <select name="categoria" class="form-select" th:aria-label="#{brochures.add.category}">
+                        <option value="" th:text="#{brochures.add.category.all}"></option>
+                        <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.name}"
+                            th:selected="${categoria == c.categoryId.toString()}"></option>
+                    </select>
+                    <button type="submit" class="secondary-button">
+                        <i data-lucide="search"></i>
+                        <span th:text="#{common.search}"></span>
+                    </button>
+                </form>
+
+                <div class="list-empty" th:if="${#lists.isEmpty(candidates)}">
+                    <p th:text="#{brochures.add.empty}"></p>
+                </div>
+
+                <!-- Lista de prendas con casilla; los botones de abajo quedan siempre a la vista -->
+                <form method="post" data-saving th:unless="${#lists.isEmpty(candidates)}"
+                    th:action="@{/admin/catalogos/{id}/agregar(id=${brochureId})}">
+                    <button type="submit" class="bro-hidden-submit" tabindex="-1" aria-hidden="true"></button>
+                    <input type="hidden" name="q" th:value="${q}">
+                    <input type="hidden" name="categoria" th:value="${categoria}">
+
+                    <p class="bro-count"
+                        th:text="#{brochures.add.count(${#lists.size(candidates)}, ${#lists.size(candidates.?[alreadyIn])})}"></p>
+
+                    <ul class="pick-list">
+                        <li th:each="c : ${candidates}">
+                            <label class="pick-row" th:classappend="${c.alreadyIn} ? 'is-in' : ''">
+                                <input type="checkbox" name="ids" th:value="${c.productId}" th:checked="${c.alreadyIn}"
+                                    th:disabled="${c.alreadyIn}">
+                                <span class="pick-thumb">
+                                    <img th:if="${c.thumbUrl != null}" th:src="${c.thumbUrl}" alt="" loading="lazy">
+                                    <i th:unless="${c.thumbUrl != null}" data-lucide="image-off"></i>
+                                </span>
+                                <span class="pick-info">
+                                    <span class="pick-name" th:text="${c.name}"></span>
+                                    <span class="pick-meta">
+                                        <span th:text="${c.code}"></span>
+                                        <span th:if="${c.category != null}" th:text="'· ' + ${c.category}"></span>
+                                        <span th:text="'· ' + #{brochures.item.photos(${c.photoCount})}"></span>
+                                    </span>
+                                    <span class="pick-tags">
+                                        <span class="tag badge-soldout" th:if="${c.availability == 'Agotado'}"
+                                            th:text="#{brochures.item.soldout}"></span>
+                                        <span class="tag badge-request" th:if="${c.availability == 'Bajo pedido'}"
+                                            th:text="#{brochures.add.onrequest}"></span>
+                                        <span class="tag badge-available" th:if="${c.alreadyIn}"
+                                            th:text="#{brochures.add.already}"></span>
+                                    </span>
+                                </span>
+                            </label>
+                        </li>
+                    </ul>
+
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/catalogos/{id}(id=${brochureId})}" class="secondary-button"
+                            th:text="#{common.cancel}"></a>
+                        <button type="submit" name="all" value="true" class="secondary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{brochures.add.all}"></button>
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{brochures.add.selected}"></button>
+                    </div>
+                </form>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

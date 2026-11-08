@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{brochures.new}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/brochures.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <form class="general-form bro-form" method="post" data-saving th:object="${brochureForm}"
+                    th:action="@{/admin/catalogos}">
+
+                    <div class="general-form-header">
+                        <div>
+                            <h1 class="general-form-title" th:text="#{brochures.new}"></h1>
+                            <p class="general-form-subtitle" th:text="#{brochures.new.subtitle}"></p>
+                        </div>
+                    </div>
+
+                    <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+
+                    <div class="general-card">
+                        <div class="general-card-body">
+                            <div class="form-field" th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
+                                <label for="name">
+                                    <span th:text="#{brochures.field.name}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="name" th:field="*{name}" class="form-input" maxlength="80"
+                                    autocomplete="off" autofocus th:placeholder="#{brochures.field.name.ph}">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('introText')} ? 'has-error' : ''">
+                                <label for="introText" th:text="#{brochures.field.intro}"></label>
+                                <textarea id="introText" th:field="*{introText}" class="form-input" rows="3" maxlength="400"
+                                    th:placeholder="#{brochures.field.intro.ph}"></textarea>
+                                <p class="form-field-hint" th:text="#{brochures.field.intro.hint}"></p>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('introText')}"
+                                    th:errors="*{introText}"></p>
+                            </div>
+
+                            <label class="bro-switch">
+                                <input type="checkbox" name="showPrices" value="true" th:checked="*{showPrices}">
+                                <span th:text="#{brochures.field.prices}"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/catalogos}" class="secondary-button" th:text="#{common.cancel}"></a>
+                        <button type="submit" class="primary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{brochures.new.submit}"></button>
+                    </div>
+                </form>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>
