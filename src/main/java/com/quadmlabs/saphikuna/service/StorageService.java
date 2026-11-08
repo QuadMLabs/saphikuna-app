@@ -10,12 +10,6 @@ public interface StorageService {
      */
     String upload(MultipartFile file, String path);
 
-    /**
-     * Sube una foto ya leída (por ejemplo, ya sin marca de agua) en {@code newPath}, optimizada como
-     * cualquier otra, junto con su miniatura. No borra nada.
-     */
-    void replaceImage(java.awt.image.BufferedImage image, String newPath);
-
     /** ¿Responde Supabase Storage con la clave configurada? No lanza excepciones (máx. ~3 s). */
     boolean ping();
 

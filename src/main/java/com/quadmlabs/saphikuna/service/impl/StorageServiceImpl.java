@@ -112,25 +112,6 @@ public class StorageServiceImpl implements StorageService {
                 }
         }
 
-        @Override
-        public void replaceImage(BufferedImage image, String newPath) {
-                try {
-                        byte[] main = encodeUnderLimit(image, maxWidth, maxHeight, maxBytes);
-                        byte[] thumb = encodeUnderLimit(image, thumbSize, thumbSize, maxBytes / 4);
-
-                        send(newPath, main);
-                        try {
-                                send(thumbPath(newPath), thumb);
-                        } catch (RuntimeException e) {
-                                delete(newPath);
-                                throw e;
-                        }
-                        log.info("Imagen {} reemplazada: {} KB (miniatura {} KB)", newPath, main.length / 1024, thumb.length / 1024);
-                } catch (IOException e) {
-                        throw new IllegalStateException("No fue posible procesar la imagen", e);
-                }
-        }
-
         /** Cliente aparte con tiempos límite cortos: la pantalla de estado no debe quedarse esperando. */
         private final RestClient pingClient = RestClient.builder()
                         .requestFactory(pingFactory())

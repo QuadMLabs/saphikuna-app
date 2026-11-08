@@ -126,16 +126,6 @@
     margin-top: auto;
 }
 
-.bro-legacy {
-    margin-top: 26px;
-    text-align: center;
-    font-size: .85rem;
-}
-
-.bro-legacy a {
-    color: var(--muted);
-}
-
 @media (min-width: 640px) {
     .bro-cards {
         grid-template-columns: 1fr 1fr;

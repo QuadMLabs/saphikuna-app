@@ -42,10 +42,6 @@ public class BrochureImageService {
 
     /** Formato de la foto dentro del catálogo. */
     public enum Shape {
-        /** Vertical 3:4, para la foto principal. 600x800 son más de 300 ppp en una columna de 48 mm. */
-        PORTRAIT(600, 800),
-        /** Cuadrada, para las fotos pequeñas (17,5 mm: 240 px bastan). */
-        SQUARE(240, 240),
         /** Foto principal de una ficha de catálogo (118 x 152 mm: 900 px de ancho dan unos 190 ppp). */
         HERO(900, 1160),
         /** Fotos de apoyo de una ficha de catálogo (58 x 74 mm). */
@@ -165,17 +161,6 @@ public class BrochureImageService {
                 return null;
             }
         });
-    }
-
-    /** El logo (PNG con fondo transparente) como data URI; null si no está. */
-    public String logoDataUri() {
-        try {
-            byte[] bytes = new ClassPathResource("static/images/logo.png").getContentAsByteArray();
-            return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
-        } catch (IOException e) {
-            log.warn("No se pudo leer el logo: {}", e.getMessage());
-            return null;
-        }
     }
 
     // ------------------------------------------------------------------

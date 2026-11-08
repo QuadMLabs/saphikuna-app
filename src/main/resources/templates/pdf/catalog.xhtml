@@ -363,6 +363,21 @@
             line-height: 1.45;
         }
 
+        /* Enlace a la prenda en la tienda: va en el centro del pie de página, que siempre está libre */
+        .foot-link {
+            text-align: center;
+        }
+
+        .shop-link {
+            padding: 0.9mm 3.2mm;
+            font-size: 7.5pt;
+            font-weight: bold;
+            letter-spacing: 0.3pt;
+            color: #6c47ff;
+            text-decoration: none;
+            border: 0.3mm solid #6c47ff;
+        }
+
         /* ------------------------------------------------ cierre */
         .closing-box {
             position: absolute;
@@ -505,6 +520,9 @@
         <div class="foot">
             <table><tr>
                 <td class="foot-brand" th:text="${store.storeName}">Saphikuna</td>
+                <td class="foot-link"><a class="shop-link" th:if="${!#strings.isEmpty(shopUrl)}"
+                    th:href="${shopUrl} + 'product.html?code=' + ${#uris.escapeQueryParam(it.code)}"
+                    th:text="#{catalogpdf.shoplink}">Ver en la tienda</a></td>
                 <td class="foot-no" th:text="${st.index + 2 + introPage}">3</td>
             </tr></table>
         </div>
@@ -522,10 +540,10 @@
                 <span class="contact-label">WhatsApp</span><span th:text="${store.whatsapp}"></span>
             </div>
             <div class="contact-line" th:if="${!#strings.isEmpty(store.phone)}">
-                <span class="contact-label" th:text="#{brochure.contact.phone}">Teléfono</span><span th:text="${store.phone}"></span>
+                <span class="contact-label" th:text="#{catalogpdf.contact.phone}">Teléfono</span><span th:text="${store.phone}"></span>
             </div>
             <div class="contact-line" th:if="${!#strings.isEmpty(store.email)}">
-                <span class="contact-label" th:text="#{brochure.contact.email}">Correo</span><span th:text="${store.email}"></span>
+                <span class="contact-label" th:text="#{catalogpdf.contact.email}">Correo</span><span th:text="${store.email}"></span>
             </div>
             <div class="contact-line" th:if="${!#strings.isEmpty(store.instagram)}">
                 <span class="contact-label">Instagram</span><span th:text="${store.instagram}"></span>
@@ -534,7 +552,7 @@
                 <span class="contact-label">Facebook</span><span th:text="${store.facebook}"></span>
             </div>
             <div class="contact-line" th:if="${!#strings.isEmpty(store.address)}">
-                <span class="contact-label" th:text="#{brochure.contact.address}">Dirección</span><span th:text="${store.address}"></span>
+                <span class="contact-label" th:text="#{catalogpdf.contact.address}">Dirección</span><span th:text="${store.address}"></span>
             </div>
             <div class="contact-line" th:if="${!#strings.isEmpty(storeUrl)}">
                 <span class="contact-label" th:text="#{catalogpdf.closing.store}">Tienda en línea</span><span th:text="${storeUrl}"></span>

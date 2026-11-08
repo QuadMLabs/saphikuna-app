@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -21,12 +20,10 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Genera el catálogo en PDF: arma una página XHTML con Thymeleaf (plantilla templates/pdf/) y
+ * Genera el PDF del catálogo armado en el panel: arma una página XHTML con Thymeleaf (plantilla templates/pdf/) y
  * la convierte con OpenHTMLtoPDF. La plantilla usa tablas y no flex/grid porque el conversor
  * solo entiende CSS 2.1 y parte de CSS 3.
  */
@@ -57,46 +54,6 @@ public class BrochurePdfService {
     /** Un PDF a la vez: generarlo usa mucha memoria y el servidor es pequeño. */
     private final java.util.concurrent.Semaphore rendering = new java.util.concurrent.Semaphore(1, true);
 
-    /** El catálogo en PDF (bytes). Lanza IllegalStateException si no se pudo generar. */
-    public byte[] render(BrochureData data) {
-        try {
-            rendering.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Se interrumpió la generación del PDF", e);
-        }
-        try {
-            return renderOne(data);
-        } finally {
-            rendering.release();
-        }
-    }
-
-    private byte[] renderOne(BrochureData data) {
-        long started = System.nanoTime();
-
-        // Fotos: la principal de cada producto (vertical) y las demás (pequeñas)
-        List<String> mains = new ArrayList<>();
-        List<String> extras = new ArrayList<>();
-        data.sections().forEach(s -> s.items().forEach(item -> {
-            if (!item.photos().isEmpty()) {
-                mains.add(item.photos().get(0));
-                extras.addAll(item.photos().subList(1, item.photos().size()));
-            }
-        }));
-        Map<String, String> mainImages = images.prepare(mains, BrochureImageService.Shape.PORTRAIT);
-        Map<String, String> thumbImages = images.prepare(extras, BrochureImageService.Shape.SQUARE);
-
-        Context context = new Context(LocaleContextHolder.getLocale());
-        context.setVariable("data", data);
-        context.setVariable("mainImages", mainImages);
-        context.setVariable("thumbImages", thumbImages);
-        context.setVariable("logo", images.logoDataUri());
-        context.setVariable("footerText", cssSafe(data.store().getStoreName()));
-
-        return toPdf(engine.process("brochure", context), data.productCount(), started);
-    }
-
     // ------------------------------------------------------------------
     // Catálogo armado en el panel (nombre, texto de inicio, prendas con sus fotos y textos)
     // ------------------------------------------------------------------
@@ -122,6 +79,7 @@ public class BrochurePdfService {
             context.setVariable("catalog", catalog);
             context.setVariable("store", store);
             context.setVariable("storeUrl", displayUrl(storeUrl));
+            context.setVariable("shopUrl", shopBase(storeUrl));
             context.setVariable("monthYear", monthYear(today));
             context.setVariable("mains", images.prepare(mains, BrochureImageService.Shape.HERO));
             context.setVariable("extras", images.prepare(extras, BrochureImageService.Shape.SUPPORT));
@@ -143,6 +101,18 @@ public class BrochurePdfService {
             return "";
         }
         return url.trim().replaceFirst("^https?://", "").replaceFirst("/+$", "");
+    }
+
+    /** Dirección de la tienda con "https://" y terminada en "/"; vacía si no hay. */
+    static String shopBase(String url) {
+        if (url == null || url.isBlank()) {
+            return "";
+        }
+        String clean = url.trim();
+        if (!clean.matches("^https?://.*")) {
+            clean = "https://" + clean;
+        }
+        return clean.endsWith("/") ? clean : clean + "/";
     }
 
     /** "Noviembre 2026". */
@@ -176,8 +146,4 @@ public class BrochurePdfService {
         return BrochurePdfService.class.getResourceAsStream("/static/fonts/" + name);
     }
 
-    /** Texto que va dentro de una cadena CSS: sin comillas ni barras. */
-    private static String cssSafe(String s) {
-        return s == null ? "" : HtmlUtils.htmlEscape(s.replace("\"", "").replace("'", "").replace("\\", ""));
-    }
 }

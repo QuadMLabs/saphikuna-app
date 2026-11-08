@@ -6,6 +6,8 @@ import com.quadmlabs.saphikuna.dto.StoreInfoForm;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -114,6 +117,55 @@ class CatalogPdfTest {
 
         assertThat(text).contains("Color: Vino").contains("Sin foto");
         assertThat(squash(text)).contains("BAJOPEDIDO").contains("NUEVO"); // las etiquetas van con letras espaciadas
+    }
+
+    /** Las direcciones de los enlaces que tiene cada página del PDF. */
+    private List<List<String>> links(PdfCatalog catalog, String storeUrl) throws Exception {
+        byte[] bytes = pdf.renderCatalog(catalog, store, storeUrl, LocalDate.of(2026, 11, 8));
+        List<List<String>> out = new ArrayList<>();
+        try (PDDocument doc = Loader.loadPDF(bytes)) {
+            for (var page : doc.getPages()) {
+                List<String> uris = new ArrayList<>();
+                for (var annotation : page.getAnnotations()) {
+                    if (annotation instanceof PDAnnotationLink link && link.getAction() instanceof PDActionURI action) {
+                        uris.add(action.getURI());
+                    }
+                }
+                out.add(uris);
+            }
+        }
+        return out;
+    }
+
+    @Test
+    void eachPieceLinksToItsPageInTheStore() throws Exception {
+        PdfCatalog catalog = new PdfCatalog("A", "Hola", true, List.of(
+                item("SPK-001", "Suéter Coral", "50.00", 0, List.of()),
+                item("SPK-002", "Blusa Gaia", "31.00", 0, List.of())));
+
+        List<List<String>> links = links(catalog, "https://saphikuna.netlify.app/");
+
+        // portada, inicio, 2 prendas, cierre
+        assertThat(links).hasSize(5);
+        assertThat(links.get(2)).containsExactly("https://saphikuna.netlify.app/product.html?code=SPK-001");
+        assertThat(links.get(3)).containsExactly("https://saphikuna.netlify.app/product.html?code=SPK-002");
+        assertThat(links.get(0)).isEmpty();
+        assertThat(links.get(4)).isEmpty();
+    }
+
+    @Test
+    void withoutAStoreAddressThereAreNoLinks() throws Exception {
+        PdfCatalog catalog = new PdfCatalog("A", null, true, List.of(item("SPK-001", "Suéter Coral", "50.00", 0, List.of())));
+
+        assertThat(links(catalog, "")).allSatisfy(page -> assertThat(page).isEmpty());
+    }
+
+    @Test
+    void theStoreAddressIsNormalised() {
+        assertThat(BrochurePdfService.shopBase("saphikuna.netlify.app")).isEqualTo("https://saphikuna.netlify.app/");
+        assertThat(BrochurePdfService.shopBase(" https://saphikuna.netlify.app ")).isEqualTo("https://saphikuna.netlify.app/");
+        assertThat(BrochurePdfService.shopBase("")).isEmpty();
+        assertThat(BrochurePdfService.shopBase(null)).isEmpty();
     }
 
     @Test
