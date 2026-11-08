@@ -48,22 +48,44 @@ Al arrancar con la tabla `admins` vacía se crea el usuario `admin`; si no defin
 El panel es una aplicación Java, así que necesita un servidor (Netlify y GitHub Pages solo sirven páginas
 estáticas). Se publica en Render con el [`Dockerfile`](Dockerfile) y el blueprint [`render.yaml`](render.yaml).
 
-1. Ejecuta en Supabase los scripts de [`db/`](db) (`001` a `008`), en orden.
-2. En [Render](https://render.com): **New > Blueprint**, conecta el repositorio de GitHub y elige la rama `main`.
-3. Render pide los valores marcados `sync: false`. Son los mismos de tu `.env`
-   (`SUPABASE_DB_URL`, `SUPABASE_DB_USER`, `SUPABASE_DB_PASSWORD`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`).
-   `SAPHIKUNA_REMEMBER_KEY` la genera Render sola.
-4. Espera el primer despliegue (varios minutos). La dirección queda como `https://saphikuna-admin.onrender.com`.
-5. Cada push a `main` vuelve a desplegar.
+### Antes de empezar
+- Los scripts de [`db/`](db) (`001` a `008`) ya están ejecutados en Supabase, en orden.
+- Los cambios están unidos a la rama `main` (Render despliega desde ahí).
+- Tienes a mano los valores de tu `.env`: `SUPABASE_DB_URL`, `SUPABASE_DB_USER`, `SUPABASE_DB_PASSWORD`,
+  `SUPABASE_URL` y `SUPABASE_SERVICE_KEY`. **No los pegues en chats ni en archivos del repositorio.**
 
-Cómo se porta el plan gratis (512 MB de memoria y poca CPU):
+### Paso a paso
+1. Crea la cuenta en [render.com](https://render.com) (se puede entrar con GitHub).
+2. **Conecta GitHub:** el repositorio es privado y pertenece a la organización `QuadMLabs`. En la pantalla de Render
+   para conectar GitHub, instala la aplicación de Render en esa organización y da acceso al repositorio
+   `saphikuna-app`. Si no eres dueño de la organización, un dueño debe aprobar la instalación.
+3. En Render: **New > Blueprint**, elige el repositorio `saphikuna-app` y la rama `main`. Render lee
+   [`render.yaml`](render.yaml) y propone el servicio `saphikuna-admin` (plan gratis, región Ohio).
+4. Render pide los 5 valores marcados como secretos (`sync: false`): pega los de tu `.env`.
+   `SAPHIKUNA_REMEMBER_KEY` la genera Render sola y `SAPHIKUNA_STORE_URL` ya viene puesta.
+5. Pulsa **Apply**. El primer despliegue compila la aplicación dentro de Render: calcula entre 5 y 10 minutos.
+6. Cuando el servicio diga **Live**, abre su dirección (`https://saphikuna-admin.onrender.com`, o la que Render
+   asigne) e ingresa con tu usuario del panel. Los administradores viven en Supabase, así que ya existen.
+7. Desde ahora, cada push a `main` vuelve a desplegar solo.
 
-- **Se duerme tras 15 minutos sin visitas** y la primera visita siguiente espera mientras arranca
-  (puede ser más de un minuto). Con "Recordarme" no hace falta volver a iniciar sesión.
-- **La memoria está ajustada** en el `Dockerfile` (heap de 192 MB). Las fotos se procesan de a una y el PDF
-  del catálogo se genera de a uno. Si algo agotara la memoria, el contenedor se reinicia solo.
+### Cómo se porta el plan gratis (512 MB de memoria y 0,1 de CPU)
+- **Se duerme tras 15 minutos sin visitas.** Al despertar tiene que arrancar de nuevo: medido en un equipo
+  rápido son 8 segundos y unos 11 segundos de CPU; con la CPU del plan gratis se estiman cerca de **2 minutos**
+  (es una estimación, no una medición en Render). Con "Recordarme" no hace falta volver a iniciar sesión.
+- **La memoria está ajustada** en el `Dockerfile` (heap de 192 MB; el proceso queda en unos 365 MB). Las fotos se
+  procesan de a una y el PDF del catálogo se genera de a uno. Si algo agotara la memoria, el contenedor se
+  reinicia solo.
 - **Lo pesado va lento** (subir fotos, generar el PDF): se mide en decenas de segundos, no en segundos.
+- Para evitar el arranque lento se puede llamar a `/login` cada 10 minutos desde un servicio externo gratuito
+  (por ejemplo cron-job.org). Así el servicio no se duerme y entra en las 750 horas gratis del mes. Es opcional.
 - Las claves **nunca** van en el repositorio: solo en las variables de entorno de Render.
+
+### Si algo falla
+- **El despliegue se queda en "Deploying" o dice que no detecta puertos:** revisa los *Logs*; con CPU limitada el
+  arranque tarda. La aplicación escucha en el puerto que Render indica (variable `PORT`).
+- **No conecta con la base de datos:** revisa que `SUPABASE_DB_URL` sea la del *Session pooler* (puerto 5432) y que
+  la contraseña sea la vigente.
+- **No se ven las fotos:** revisa `SUPABASE_URL` y `SUPABASE_SERVICE_KEY` (la clave `secret`, no la `publishable`).
 
 El perfil de producción está en [`application-prod.properties`](src/main/resources/application-prod.properties).
 

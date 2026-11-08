@@ -7,7 +7,7 @@ services:
     plan: free
     region: ohio            # la base de datos de Supabase esta en us-east-2 (Ohio): menor latencia
     branch: main
-    autoDeploy: true        # cada push a main vuelve a desplegar
+    autoDeployTrigger: commit  # cada push a main vuelve a desplegar
     healthCheckPath: /login # pagina publica, responde 200 cuando la app esta lista
     envVars:
       # Base de datos (Supabase > Project Settings > Database > "Session pooler")

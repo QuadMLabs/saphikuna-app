@@ -12,7 +12,7 @@ COPY pom.xml ./
 RUN mvn -q -B dependency:go-offline
 
 COPY src ./src
-RUN mvn -q -B -DskipTests package \
+RUN mvn -q -B -Dmaven.test.skip=true package \
     && cp target/saphikuna-*.jar /app.jar
 
 # ---------- 2) Ejecutar ----------
