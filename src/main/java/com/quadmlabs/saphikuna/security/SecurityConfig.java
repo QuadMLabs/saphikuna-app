@@ -13,8 +13,7 @@ import java.time.Duration;
 
 /**
  * Seguridad: todo el panel pide sesión de administrador. Solo son públicos el inicio de
- * sesión, el catálogo (/catalogo y /catalogo.pdf, que se comparte con los clientes) y los
- * archivos estáticos.
+ * sesión y los archivos estáticos.
  */
 @Configuration
 @EnableWebSecurity
@@ -36,7 +35,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/error", "/catalogo", "/catalogo.pdf",
+                        .requestMatchers("/login", "/error",
                                 "/css/**", "/js/**", "/images/**", "/fonts/**", "/favicon.ico")
                         .permitAll()
                         .anyRequest().hasRole("ADMIN"))

@@ -84,10 +84,10 @@ class SecurityRulesTest {
     }
 
     @Test
-    void publicCatalogIsNotBehindTheLogin() throws Exception {
-        // Aquí no hay controlador del catálogo: 404 (y no un redirect al login) prueba que es público
-        mvc.perform(get("/catalogo.pdf")).andExpect(status().isNotFound());
-        mvc.perform(get("/catalogo")).andExpect(status().isNotFound());
+    void thereIsNoPublicCatalogAnymore() throws Exception {
+        // El catálogo ahora se arma y se descarga solo desde el panel: sin sesión, todo lleva al login
+        mvc.perform(get("/catalogo")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
+        mvc.perform(get("/catalogo.pdf")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
     }
 
     @Test
