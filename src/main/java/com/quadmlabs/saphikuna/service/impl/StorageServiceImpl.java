@@ -1,5 +1,6 @@
 package com.quadmlabs.saphikuna.service.impl;
 
+import com.quadmlabs.saphikuna.image.WatermarkRemover;
 import com.quadmlabs.saphikuna.service.StorageService;
 
 import java.awt.Color;
@@ -46,6 +47,10 @@ public class StorageServiceImpl implements StorageService {
         private final float webpQuality;
         private final int maxBytes;
         private final int thumbSize;
+
+        /** Quitar la marca de agua "Dola AI" al subir fotos (app.images.remove-watermark, por defecto sí). */
+        @Value("${app.images.remove-watermark:true}")
+        private boolean removeWatermark = true;
 
         public StorageServiceImpl(
                         @Value("${supabase.url}") String supabaseUrl,
@@ -146,6 +151,26 @@ public class StorageServiceImpl implements StorageService {
          */
         Processed process(byte[] raw) throws IOException {
 
+                // Una foto de celular decodificada ocupa decenas de MB: de a una por vez, para que dos
+                // personas subiendo fotos a la vez no agoten la memoria en un servidor pequeño.
+                try {
+                        processing.acquire();
+                } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Se interrumpió el procesamiento de la imagen", e);
+                }
+                try {
+                        return processOne(raw);
+                } finally {
+                        processing.release();
+                }
+        }
+
+        /** Fotos que se procesan a la vez (ver {@link #process}). */
+        private final java.util.concurrent.Semaphore processing = new java.util.concurrent.Semaphore(1, true);
+
+        private Processed processOne(byte[] raw) throws IOException {
+
                 BufferedImage original = ImageIO.read(new java.io.ByteArrayInputStream(raw));
 
                 if (original == null) {
@@ -154,6 +179,16 @@ public class StorageServiceImpl implements StorageService {
 
                 // Sin esto, una foto vertical del celular queda girada 90° en la tienda
                 original = ImageOrientation.apply(original, ImageOrientation.read(raw));
+
+                // Las fotos de modelo generadas con IA traen la marca "Dola AI" abajo a la derecha
+                if (removeWatermark) {
+                        WatermarkRemover.Result mark = WatermarkRemover.removeIfPresent(original);
+                        if (mark.detected()) {
+                                log.info("Marca de agua {} (puntaje {}, {})",
+                                                mark.removed() ? "quitada" : "detectada pero sin tocar",
+                                                String.format(java.util.Locale.ROOT, "%.2f", mark.score()), mark.method());
+                        }
+                }
 
                 return new Processed(
                                 encodeUnderLimit(original, maxWidth, maxHeight, maxBytes),

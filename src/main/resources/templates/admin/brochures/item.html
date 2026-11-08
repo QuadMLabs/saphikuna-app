@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=${edit.name}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/brochures.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content bro-page">
+
+                <a class="bro-back"
+                    th:href="@{/admin/catalogos/{id}(id=${edit.brochureId})} + '#prenda-' + ${edit.itemId}">
+                    <i data-lucide="arrow-left"></i>
+                    <span th:text="#{brochures.item.back}"></span>
+                </a>
+
+                <!-- Qué prenda es y en qué lugar va -->
+                <div class="bro-product">
+                    <span class="bro-product-thumb">
+                        <img th:if="${edit.productThumbUrl != null}" th:src="${edit.productThumbUrl}" alt="">
+                    </span>
+                    <div>
+                        <span class="bro-product-pos" th:text="#{brochures.item.position(${edit.number}, ${edit.total})}"></span>
+                        <h1 class="bro-product-name" th:text="${edit.name}"></h1>
+                        <span class="bro-product-code">
+                            <span th:text="${edit.code}"></span>
+                            <span th:if="${edit.category != null}" th:text="'· ' + ${edit.category}"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-success" role="status" th:if="${notice != null}" th:text="${notice}"></div>
+                <div class="flash flash-error" role="alert" th:if="${error != null}" th:text="${error}"></div>
+
+                <form class="general-form bro-form" method="post" data-saving
+                    th:action="@{/admin/catalogos/{id}/prendas/{item}(id=${edit.brochureId}, item=${edit.itemId})}">
+                    <button type="submit" class="bro-hidden-submit" tabindex="-1" aria-hidden="true"></button>
+
+                    <!-- ============ Fotos ============ -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{brochures.item.section.photos}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <p class="field-hint" th:text="#{brochures.item.photos.hint(2)}"></p>
+
+                            <p class="list-empty" th:if="${#lists.isEmpty(edit.photos)}"
+                                th:text="#{brochures.item.photos.none}"></p>
+
+                            <div class="photo-grid" th:unless="${#lists.isEmpty(edit.photos)}">
+                                <div class="photo-tile" th:each="p : ${edit.photos}"
+                                    th:classappend="${p.role == 'main'} ? 'is-main' : (${p.role == 'extra'} ? 'is-extra' : '')">
+                                    <div class="photo-img">
+                                        <img th:if="${p.thumbUrl != null}" th:src="${p.thumbUrl}" alt="" loading="lazy">
+                                    </div>
+                                    <!-- Un solo control por foto: no usar / principal / apoyo -->
+                                    <div class="seg" role="radiogroup" th:attr="aria-label=#{brochures.item.photo.role}">
+                                        <input type="radio" th:id="'r-' + ${p.imageId} + '-none'"
+                                            th:name="'role_' + ${p.imageId}" value="none" th:checked="${p.role == 'none'}">
+                                        <label th:for="'r-' + ${p.imageId} + '-none'" th:text="#{brochures.item.role.none}"></label>
+
+                                        <input type="radio" th:id="'r-' + ${p.imageId} + '-main'"
+                                            th:name="'role_' + ${p.imageId}" value="main" th:checked="${p.role == 'main'}">
+                                        <label th:for="'r-' + ${p.imageId} + '-main'" th:text="#{brochures.item.role.main}"></label>
+
+                                        <input type="radio" th:id="'r-' + ${p.imageId} + '-extra'"
+                                            th:name="'role_' + ${p.imageId}" value="extra" th:checked="${p.role == 'extra'}">
+                                        <label th:for="'r-' + ${p.imageId} + '-extra'" th:text="#{brochures.item.role.extra}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============ Textos ============ -->
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{brochures.item.section.texts}"></h3>
+                        </div>
+                        <div class="general-card-body">
+
+                            <div class="form-field">
+                                <label for="highlightText" th:text="#{brochures.item.highlight}"></label>
+                                <textarea id="highlightText" name="highlightText" class="form-input" rows="4" maxlength="450"
+                                    th:text="${edit.form.highlightText}"
+                                    th:placeholder="#{brochures.item.highlight.ph}"></textarea>
+                                <p class="form-field-hint" th:text="#{brochures.item.highlight.hint}"></p>
+                                <button type="submit" name="reset" value="highlight" formnovalidate
+                                    class="bro-link-button" th:text="#{brochures.item.highlight.reset}"></button>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="detailsText" th:text="#{brochures.item.details}"></label>
+                                <textarea id="detailsText" name="detailsText" class="form-input" rows="6" maxlength="500"
+                                    th:text="${edit.form.detailsText}"
+                                    th:placeholder="#{brochures.item.details.ph}"></textarea>
+                                <p class="form-field-hint" th:text="#{brochures.item.details.hint}"></p>
+                                <button type="submit" name="reset" value="details" formnovalidate
+                                    class="bro-link-button" th:text="#{brochures.item.details.reset}"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bar">
+                        <a th:href="@{/admin/catalogos/{id}(id=${edit.brochureId})} + '#prenda-' + ${edit.itemId}"
+                            class="secondary-button" th:text="#{common.cancel}"></a>
+                        <button type="submit" class="secondary-button" data-saving-button
+                            th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                        <button type="submit" name="next" value="true" class="primary-button" data-saving-button
+                            th:if="${edit.nextItemId != null}" th:attr="data-saving-text=#{common.saving}"
+                            th:text="#{brochures.item.save.next}"></button>
+                    </div>
+                </form>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+            <script th:src="@{/js/brochure-photos.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

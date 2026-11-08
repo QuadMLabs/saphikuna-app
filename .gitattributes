@@ -1,2 +1,5 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+/Dockerfile text eol=lf
+/.dockerignore text eol=lf
+/render.yaml text eol=lf

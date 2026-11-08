@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=${ov.name}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/catalog.css}">
+        <link rel="stylesheet" th:href="@{/css/brochures.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content bro-page">
+
+                <a class="bro-back" th:href="@{/admin/catalogos}">
+                    <i data-lucide="arrow-left"></i>
+                    <span th:text="#{brochures.back}"></span>
+                </a>
+
+                <div class="page-header">
+                    <h1 class="page-title" th:text="${ov.name}"></h1>
+                    <p class="page-subtitle" th:text="#{brochures.overview.subtitle}"></p>
+                </div>
+
+                <!-- Pasos: dónde voy y qué sigue -->
+                <ol class="bro-steps">
+                    <li class="is-done"><a href="#datos"><b>1</b><span th:text="#{brochures.step.data}"></span></a></li>
+                    <li th:classappend="${#lists.isEmpty(ov.items)} ? 'is-next' : 'is-done'">
+                        <a href="#prendas"><b>2</b><span th:text="#{brochures.step.items(${#lists.size(ov.items)})}"></span></a>
+                    </li>
+                    <li th:classappend="${#lists.isEmpty(ov.items)} ? '' : 'is-next'">
+                        <a href="#prendas"><b>3</b><span th:text="#{brochures.step.sheets}"></span></a>
+                    </li>
+                </ol>
+
+                <div class="flash flash-success" role="status" th:if="${flashText != null}" th:text="${flashText}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}" th:text="${flashError}"></div>
+
+                <!-- ============ Catálogo en PDF ============ -->
+                <div class="general-card bro-block bro-pdf" id="pdf">
+                    <div class="general-card-body">
+                        <div class="bro-pdf-text">
+                            <h3 th:text="#{brochures.pdf.title}"></h3>
+                            <p th:text="${#lists.isEmpty(ov.items)} ? #{brochures.pdf.empty} : #{brochures.pdf.hint}"></p>
+                        </div>
+                        <div class="bro-pdf-actions">
+                            <a class="primary-button" th:unless="${#lists.isEmpty(ov.items)}" target="_blank" rel="noopener"
+                                th:href="@{/admin/catalogos/{id}/pdf(id=${ov.id})}">
+                                <i data-lucide="file-text"></i>
+                                <span th:text="#{brochures.pdf.view}"></span>
+                            </a>
+                            <a class="secondary-button" th:unless="${#lists.isEmpty(ov.items)}"
+                                th:href="@{/admin/catalogos/{id}/pdf(id=${ov.id}, descargar=true)}">
+                                <i data-lucide="download"></i>
+                                <span th:text="#{brochures.pdf.download}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ 1. Datos ============ -->
+                <form class="general-form bro-block" id="datos" method="post" data-saving th:object="${brochureForm}"
+                    th:action="@{/admin/catalogos/{id}(id=${ov.id})}">
+                    <div class="general-card">
+                        <div class="general-card-header">
+                            <h3 th:text="#{brochures.section.data}"></h3>
+                        </div>
+                        <div class="general-card-body">
+                            <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                            </div>
+
+                            <!-- Marca y eslogan: vienen de Configuración -->
+                            <div class="bro-brand">
+                                <i data-lucide="sparkles"></i>
+                                <div>
+                                    <b th:text="${store.storeName}"></b>
+                                    <span th:if="${store.tagline != null and !store.tagline.isBlank()}" th:text="${store.tagline}"></span>
+                                    <small>
+                                        <span th:text="#{brochures.brand.hint}"></span>
+                                        <a th:href="@{/admin/settings}" th:text="#{brochures.brand.change}"></a>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
+                                <label for="name">
+                                    <span th:text="#{brochures.field.name}"></span>
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="name" th:field="*{name}" class="form-input" maxlength="80"
+                                    autocomplete="off" th:placeholder="#{brochures.field.name.ph}">
+                                <p class="form-field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                            </div>
+
+                            <div class="form-field" th:classappend="${#fields.hasErrors('introText')} ? 'has-error' : ''">
+                                <label for="introText" th:text="#{brochures.field.intro}"></label>
+                                <textarea id="introText" th:field="*{introText}" class="form-input" rows="3" maxlength="400"
+                                    th:placeholder="#{brochures.field.intro.ph}"></textarea>
+                                <p class="form-field-hint" th:text="#{brochures.field.intro.hint}"></p>
+                                <p class="form-field-error" th:if="${#fields.hasErrors('introText')}"
+                                    th:errors="*{introText}"></p>
+                            </div>
+
+                            <label class="bro-switch">
+                                <input type="checkbox" name="showPrices" value="true" th:checked="*{showPrices}">
+                                <span th:text="#{brochures.field.prices}"></span>
+                            </label>
+                        </div>
+                        <div class="settings-card-footer">
+                            <button type="submit" class="primary-button" data-saving-button
+                                th:attr="data-saving-text=#{common.saving}" th:text="#{common.save}"></button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- ============ 2 y 3. Prendas y sus fichas ============ -->
+                <div class="general-card bro-block" id="prendas">
+                    <div class="general-card-header bro-items-head">
+                        <h3 th:text="#{brochures.section.items(${#lists.size(ov.items)})}"></h3>
+                        <a th:href="@{/admin/catalogos/{id}/agregar(id=${ov.id})}" class="primary-button bro-small">
+                            <i data-lucide="plus"></i>
+                            <span th:text="#{brochures.items.add}"></span>
+                        </a>
+                    </div>
+
+                    <div class="general-card-body">
+                        <p class="field-hint" th:text="#{brochures.items.hint}"></p>
+
+                        <div class="list-empty" th:if="${#lists.isEmpty(ov.items)}">
+                            <p th:text="#{brochures.items.empty}"></p>
+                            <a th:href="@{/admin/catalogos/{id}/agregar(id=${ov.id})}" class="primary-button"
+                                th:text="#{brochures.items.add.first}"></a>
+                        </div>
+
+                        <ol class="bro-items" th:unless="${#lists.isEmpty(ov.items)}">
+                            <li class="bro-item" th:each="it, st : ${ov.items}" th:id="'prenda-' + ${it.itemId}">
+                                <a class="bro-item-thumb"
+                                    th:href="@{/admin/catalogos/{id}/prendas/{item}(id=${ov.id}, item=${it.itemId})}">
+                                    <img th:if="${it.thumbUrl != null}" th:src="${it.thumbUrl}" alt="" loading="lazy">
+                                    <i th:unless="${it.thumbUrl != null}" data-lucide="image-off"></i>
+                                </a>
+
+                                <div class="bro-item-info">
+                                    <span class="bro-item-code" th:text="${it.code}"></span>
+                                    <a class="bro-item-name"
+                                        th:href="@{/admin/catalogos/{id}/prendas/{item}(id=${ov.id}, item=${it.itemId})}"
+                                        th:text="${it.name}"></a>
+                                    <span class="bro-item-meta">
+                                        <span th:text="#{brochures.item.photos(${it.photoCount})}"></span>
+                                        <span class="bro-ok" th:if="${it.textsReady}">
+                                            <i data-lucide="check"></i> <span th:text="#{brochures.item.texts.ready}"></span>
+                                        </span>
+                                        <span class="bro-warn" th:unless="${it.textsReady}"
+                                            th:text="#{brochures.item.texts.missing}"></span>
+                                        <span class="tag badge-soldout" th:if="${it.availability == 'Agotado'}"
+                                            th:text="#{brochures.item.soldout}"></span>
+                                    </span>
+                                </div>
+
+                                <div class="bro-item-actions">
+                                    <a class="primary-button bro-small"
+                                        th:href="@{/admin/catalogos/{id}/prendas/{item}(id=${ov.id}, item=${it.itemId})}"
+                                        th:text="#{brochures.item.edit}"></a>
+
+                                    <form method="post"
+                                        th:action="@{/admin/catalogos/{id}/prendas/{item}/mover(id=${ov.id}, item=${it.itemId})}">
+                                        <input type="hidden" name="dir" value="up">
+                                        <button type="submit" class="icon-button" th:disabled="${st.first}"
+                                            th:title="#{brochures.item.up}" th:aria-label="#{brochures.item.up}">
+                                            <i data-lucide="arrow-up"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post"
+                                        th:action="@{/admin/catalogos/{id}/prendas/{item}/mover(id=${ov.id}, item=${it.itemId})}">
+                                        <input type="hidden" name="dir" value="down">
+                                        <button type="submit" class="icon-button" th:disabled="${st.last}"
+                                            th:title="#{brochures.item.down}" th:aria-label="#{brochures.item.down}">
+                                            <i data-lucide="arrow-down"></i>
+                                        </button>
+                                    </form>
+
+                                    <details class="row-delete">
+                                        <summary class="icon-button is-danger" th:title="#{brochures.item.remove}"
+                                            th:aria-label="#{brochures.item.remove}">
+                                            <i data-lucide="x"></i>
+                                        </summary>
+                                        <form class="row-delete-pop" method="post" data-saving
+                                            th:action="@{/admin/catalogos/{id}/prendas/{item}/quitar(id=${ov.id}, item=${it.itemId})}">
+                                            <p th:text="#{brochures.item.remove.confirm(${it.name})}"></p>
+                                            <button type="submit" class="danger-button" data-saving-button
+                                                th:attr="data-saving-text=#{products.deleting}"
+                                                th:text="#{brochures.item.remove.button}"></button>
+                                        </form>
+                                    </details>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_config})}">
+        <th:block th:fragment="scripts_config">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>
