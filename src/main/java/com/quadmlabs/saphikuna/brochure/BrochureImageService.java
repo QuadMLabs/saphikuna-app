@@ -42,10 +42,10 @@ public class BrochureImageService {
 
     /** Formato de la foto dentro del catálogo. */
     public enum Shape {
-        /** Vertical 3:4, para la foto principal. */
-        PORTRAIT(900, 1200),
-        /** Cuadrada, para las fotos pequeñas. */
-        SQUARE(360, 360);
+        /** Vertical 3:4, para la foto principal. 600x800 son más de 300 ppp en una columna de 48 mm. */
+        PORTRAIT(600, 800),
+        /** Cuadrada, para las fotos pequeñas (17,5 mm: 240 px bastan). */
+        SQUARE(240, 240);
 
         final int width;
         final int height;
@@ -67,7 +67,19 @@ public class BrochureImageService {
             .build();
 
     /** Fotos ya preparadas (clave: forma + url), para no repetir descargas entre catálogos. */
-    private final Map<String, String> cache = new ConcurrentHashMap<>();
+    private static final int MAX_CACHED = 80;
+
+    /** Con tope: en un servidor pequeño no puede crecer sin límite (se descartan las menos usadas). */
+    private final Map<String, String> cache = java.util.Collections.synchronizedMap(
+            new java.util.LinkedHashMap<String, String>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+                    return size() > MAX_CACHED;
+                }
+            });
+
+    /** Fotos que se descargan y convierten a la vez: cada una ocupa varios MB mientras se procesa. */
+    private final java.util.concurrent.Semaphore working = new java.util.concurrent.Semaphore(3);
 
     /**
      * Devuelve url -> data URI JPEG. Las fotos que no se puedan descargar o leer se omiten
@@ -88,7 +100,14 @@ public class BrochureImageService {
                 if (cached != null) {
                     result.put(url, cached);
                 } else {
-                    pending.put(url, pool.submit(() -> fetchAndConvert(url, shape)));
+                    pending.put(url, pool.submit(() -> {
+                        working.acquire();
+                        try {
+                            return fetchAndConvert(url, shape);
+                        } finally {
+                            working.release();
+                        }
+                    }));
                 }
             }
 

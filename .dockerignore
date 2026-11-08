@@ -1,0 +1,14 @@
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+target
+design
+db
+README.md
+HELP.md
+
+# Credenciales: nunca entran a la imagen
+.env
+.env.*

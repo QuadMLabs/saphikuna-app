@@ -1,0 +1,30 @@
+# Blueprint de Render: describe el servicio para crearlo con un clic (New > Blueprint).
+# Los valores marcados "sync: false" se piden en el panel de Render al crearlo; NO se escriben aqui.
+services:
+  - type: web
+    name: saphikuna-admin
+    runtime: docker
+    plan: free
+    region: ohio            # la base de datos de Supabase esta en us-east-2 (Ohio): menor latencia
+    branch: main
+    autoDeploy: true        # cada push a main vuelve a desplegar
+    healthCheckPath: /login # pagina publica, responde 200 cuando la app esta lista
+    envVars:
+      # Base de datos (Supabase > Project Settings > Database > "Session pooler")
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SUPABASE_DB_USER
+        sync: false
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      # Fotos (Supabase > Project Settings > API Keys > secret key)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      # Firma de la cookie "Recordarme": Render genera una cadena al azar la primera vez
+      - key: SAPHIKUNA_REMEMBER_KEY
+        generateValue: true
+      # Enlace del menu "Ir a la tienda"
+      - key: SAPHIKUNA_STORE_URL
+        value: https://saphikuna.netlify.app/

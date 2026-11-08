@@ -48,8 +48,25 @@ public class BrochurePdfService {
         this.engine.setTemplateEngineMessageSource(messages);
     }
 
+    /** Un PDF a la vez: generarlo usa mucha memoria y el servidor es pequeño. */
+    private final java.util.concurrent.Semaphore rendering = new java.util.concurrent.Semaphore(1, true);
+
     /** El catálogo en PDF (bytes). Lanza IllegalStateException si no se pudo generar. */
     public byte[] render(BrochureData data) {
+        try {
+            rendering.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Se interrumpió la generación del PDF", e);
+        }
+        try {
+            return renderOne(data);
+        } finally {
+            rendering.release();
+        }
+    }
+
+    private byte[] renderOne(BrochureData data) {
         long started = System.nanoTime();
 
         // Fotos: la principal de cada producto (vertical) y las demás (pequeñas)

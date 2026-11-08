@@ -87,14 +87,20 @@ public class BrochureController {
     @GetMapping(value = "/catalogo.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> download(@ModelAttribute("options") BrochureOptions options, BindingResult ignored) {
 
-        BrochureData data = brochure.build(options);
+        // /catalogo.pdf es público y generarlo gasta CPU y memoria: el mismo catálogo pedido varias
+        // veces seguidas se reutiliza por un minuto (también frena a quien lo pida sin parar).
+        String key = options.query();
+        byte[] bytes = cachedPdf(key);
 
-        byte[] bytes;
-        try {
-            bytes = pdf.render(data);
-        } catch (RuntimeException e) {
-            log.error("No se pudo generar el catálogo en PDF", e);
-            return ResponseEntity.internalServerError().build();
+        if (bytes == null) {
+            BrochureData data = brochure.build(options);
+            try {
+                bytes = pdf.render(data);
+            } catch (RuntimeException e) {
+                log.error("No se pudo generar el catálogo en PDF", e);
+                return ResponseEntity.internalServerError().build();
+            }
+            rememberPdf(key, bytes);
         }
 
         return ResponseEntity.ok()
@@ -103,5 +109,31 @@ public class BrochureController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
                         .filename("catalogo-saphikuna.pdf").build().toString())
                 .body(bytes);
+    }
+
+    // ------------------------------------------------------------------
+    // Recuerdo breve de PDFs ya generados
+    // ------------------------------------------------------------------
+
+    private static final long PDF_TTL_MS = 60_000;
+    private static final int PDF_MAX_CACHED = 5;
+
+    private record CachedPdf(byte[] bytes, long at) {
+    }
+
+    private final java.util.Map<String, CachedPdf> pdfCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private byte[] cachedPdf(String key) {
+        CachedPdf hit = pdfCache.get(key);
+        return hit != null && System.currentTimeMillis() - hit.at() < PDF_TTL_MS ? hit.bytes() : null;
+    }
+
+    private void rememberPdf(String key, byte[] bytes) {
+        long now = System.currentTimeMillis();
+        pdfCache.values().removeIf(c -> now - c.at() >= PDF_TTL_MS);
+        if (pdfCache.size() >= PDF_MAX_CACHED) {
+            pdfCache.clear(); // pocos y de vida corta: más simple vaciar que ordenar
+        }
+        pdfCache.put(key, new CachedPdf(bytes, now));
     }
 }
