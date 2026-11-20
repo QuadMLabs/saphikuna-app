@@ -104,6 +104,62 @@ class CollaborationServiceTest {
     }
 
     @Test
+    void subeReemplazaYQuitaElVideoDeUnaPrenda() {
+        CollabPiece piece = existingPiece("a");
+        MockMultipartFile video = new MockMultipartFile("newVideo", "v.mp4", "video/mp4", new byte[] { 1, 2, 3 });
+
+        PieceForm up = new PieceForm();
+        up.setName("Chompa");
+        up.setNewVideo(video);
+        service.updatePiece(piece.getCollabPieceId(), up);
+        String first = piece.getVideoPath();
+        assertThat(first).startsWith("collaborations/" + piece.getCollabPieceId() + "/video-").endsWith(".mp4");
+        verify(storage).uploadVideo(video, first);
+
+        // reemplazar: el anterior se borra del storage
+        PieceForm again = new PieceForm();
+        again.setName("Chompa");
+        again.setNewVideo(video);
+        service.updatePiece(piece.getCollabPieceId(), again);
+        assertThat(piece.getVideoPath()).isNotEqualTo(first);
+        verify(storage).delete(first);
+
+        // quitar
+        String second = piece.getVideoPath();
+        PieceForm remove = new PieceForm();
+        remove.setName("Chompa");
+        remove.setRemoveVideo(true);
+        service.updatePiece(piece.getCollabPieceId(), remove);
+        assertThat(piece.getVideoPath()).isNull();
+        verify(storage).delete(second);
+    }
+
+    @Test
+    void sinTocarElVideoSeConserva() {
+        CollabPiece piece = existingPiece("a");
+        piece.setVideoPath("collaborations/x/video-1.mp4");
+
+        PieceForm form = new PieceForm();
+        form.setName("Chompa nueva");
+        service.updatePiece(piece.getCollabPieceId(), form);
+
+        assertThat(piece.getVideoPath()).isEqualTo("collaborations/x/video-1.mp4");
+        verify(storage, never()).uploadVideo(any(), anyString());
+        verify(storage, never()).delete("collaborations/x/video-1.mp4");
+    }
+
+    @Test
+    void alBorrarLaMarcaSeBorraTambienElVideo() {
+        CollabPiece piece = existingPiece("a");
+        piece.setVideoPath("collaborations/x/video-1.mp4");
+        brand.getPieces().add(piece);
+
+        service.deleteBrand(brandId);
+
+        verify(storage).delete("collaborations/x/video-1.mp4");
+    }
+
+    @Test
     void creaUnaPrendaConColoresFotosYLaPrimeraComoPrincipal() {
         UUID red = UUID.randomUUID();
         when(colors.findAllById(any())).thenReturn(List.of(color(red, "Rojo")));

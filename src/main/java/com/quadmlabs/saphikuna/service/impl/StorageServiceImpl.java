@@ -112,6 +112,44 @@ public class StorageServiceImpl implements StorageService {
                 }
         }
 
+        /** Un solo video a la vez: se lee entero en memoria (hasta 15 MB) y el servidor gratis tiene poca. */
+        private final java.util.concurrent.Semaphore videoSlot = new java.util.concurrent.Semaphore(1, true);
+
+        @Override
+        public String uploadVideo(MultipartFile file, String path) {
+                if (file == null || file.isEmpty()) {
+                        throw new IllegalArgumentException("El video está vacío");
+                }
+                if (path == null || path.isBlank()) {
+                        throw new IllegalArgumentException("La ruta del archivo es obligatoria");
+                }
+                try {
+                        videoSlot.acquire();
+                } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Se interrumpió la subida del video", e);
+                }
+                try {
+                        byte[] bytes = file.getBytes();
+                        StorageService.checkVideo(file.getContentType(), file.getOriginalFilename(), bytes.length, bytes);
+                        restClient.post()
+                                        .uri(objectUrl(path))
+                                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+                                        .header("apikey", serviceKey)
+                                        .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
+                                        .header(HttpHeaders.CACHE_CONTROL, "max-age=31536000")
+                                        .body(bytes)
+                                        .retrieve()
+                                        .toBodilessEntity();
+                        log.info("Video {} subido: {} KB", path, bytes.length / 1024);
+                        return getPublicUrl(path);
+                } catch (IOException e) {
+                        throw new IllegalStateException("No fue posible leer el video", e);
+                } finally {
+                        videoSlot.release();
+                }
+        }
+
         /** Cliente aparte con tiempos límite cortos: la pantalla de estado no debe quedarse esperando. */
         private final RestClient pingClient = RestClient.builder()
                         .requestFactory(pingFactory())
@@ -313,7 +351,9 @@ public class StorageServiceImpl implements StorageService {
                         return;
                 }
 
-                for (String p : new String[] { path, thumbPath(path) }) {
+                // Los videos no tienen miniatura; las imágenes sí
+                String[] paths = path.endsWith(".mp4") ? new String[] { path } : new String[] { path, thumbPath(path) };
+                for (String p : paths) {
                         try {
                                 restClient.delete()
                                                 .uri(objectUrl(p))

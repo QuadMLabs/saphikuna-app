@@ -64,6 +64,14 @@ public class Product {
     @Column(name = "commissionId")
     private UUID commissionId;
 
+    /** Ruta del video corto (MP4) en el Storage; null = sin video. */
+    @Column(name = "videoPath")
+    private String videoPath;
+
+    /** El audio del video vale la pena: la tienda muestra el control de volumen (si no, va sin sonido). */
+    @Column(name = "videoHasSound")
+    private boolean videoHasSound;
+
     @Column(name = "primaryImagePath")
     private String primaryImagePath;
 

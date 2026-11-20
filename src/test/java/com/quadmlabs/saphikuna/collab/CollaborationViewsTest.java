@@ -40,6 +40,8 @@ class CollaborationViewsTest {
     CollaborationService service;
     @MockitoBean
     ColorService colorService;
+    @MockitoBean
+    com.quadmlabs.saphikuna.service.StorageService storage;
 
     private final UUID brandId = UUID.randomUUID();
     private final UUID pieceId = UUID.randomUUID();
@@ -119,6 +121,41 @@ class CollaborationViewsTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"colorIds\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Rojo")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("Precio"))));
+    }
+
+    @Test
+    void elFormularioDePrendaTraeElCampoDeVideo() throws Exception {
+        mvc.perform(get("/admin/colaboraciones/" + brandId + "/prendas/nueva"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"newVideo\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("accept=\"video/mp4\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Video corto")));
+    }
+
+    @Test
+    void unVideoInvalidoNoSeGuardaYSeExplicaElMotivo() throws Exception {
+        org.mockito.Mockito.doThrow(new IllegalArgumentException("El video pesa 20 MB y el máximo es 15 MB"))
+                .when(storage).validateVideo(any());
+
+        mvc.perform(multipart("/admin/colaboraciones/" + brandId + "/prendas")
+                .file(new MockMultipartFile("newVideo", "v.mp4", "video/mp4", new byte[] { 1 }))
+                .param("name", "Chompa"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("El video pesa 20 MB")));
+        verify(service, never()).createPiece(any(), any());
+    }
+
+    @Test
+    void editarUnaPrendaConVideoLoMuestraYOfreceQuitarlo() throws Exception {
+        PieceForm form = new PieceForm();
+        form.setName("Chompa");
+        form.setVideoUrl("http://t/video.mp4");
+        when(service.toPieceForm(pieceId)).thenReturn(form);
+
+        mvc.perform(get("/admin/colaboraciones/prendas/" + pieceId + "/editar"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("http://t/video.mp4")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"removeVideo\"")));
     }
 
     @Test
