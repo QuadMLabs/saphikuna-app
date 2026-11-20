@@ -14,15 +14,33 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /** Datos del formulario de encargo (crear y editar). */
 @Getter
 @Setter
 public class CommissionForm {
 
-    @NotBlank(message = "{commissions.validation.client.required}")
+    public static final String BRAND = "BRAND";
+    public static final String PERSON = "PERSON";
+
+    /** BRAND: una marca de Colaboraciones. PERSON: un cliente personal (nombre escrito a mano). */
+    private String clientType = PERSON;
+
+    /** Marca elegida (solo si clientType es BRAND). */
+    private UUID collaborationId;
+
+    /** Nombre del cliente (solo si clientType es PERSON; para una marca se toma el de la marca). */
     @Size(max = 120, message = "{commissions.validation.client.max}")
     private String clientName;
+
+    /** Celular u otra referencia (opcional, para ambos casos). */
+    @Size(max = 80, message = "{commissions.validation.contact.max}")
+    private String clientContact;
+
+    public boolean isBrand() {
+        return BRAND.equals(clientType);
+    }
 
     @NotBlank(message = "{commissions.validation.title.required}")
     @Size(max = 150, message = "{commissions.validation.title.max}")

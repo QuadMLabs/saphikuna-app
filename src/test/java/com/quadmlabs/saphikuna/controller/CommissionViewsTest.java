@@ -119,6 +119,34 @@ class CommissionViewsTest {
     }
 
     @Test
+    void aBrandCommissionNeedsABrandAndAPersonNeedsAName() throws Exception {
+        mvc.perform(post("/admin/commissions").param("clientType", "BRAND").param("title", "Trabajo")
+                .param("quantity", "5").param("dueDate", "2026-12-01").param("status", "Por empezar")
+                .param("advancePaid", "0"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Elige una marca")));
+        mvc.perform(post("/admin/commissions").param("clientType", "PERSON").param("clientName", " ")
+                .param("title", "Trabajo").param("quantity", "5").param("dueDate", "2026-12-01")
+                .param("status", "Por empezar").param("advancePaid", "0"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("El cliente es obligatorio")));
+    }
+
+    @Test
+    void theFormOffersTheBrandsAndTheContactField() throws Exception {
+        when(service.brandOptions()).thenReturn(List.of(
+                new com.quadmlabs.saphikuna.service.CommissionService.BrandOption(java.util.UUID.randomUUID(), "Marca Andina")));
+
+        mvc.perform(get("/admin/commissions/new"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("name=\"clientType\"")))
+                .andExpect(content().string(containsString(">Marca Andina</option>")))
+                .andExpect(content().string(containsString("name=\"clientContact\"")))
+                .andExpect(content().string(containsString("Para una marca")))
+                .andExpect(content().string(containsString("Cliente personal")));
+    }
+
+    @Test
     void editFormIsPrefilled() throws Exception {
         Commission c = commission("Marca Andina", "40 bufandas", TODAY.plusDays(10), Commission.IN_PROGRESS, "800.00", "300.00");
         CommissionForm form = new CommissionForm();

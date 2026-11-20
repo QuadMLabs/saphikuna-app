@@ -558,6 +558,30 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    public void addDeliveredCommission(UUID commissionId, String title, String description, BigDecimal price) {
+        if (productRepository.existsByCommissionId(commissionId)) {
+            return;
+        }
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        Product p = new Product();
+        p.setProductId(UUID.randomUUID());
+        p.setCommissionId(commissionId);
+        p.setName(title.trim());
+        p.setDescription(blankToNull(description));
+        p.setGeneralPrice(price == null ? BigDecimal.ZERO : price);
+        p.setDiscountPercent(BigDecimal.ZERO);
+        // Oculto en la tienda (solo se muestran los Activos) hasta que se complete y se active
+        p.setStatus(Product.INACTIVE);
+        p.setAvailability(Product.ON_REQUEST);
+        p.setLabel(Product.ORDERED_LABEL);
+        p.setCode(allocateCode());
+        p.setCreatedAt(now);
+        p.setUpdatedAt(now);
+        productRepository.save(p);
+    }
+
+    @Override
+    @Transactional
     public void delete(UUID productId) {
         Product product = findById(productId);
         List<String> paths = product.getProductImages().stream().map(ProductImage::getStoragePath).toList();

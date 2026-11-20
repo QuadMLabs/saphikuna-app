@@ -31,6 +31,12 @@ public interface CommissionService {
     /** Clientes ya usados, para sugerirlos en el formulario. */
     List<String> clientNames();
 
+    /** Marcas de Colaboraciones que se pueden elegir como cliente, por nombre. */
+    List<BrandOption> brandOptions();
+
+    record BrandOption(UUID id, String name) {
+    }
+
     /** Cuántos encargos piden atención ya (vencidos, de hoy o de los próximos 7 días). */
     long urgentCount();
 

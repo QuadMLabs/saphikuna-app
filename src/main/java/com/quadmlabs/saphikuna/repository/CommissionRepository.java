@@ -21,4 +21,10 @@ public interface CommissionRepository extends JpaRepository<Commission, UUID>, J
     long countByStatusNotAndDueDateLessThanEqual(String status, LocalDate date);
 
     long countByStatusNot(String status);
+
+    /** Si se renombra una marca, sus encargos muestran el nombre nuevo. */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("update Commission c set c.clientName = :name where c.collaborationId = :brandId")
+    int renameClient(@org.springframework.data.repository.query.Param("brandId") UUID brandId,
+            @org.springframework.data.repository.query.Param("name") String name);
 }

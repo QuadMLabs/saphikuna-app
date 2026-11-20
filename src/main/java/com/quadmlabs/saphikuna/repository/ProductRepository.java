@@ -11,6 +11,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     boolean existsByCodeIgnoreCase(String code);
 
+    boolean existsByCommissionId(java.util.UUID commissionId);
+
     long countByStatus(String status);
 
     long countByAvailability(String availability);
