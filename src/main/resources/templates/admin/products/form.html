@@ -108,6 +108,8 @@
                                 </div>
                             </div>
 
+                            <div th:replace="~{fragments/admin-video :: video-field}"></div>
+
                             <!-- INFORMACIÓN -->
                             <div class="general-card card-info">
                                 <div class="general-card-header">
@@ -380,6 +382,7 @@
     <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_productos})}">
         <th:block th:fragment="scripts_productos">
             <script th:src="@{/js/product-photos.js}"></script>
+            <script th:src="@{/js/video-field.js}"></script>
             <script th:src="@{/js/form-saving.js}"></script>
         </th:block>
     </th:block>

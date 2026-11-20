@@ -279,6 +279,12 @@ public class ProductController {
             }
         }
 
+        try {
+            storageService.validateVideo(form.getNewVideo());
+        } catch (IllegalArgumentException e) {
+            result.rejectValue("newVideo", "products.video.invalid", e.getMessage());
+        }
+
         if ((form.getSpecialSizeId() == null) != (form.getSpecialSizePrice() == null)) {
             result.rejectValue("specialSizePrice", "products.form.validation.special.incomplete");
         }

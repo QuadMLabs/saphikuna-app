@@ -132,7 +132,12 @@ public class CollaborationService {
     public void deleteBrand(UUID brandId) {
         Collaboration c = findBrand(brandId);
         List<String> paths = new ArrayList<>();
-        c.getPieces().forEach(p -> p.getImages().forEach(i -> paths.add(i.getStoragePath())));
+        c.getPieces().forEach(p -> {
+            p.getImages().forEach(i -> paths.add(i.getStoragePath()));
+            if (p.getVideoPath() != null) {
+                paths.add(p.getVideoPath());
+            }
+        });
         brands.delete(c);
         deleteAfterCommit(paths);
     }
@@ -179,6 +184,8 @@ public class CollaborationService {
         PieceForm form = new PieceForm();
         form.setName(p.getName());
         form.setDescription(p.getDescription());
+        form.setVideoUrl(storage.getPublicUrl(p.getVideoPath()));
+        form.setVideoHasSound(p.isVideoHasSound());
         p.getColors().forEach(c -> form.getColorIds().add(c.getColorId()));
         for (CollabPieceImage img : p.getImages()) {
             PieceForm.ImageRow row = new PieceForm.ImageRow();
@@ -200,6 +207,7 @@ public class CollaborationService {
             return;
         }
         CollabPiece p = findPiece(pieceId);
+        form.setVideoUrl(storage.getPublicUrl(p.getVideoPath()));
         java.util.Map<UUID, String> paths = new java.util.HashMap<>();
         p.getImages().forEach(i -> paths.put(i.getCollabPieceImageId(), i.getStoragePath()));
         form.getImages().removeIf(r -> r.getId() == null || !paths.containsKey(r.getId()));
@@ -234,7 +242,10 @@ public class CollaborationService {
     @Transactional
     public void deletePiece(UUID pieceId) {
         CollabPiece p = findPiece(pieceId);
-        List<String> paths = p.getImages().stream().map(CollabPieceImage::getStoragePath).toList();
+        List<String> paths = new ArrayList<>(p.getImages().stream().map(CollabPieceImage::getStoragePath).toList());
+        if (p.getVideoPath() != null) {
+            paths.add(p.getVideoPath());
+        }
         p.getCollaboration().getPieces().remove(p);
         pieces.delete(p);
         deleteAfterCommit(paths);
@@ -246,6 +257,7 @@ public class CollaborationService {
         p.setUpdatedAt(now);
         syncColors(p, form);
         syncImages(p, form, now);
+        syncVideo(p, form);
     }
 
     private void syncColors(CollabPiece p, PieceForm form) {
@@ -310,6 +322,35 @@ public class CollaborationService {
         }
         p.setPrimaryImagePath(primary);
 
+        deleteAfterCommit(removed);
+    }
+
+    /** Video corto: se sube tal cual, reemplaza al anterior y se puede quitar. Va con la misma transacción que las fotos. */
+    private void syncVideo(CollabPiece p, PieceForm form) {
+        MultipartFile upload = form.getNewVideo();
+        boolean hasUpload = upload != null && !upload.isEmpty();
+        boolean remove = !hasUpload && form.isRemoveVideo() && p.getVideoPath() != null;
+        // El sonido solo cuenta si queda un video
+        boolean keepsVideo = hasUpload || (p.getVideoPath() != null && !remove);
+        p.setVideoHasSound(keepsVideo && form.isVideoHasSound());
+        if (!hasUpload && !remove) {
+            return;
+        }
+        List<String> uploaded = new ArrayList<>();
+        List<String> removed = new ArrayList<>();
+        cleanupOnRollback(uploaded);
+        if (hasUpload) {
+            String path = "collaborations/" + p.getCollabPieceId() + "/video-" + UUID.randomUUID() + ".mp4";
+            storage.uploadVideo(upload, path);
+            uploaded.add(path);
+            if (p.getVideoPath() != null) {
+                removed.add(p.getVideoPath());
+            }
+            p.setVideoPath(path);
+        } else {
+            removed.add(p.getVideoPath());
+            p.setVideoPath(null);
+        }
         deleteAfterCommit(removed);
     }
 
