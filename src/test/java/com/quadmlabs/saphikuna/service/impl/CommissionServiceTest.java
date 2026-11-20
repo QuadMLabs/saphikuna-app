@@ -34,14 +34,20 @@ class CommissionServiceTest {
     static final LocalDate TODAY = LocalDate.of(2026, 11, 15);
 
     private CommissionRepository repository;
+    private com.quadmlabs.saphikuna.repository.CollaborationRepository brands;
+    private com.quadmlabs.saphikuna.collab.CollaborationService collaborations;
+    private com.quadmlabs.saphikuna.service.ProductService products;
     private CommissionServiceImpl service;
 
     @BeforeEach
     void setUp() {
         repository = mock(CommissionRepository.class);
+        products = mock(com.quadmlabs.saphikuna.service.ProductService.class);
+        collaborations = mock(com.quadmlabs.saphikuna.collab.CollaborationService.class);
+        brands = mock(com.quadmlabs.saphikuna.repository.CollaborationRepository.class);
         Clock clock = Clock.fixed(TODAY.atTime(10, 0).atZone(ZoneId.of("America/Guayaquil")).toInstant(),
                 ZoneId.of("America/Guayaquil"));
-        service = new CommissionServiceImpl(repository, clock);
+        service = new CommissionServiceImpl(repository, brands, collaborations, products, clock);
     }
 
     private Commission commission(String client, LocalDate due, String status) {
@@ -138,6 +144,126 @@ class CommissionServiceTest {
         f.setAgreedPrice(new BigDecimal("800.00"));
         f.setAdvancePaid(new BigDecimal("300.00"));
         return f;
+    }
+
+    @Test
+    void forABrandTheNameComesFromTheBrandAndIsLinked() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        com.quadmlabs.saphikuna.entity.Collaboration brand = new com.quadmlabs.saphikuna.entity.Collaboration();
+        brand.setCollaborationId(java.util.UUID.randomUUID());
+        brand.setBrandName("Marca Andina");
+        when(brands.findById(brand.getCollaborationId())).thenReturn(java.util.Optional.of(brand));
+
+        CommissionForm f = form();
+        f.setClientType(CommissionForm.BRAND);
+        f.setCollaborationId(brand.getCollaborationId());
+        f.setClientName("texto que se ignora");
+        f.setClientContact("  0991234567 ");
+        service.create(f);
+
+        ArgumentCaptor<Commission> saved = ArgumentCaptor.forClass(Commission.class);
+        verify(repository).save(saved.capture());
+        assertEquals("Marca Andina", saved.getValue().getClientName());
+        assertEquals(brand.getCollaborationId(), saved.getValue().getCollaborationId());
+        assertEquals("0991234567", saved.getValue().getClientContact());
+    }
+
+    private java.util.UUID brandFor(CommissionForm f) {
+        com.quadmlabs.saphikuna.entity.Collaboration brand = new com.quadmlabs.saphikuna.entity.Collaboration();
+        brand.setCollaborationId(java.util.UUID.randomUUID());
+        brand.setBrandName("Marca Andina");
+        when(brands.findById(brand.getCollaborationId())).thenReturn(java.util.Optional.of(brand));
+        f.setClientType(CommissionForm.BRAND);
+        f.setCollaborationId(brand.getCollaborationId());
+        return brand.getCollaborationId();
+    }
+
+    @Test
+    void aDeliveredBrandCommissionIsMovedToCollaborations() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        CommissionForm f = form();
+        f.setStatus(Commission.DELIVERED);
+        f.setDescription("Hilo angora, azul");
+        java.util.UUID brandId = brandFor(f);
+
+        java.util.UUID id = service.create(f);
+
+        verify(collaborations).addDeliveredPiece(brandId, id, "40 bufandas", "Hilo angora, azul");
+    }
+
+    @Test
+    void whenAnExistingCommissionBecomesDeliveredItIsMovedToo() {
+        Commission existing = commission("Marca Andina", TODAY, Commission.IN_PROGRESS);
+        existing.setCommissionId(java.util.UUID.randomUUID());
+        when(repository.findById(existing.getCommissionId())).thenReturn(java.util.Optional.of(existing));
+        CommissionForm f = form();
+        f.setStatus(Commission.DELIVERED);
+        java.util.UUID brandId = brandFor(f);
+
+        service.update(existing.getCommissionId(), f);
+
+        verify(collaborations).addDeliveredPiece(brandId, existing.getCommissionId(), "40 bufandas", null);
+    }
+
+    @Test
+    void notDeliveredOrPersonalCommissionsDoNotGoToCollaborations() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        CommissionForm inProgress = form();            // en proceso, para una marca
+        brandFor(inProgress);
+        service.create(inProgress);
+
+        verify(collaborations, org.mockito.Mockito.never()).addDeliveredPiece(any(), any(), any(), any());
+        verify(products, org.mockito.Mockito.never()).addDeliveredCommission(any(), any(), any(), any());
+    }
+
+    @Test
+    void aDeliveredPersonalCommissionGoesToTheCatalogWithTheUnitPrice() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        CommissionForm personal = form();              // 40 unidades, 800 acordados
+        personal.setStatus(Commission.DELIVERED);
+
+        java.util.UUID id = service.create(personal);
+
+        verify(products).addDeliveredCommission(id, "40 bufandas", null, new BigDecimal("20.00"));
+        verify(collaborations, org.mockito.Mockito.never()).addDeliveredPiece(any(), any(), any(), any());
+    }
+
+    @Test
+    void forABrandThatDoesNotExistItFails() {
+        CommissionForm f = form();
+        f.setClientType(CommissionForm.BRAND);
+        f.setCollaborationId(java.util.UUID.randomUUID());
+        when(brands.findById(any())).thenReturn(java.util.Optional.empty());
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.create(f));
+        verify(repository, org.mockito.Mockito.never()).save(any());
+    }
+
+    @Test
+    void forAPersonTheBrandLinkIsCleared() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        CommissionForm f = form();
+        f.setCollaborationId(java.util.UUID.randomUUID()); // quedó de una marca elegida antes
+        service.create(f);
+
+        ArgumentCaptor<Commission> saved = ArgumentCaptor.forClass(Commission.class);
+        verify(repository).save(saved.capture());
+        assertNull(saved.getValue().getCollaborationId());
+        assertNull(saved.getValue().getClientContact());
+        assertEquals("Marca Andina", saved.getValue().getClientName());
+    }
+
+    @Test
+    void theFormOfABrandCommissionOpensOnTheBrandOption() {
+        Commission c = commission("Marca Andina", TODAY, Commission.TO_START);
+        c.setCollaborationId(java.util.UUID.randomUUID());
+        c.setCommissionId(java.util.UUID.randomUUID());
+        when(repository.findById(c.getCommissionId())).thenReturn(java.util.Optional.of(c));
+
+        CommissionForm f = service.toForm(c.getCommissionId());
+
+        assertTrue(f.isBrand());
+        assertEquals(c.getCollaborationId(), f.getCollaborationId());
     }
 
     @Test

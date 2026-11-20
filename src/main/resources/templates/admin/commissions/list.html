@@ -89,6 +89,8 @@
                         <div class="cm-main">
                             <a class="cm-client" th:href="@{/admin/commissions/{id}/edit(id=${row.commission().commissionId})}"
                                 th:text="${row.commission().clientName}"></a>
+                            <span class="cm-contact" th:if="${row.commission().clientContact != null}"
+                                th:text="${row.commission().clientContact}"></span>
                             <span class="cm-title" th:text="${row.commission().title}"></span>
                         </div>
 

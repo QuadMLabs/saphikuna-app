@@ -2,10 +2,14 @@ package com.quadmlabs.saphikuna.service.impl;
 
 import com.quadmlabs.saphikuna.dto.CommissionForm;
 import com.quadmlabs.saphikuna.entity.Commission;
+import com.quadmlabs.saphikuna.collab.CollaborationService;
+import com.quadmlabs.saphikuna.entity.Collaboration;
+import com.quadmlabs.saphikuna.repository.CollaborationRepository;
 import com.quadmlabs.saphikuna.repository.CommissionRepository;
 import com.quadmlabs.saphikuna.service.CommissionRow;
 import com.quadmlabs.saphikuna.service.CommissionService;
 import com.quadmlabs.saphikuna.service.DeliveryUrgency;
+import com.quadmlabs.saphikuna.service.ProductService;
 
 import jakarta.persistence.criteria.Predicate;
 
@@ -30,10 +34,17 @@ public class CommissionServiceImpl implements CommissionService {
     private static final int LATER_DAYS = 30;
 
     private final CommissionRepository repository;
+    private final CollaborationRepository brands;
+    private final CollaborationService collaborations;
+    private final ProductService products;
     private final Clock clock;
 
-    public CommissionServiceImpl(CommissionRepository repository, Clock clock) {
+    public CommissionServiceImpl(CommissionRepository repository, CollaborationRepository brands,
+            CollaborationService collaborations, ProductService products, Clock clock) {
         this.repository = repository;
+        this.brands = brands;
+        this.collaborations = collaborations;
+        this.products = products;
         this.clock = clock;
     }
 
@@ -62,6 +73,7 @@ public class CommissionServiceImpl implements CommissionService {
                 String like = "%" + escapeLike(q.trim().toLowerCase()) + "%";
                 where.add(cb.or(
                         cb.like(cb.lower(root.<String>get("clientName")), like, '\\'),
+                        cb.like(cb.lower(root.<String>get("clientContact")), like, '\\'),
                         cb.like(cb.lower(root.<String>get("title")), like, '\\')));
             }
             return cb.and(where.toArray(new Predicate[0]));
@@ -83,6 +95,13 @@ public class CommissionServiceImpl implements CommissionService {
     @Transactional(readOnly = true)
     public List<String> clientNames() {
         return repository.findClientNames();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BrandOption> brandOptions() {
+        return brands.findAllByOrderByBrandNameAsc().stream()
+                .map(b -> new BrandOption(b.getCollaborationId(), b.getBrandName())).toList();
     }
 
     @Override
@@ -125,7 +144,10 @@ public class CommissionServiceImpl implements CommissionService {
                 .orElseThrow(() -> new IllegalArgumentException("Encargo no encontrado"));
 
         CommissionForm f = new CommissionForm();
+        f.setClientType(c.getCollaborationId() != null ? CommissionForm.BRAND : CommissionForm.PERSON);
+        f.setCollaborationId(c.getCollaborationId());
         f.setClientName(c.getClientName());
+        f.setClientContact(c.getClientContact());
         f.setTitle(c.getTitle());
         f.setDescription(c.getDescription());
         f.setQuantity(c.getQuantity());
@@ -148,7 +170,9 @@ public class CommissionServiceImpl implements CommissionService {
         c.setCommissionId(UUID.randomUUID());
         c.setCreatedAt(OffsetDateTime.now(clock));
         apply(c, form);
-        return repository.save(c).getCommissionId();
+        Commission saved = repository.save(c);
+        moveToCollaborations(saved);
+        return saved.getCommissionId();
     }
 
     @Override
@@ -158,6 +182,7 @@ public class CommissionServiceImpl implements CommissionService {
                 .orElseThrow(() -> new IllegalArgumentException("Encargo no encontrado"));
         apply(c, form);
         repository.save(c);
+        moveToCollaborations(c);
     }
 
     @Override
@@ -166,8 +191,45 @@ public class CommissionServiceImpl implements CommissionService {
         repository.deleteById(id);
     }
 
+    /**
+     * Un encargo entregado se agrega solo (una vez): de una marca pasa a Colaboraciones; de un cliente
+     * personal pasa al catálogo como producto oculto, para completarle fotos y datos.
+     */
+    private void moveToCollaborations(Commission c) {
+        if (!c.isDelivered()) {
+            return;
+        }
+        if (c.getCollaborationId() != null) {
+            collaborations.addDeliveredPiece(c.getCollaborationId(), c.getCommissionId(), c.getTitle(),
+                    c.getDescription());
+        } else {
+            products.addDeliveredCommission(c.getCommissionId(), c.getTitle(), c.getDescription(), unitPrice(c));
+        }
+    }
+
+    /** Precio acordado por unidad (el acordado es por todo el encargo); null si no hay precio. */
+    private static BigDecimal unitPrice(Commission c) {
+        if (c.getAgreedPrice() == null || c.getQuantity() == null || c.getQuantity() < 1) {
+            return null;
+        }
+        return c.getAgreedPrice().divide(BigDecimal.valueOf(c.getQuantity()), 2, java.math.RoundingMode.HALF_UP);
+    }
+
     private void apply(Commission c, CommissionForm f) {
-        c.setClientName(f.getClientName().trim());
+        if (f.isBrand()) {
+            // Para una marca el nombre se toma de la marca elegida
+            Collaboration brand = f.getCollaborationId() == null ? null
+                    : brands.findById(f.getCollaborationId()).orElse(null);
+            if (brand == null) {
+                throw new IllegalArgumentException("Marca no encontrada");
+            }
+            c.setCollaborationId(brand.getCollaborationId());
+            c.setClientName(brand.getBrandName());
+        } else {
+            c.setCollaborationId(null);
+            c.setClientName(f.getClientName().trim());
+        }
+        c.setClientContact(blankToNull(f.getClientContact()));
         c.setTitle(f.getTitle().trim());
         c.setDescription(blankToNull(f.getDescription()));
         c.setQuantity(f.getQuantity());

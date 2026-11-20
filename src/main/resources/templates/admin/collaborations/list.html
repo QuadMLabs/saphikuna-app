@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/admin-head :: head(title=#{collab.title}, additionalStyles=~{::css_exclusivo})}">
+    <th:block th:fragment="css_exclusivo">
+        <link rel="stylesheet" th:href="@{/css/products/products.css}">
+        <link rel="stylesheet" th:href="@{/css/collaborations.css}">
+    </th:block>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside th:replace="~{fragments/admin-sidebar :: sidebar}"></aside>
+        <main class="admin-main">
+            <header th:replace="~{fragments/admin-topbar :: topbar}"></header>
+            <section class="admin-content">
+
+                <div class="page-header-row">
+                    <div class="page-header">
+                        <h1 class="page-title" th:text="#{collab.title}"></h1>
+                        <p class="page-subtitle" th:text="#{collab.subtitle}"></p>
+                    </div>
+                    <a th:href="@{/admin/colaboraciones/nueva}" class="primary-button">
+                        <i data-lucide="plus"></i>
+                        <span th:text="#{collab.brand.new}"></span>
+                    </a>
+                </div>
+
+                <div class="flash flash-success" role="status" th:if="${flashMessage != null}"
+                    th:text="#{${flashMessage}}"></div>
+                <div class="flash flash-error" role="alert" th:if="${flashError != null}"
+                    th:text="#{${flashError}}"></div>
+
+                <div class="list-empty" th:if="${#lists.isEmpty(brands)}">
+                    <p th:text="#{collab.empty}"></p>
+                    <a th:href="@{/admin/colaboraciones/nueva}" class="primary-button" th:text="#{collab.empty.cta}"></a>
+                </div>
+
+                <!-- Una sección por marca, con sus prendas -->
+                <article class="collab-brand" th:each="b : ${brands}">
+                    <header class="collab-brand-head">
+                        <div class="collab-brand-title">
+                            <h2 th:text="${b.name}"></h2>
+                            <span class="collab-badge" th:unless="${b.visible}" th:text="#{collab.brand.hidden}"></span>
+                        </div>
+                        <div class="collab-brand-actions">
+                            <a class="primary-button collab-small"
+                                th:href="@{/admin/colaboraciones/{id}/prendas/nueva(id=${b.id})}">
+                                <i data-lucide="plus"></i>
+                                <span th:text="#{collab.piece.add}"></span>
+                            </a>
+                            <a class="icon-button" th:href="@{/admin/colaboraciones/{id}/editar(id=${b.id})}"
+                                th:title="#{collab.brand.edit}" th:aria-label="#{collab.brand.edit}">
+                                <i data-lucide="pencil"></i>
+                            </a>
+                            <details class="row-delete">
+                                <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                    th:aria-label="#{common.delete}">
+                                    <i data-lucide="trash-2"></i>
+                                </summary>
+                                <form class="row-delete-pop" method="post" data-saving
+                                    th:action="@{/admin/colaboraciones/{id}/eliminar(id=${b.id})}">
+                                    <p th:text="#{collab.brand.delete.confirm(${b.name})}"></p>
+                                    <button type="submit" class="danger-button" data-saving-button
+                                        th:attr="data-saving-text=#{products.deleting}"
+                                        th:text="#{products.delete.confirm.button}"></button>
+                                </form>
+                            </details>
+                        </div>
+                    </header>
+
+                    <p class="collab-none" th:if="${#lists.isEmpty(b.pieces)}" th:text="#{collab.piece.none}"></p>
+
+                    <div class="collab-pieces" th:unless="${#lists.isEmpty(b.pieces)}">
+                        <div class="collab-piece" th:each="p : ${b.pieces}">
+                            <a class="collab-piece-media"
+                                th:href="@{/admin/colaboraciones/prendas/{id}/editar(id=${p.id})}"
+                                th:attr="aria-label=${p.name}">
+                                <img th:if="${p.thumbUrl != null}" th:src="${p.thumbUrl}" alt="" loading="lazy">
+                                <span class="collab-piece-empty" th:unless="${p.thumbUrl != null}"
+                                    th:text="#{collab.piece.nophoto}"></span>
+                            </a>
+                            <div class="collab-piece-body">
+                                <a class="collab-piece-name"
+                                    th:href="@{/admin/colaboraciones/prendas/{id}/editar(id=${p.id})}"
+                                    th:text="${p.name}"></a>
+                                <span class="collab-piece-dots" th:unless="${#lists.isEmpty(p.colors)}">
+                                    <i class="color-dot" th:each="c : ${p.colors}" th:title="${c.name}"
+                                        th:style="'background:' + ${c.hex}"></i>
+                                </span>
+                                <span class="collab-piece-meta" th:text="#{collab.piece.photos(${p.photoCount})}"></span>
+                                <details class="row-delete">
+                                    <summary class="icon-button is-danger" th:title="#{common.delete}"
+                                        th:aria-label="#{common.delete}">
+                                        <i data-lucide="trash-2"></i>
+                                    </summary>
+                                    <form class="row-delete-pop" method="post" data-saving
+                                        th:action="@{/admin/colaboraciones/prendas/{id}/eliminar(id=${p.id})}">
+                                        <p th:text="#{collab.piece.delete.confirm(${p.name})}"></p>
+                                        <button type="submit" class="danger-button" data-saving-button
+                                            th:attr="data-saving-text=#{products.deleting}"
+                                            th:text="#{products.delete.confirm.button}"></button>
+                                    </form>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+            <footer th:replace="~{fragments/admin-footer :: footer}"></footer>
+        </main>
+    </div>
+    <th:block th:replace="~{fragments/admin-scripts :: global-scripts(~{::scripts_colab})}">
+        <th:block th:fragment="scripts_colab">
+            <script th:src="@{/js/form-saving.js}"></script>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

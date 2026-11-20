@@ -42,6 +42,12 @@ public interface ProductService {
 
     void update(UUID productId, ProductForm form);
 
+    /**
+     * Un encargo personal quedó entregado: se agrega al catálogo como producto oculto (Inactivo),
+     * sin fotos, "Bajo pedido" y con la etiqueta "Por encargo". Si ya se había agregado, no hace nada.
+     */
+    void addDeliveredCommission(UUID commissionId, String title, String description, java.math.BigDecimal price);
+
     /** Borra el producto con sus datos relacionados y sus imágenes del storage. */
     void delete(UUID productId);
 }

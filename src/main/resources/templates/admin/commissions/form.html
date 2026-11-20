@@ -44,19 +44,64 @@
                             <h3 th:text="#{commissions.form.section.work}"></h3>
                         </div>
                         <div class="general-card-body">
-                            <div class="form-field" th:classappend="${#fields.hasErrors('clientName')} ? 'has-error' : ''">
-                                <label for="clientName">
-                                    <span th:text="#{commissions.field.client}"></span>
-                                    <span class="required-mark">*</span>
-                                </label>
-                                <input type="text" id="clientName" th:field="*{clientName}" class="form-input"
-                                    maxlength="120" list="clientList" autocomplete="off"
-                                    th:placeholder="#{commissions.field.client.ph}">
-                                <datalist id="clientList">
-                                    <option th:each="c : ${clients}" th:value="${c}"></option>
-                                </datalist>
-                                <p class="form-field-error" th:if="${#fields.hasErrors('clientName')}"
-                                    th:errors="*{clientName}"></p>
+                            <!-- ¿Para quién es? Marca de Colaboraciones o cliente personal (sin JavaScript) -->
+                            <div class="cm-who">
+                                <span class="field-label" th:text="#{commissions.field.type}"></span>
+                                <input type="radio" id="typeBrand" name="clientType" value="BRAND"
+                                    class="visually-hidden" th:checked="${commissionForm.brand}">
+                                <input type="radio" id="typePerson" name="clientType" value="PERSON"
+                                    class="visually-hidden" th:checked="${!commissionForm.brand}">
+                                <div class="cm-segment">
+                                    <label for="typeBrand" th:text="#{commissions.type.brand}"></label>
+                                    <label for="typePerson" th:text="#{commissions.type.person}"></label>
+                                </div>
+
+                                <div class="cm-pane cm-pane-brand">
+                                    <div class="form-field"
+                                        th:classappend="${#fields.hasErrors('collaborationId')} ? 'has-error' : ''">
+                                        <label for="collaborationId" th:text="#{commissions.field.brand}"></label>
+                                        <select id="collaborationId" th:field="*{collaborationId}" class="form-select"
+                                            th:disabled="${#lists.isEmpty(brandOptions)}">
+                                            <option value="" th:text="#{commissions.field.brand.choose}"></option>
+                                            <option th:each="b : ${brandOptions}" th:value="${b.id()}"
+                                                th:text="${b.name()}"></option>
+                                        </select>
+                                        <p class="form-field-hint" th:if="${#lists.isEmpty(brandOptions)}"
+                                            th:text="#{commissions.field.brand.none}"></p>
+                                        <p class="form-field-hint" th:unless="${#lists.isEmpty(brandOptions)}"
+                                            th:text="#{commissions.field.brand.hint}"></p>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('collaborationId')}"
+                                            th:errors="*{collaborationId}"></p>
+                                    </div>
+                                </div>
+
+                                <div class="cm-pane cm-pane-person">
+                                    <div class="form-field"
+                                        th:classappend="${#fields.hasErrors('clientName')} ? 'has-error' : ''">
+                                        <label for="clientName">
+                                            <span th:text="#{commissions.field.client}"></span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+                                        <input type="text" id="clientName" th:field="*{clientName}" class="form-input"
+                                            maxlength="120" list="clientList" autocomplete="off"
+                                            th:placeholder="#{commissions.field.client.ph}">
+                                        <datalist id="clientList">
+                                            <option th:each="c : ${clients}" th:value="${c}"></option>
+                                        </datalist>
+                                        <p class="form-field-error" th:if="${#fields.hasErrors('clientName')}"
+                                            th:errors="*{clientName}"></p>
+                                    </div>
+                                </div>
+
+                                <div class="form-field"
+                                    th:classappend="${#fields.hasErrors('clientContact')} ? 'has-error' : ''">
+                                    <label for="clientContact" th:text="#{commissions.field.contact}"></label>
+                                    <input type="text" id="clientContact" th:field="*{clientContact}" class="form-input"
+                                        maxlength="80" autocomplete="off" inputmode="text"
+                                        th:placeholder="#{commissions.field.contact.ph}">
+                                    <p class="form-field-error" th:if="${#fields.hasErrors('clientContact')}"
+                                        th:errors="*{clientContact}"></p>
+                                </div>
                             </div>
 
                             <div class="form-field" th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''">

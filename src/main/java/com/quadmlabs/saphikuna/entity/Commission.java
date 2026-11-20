@@ -34,6 +34,14 @@ public class Commission {
     @Column(name = "clientName")
     private String clientName;
 
+    /** Marca elegida de Colaboraciones; null = cliente personal (o encargo anterior a esta opción). */
+    @Column(name = "collaborationId")
+    private UUID collaborationId;
+
+    /** Celular u otra referencia del cliente (opcional). */
+    @Column(name = "clientContact")
+    private String clientContact;
+
     @Column(name = "title")
     private String title;
 
