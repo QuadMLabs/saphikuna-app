@@ -235,3 +235,59 @@ a.cm-client:hover {
         flex: 1 1 100%;
     }
 }
+
+/* ---------- ¿Para quién es? marca o cliente personal (sin JavaScript) ---------- */
+.cm-who {
+    margin-bottom: 4px;
+}
+
+.cm-segment {
+    display: flex;
+    gap: 6px;
+    margin: 6px 0 12px;
+    padding: 4px;
+    background: var(--surface-soft);
+    border-radius: 12px;
+}
+
+.cm-segment label {
+    flex: 1;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 9px;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+}
+
+#typeBrand:checked ~ .cm-segment label[for="typeBrand"],
+#typePerson:checked ~ .cm-segment label[for="typePerson"] {
+    background: #fff;
+    color: var(--primary-dark);
+    box-shadow: 0 1px 4px rgba(var(--primary-rgb), .25);
+}
+
+#typeBrand:focus-visible ~ .cm-segment label[for="typeBrand"],
+#typePerson:focus-visible ~ .cm-segment label[for="typePerson"] {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.cm-pane {
+    display: none;
+}
+
+#typeBrand:checked ~ .cm-pane-brand,
+#typePerson:checked ~ .cm-pane-person {
+    display: block;
+}
+
+.cm-contact {
+    display: block;
+    color: var(--muted);
+    font-size: .85rem;
+}

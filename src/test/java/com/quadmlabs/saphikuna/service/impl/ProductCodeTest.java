@@ -65,6 +65,45 @@ class ProductCodeTest {
     }
 
     @Test
+    void aDeliveredCommissionBecomesAHiddenProductWithoutPhotos() {
+        when(products.nextCodeNumber()).thenReturn(22L);
+        java.util.UUID commissionId = java.util.UUID.randomUUID();
+
+        service.addDeliveredCommission(commissionId, "  Chaqueta para Ana ", "Lana azul", new BigDecimal("20.00"));
+
+        Product p = lastSaved();
+        assertEquals("Chaqueta para Ana", p.getName());
+        assertEquals("Lana azul", p.getDescription());
+        assertEquals("SPK-022", p.getCode());
+        assertEquals(commissionId, p.getCommissionId());
+        assertEquals(Product.INACTIVE, p.getStatus());          // oculta en la tienda hasta completarla
+        assertEquals(Product.ON_REQUEST, p.getAvailability());
+        assertEquals("Por encargo", p.getLabel());
+        assertEquals(new BigDecimal("20.00"), p.getGeneralPrice());
+        org.junit.jupiter.api.Assertions.assertNull(p.getPrimaryImagePath());
+        org.junit.jupiter.api.Assertions.assertNull(p.getNewUntil());
+    }
+
+    @Test
+    void aCommissionAlreadyInTheCatalogIsNotAddedAgain() {
+        java.util.UUID commissionId = java.util.UUID.randomUUID();
+        when(products.existsByCommissionId(commissionId)).thenReturn(true);
+
+        service.addDeliveredCommission(commissionId, "Chaqueta", null, null);
+
+        verify(products, org.mockito.Mockito.never()).save(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void withoutAnAgreedPriceTheProductStartsAtZero() {
+        when(products.nextCodeNumber()).thenReturn(23L);
+
+        service.addDeliveredCommission(java.util.UUID.randomUUID(), "Chaqueta", null, null);
+
+        assertEquals(0, BigDecimal.ZERO.compareTo(lastSaved().getGeneralPrice()));
+    }
+
+    @Test
     void newProductGetsNextNumberFromTheSequence() {
         when(products.nextCodeNumber()).thenReturn(21L);
 

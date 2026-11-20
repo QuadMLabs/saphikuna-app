@@ -24,6 +24,9 @@ public class Product {
     public static final String SOLD_OUT = "Agotado";
     public static final String ON_REQUEST = "Bajo pedido";
 
+    /** Etiqueta de los productos que vienen de un encargo entregado. */
+    public static final String ORDERED_LABEL = "Por encargo";
+
     @Id
     @Column(name = "producttId")
     private UUID productId;
@@ -56,6 +59,10 @@ public class Product {
 
     @Column(name = "discountPercent")
     private BigDecimal discountPercent = BigDecimal.ZERO;
+
+    /** Encargo del que viene el producto (null = se creó a mano); evita crearlo dos veces. */
+    @Column(name = "commissionId")
+    private UUID commissionId;
 
     @Column(name = "primaryImagePath")
     private String primaryImagePath;

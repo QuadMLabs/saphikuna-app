@@ -1,0 +1,174 @@
+/* Colaboraciones: una sección por marca con sus prendas, y los formularios.
+   Pensado primero para el celular: una columna que pasa a varias en pantallas grandes. */
+
+.collab-form {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.collab-form .general-card {
+    margin-bottom: 16px;
+}
+
+.collab-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.collab-switch input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+/* ---------- Lista ---------- */
+
+.collab-brand {
+    margin-bottom: 18px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--primary-border);
+    border-radius: 14px;
+}
+
+.collab-brand-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin-bottom: 14px;
+}
+
+.collab-brand-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    min-width: 0;
+}
+
+.collab-brand-title h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.2rem;
+    overflow-wrap: anywhere;
+}
+
+.collab-badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--surface-soft);
+    color: var(--primary-dark);
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.collab-brand-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.collab-small {
+    height: 38px;
+    padding: 0 14px;
+    font-size: .9rem;
+}
+
+.collab-none {
+    margin: 0;
+    color: var(--muted);
+}
+
+.collab-pieces {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .collab-pieces {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1000px) {
+    .collab-pieces {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+.collab-piece {
+    display: flex;
+    flex-direction: column;
+    background: var(--primary-tint);
+    border: 1px solid var(--primary-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.collab-piece-media {
+    display: block;
+    aspect-ratio: 4 / 5;
+    background: var(--surface-soft);
+}
+
+.collab-piece-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.collab-piece-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.collab-piece-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px 12px;
+}
+
+.collab-piece-name {
+    padding-right: 40px;
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.collab-piece-name:hover {
+    color: var(--primary-color);
+}
+
+.collab-piece-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.collab-piece-meta {
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+/* El botón de borrar queda en la esquina de la tarjeta */
+.collab-piece-body .row-delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}

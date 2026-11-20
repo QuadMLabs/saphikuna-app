@@ -47,6 +47,11 @@
                 <span class="sidebar-item-icon"><i data-lucide="book-open"></i></span>
                 <span class="sidebar-item-label" th:text="#{menu.brochure}"></span>
             </a>
+            <a th:href="@{/admin/colaboraciones}" class="sidebar-item"
+                th:classappend="${activeMenu == 'collaborations'} ? ' is-active' : ''" th:title="#{menu.collaborations}">
+                <span class="sidebar-item-icon"><i data-lucide="handshake"></i></span>
+                <span class="sidebar-item-label" th:text="#{menu.collaborations}"></span>
+            </a>
             <a th:href="@{/admin/collections}" class="sidebar-item"
                 th:classappend="${activeMenu == 'collections'} ? ' is-active' : ''" th:title="#{menu.collections}">
                 <span class="sidebar-item-icon"><i data-lucide="shopping-bag"></i></span>
