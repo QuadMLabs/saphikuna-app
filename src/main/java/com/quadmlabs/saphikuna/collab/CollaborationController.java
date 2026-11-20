@@ -1,6 +1,7 @@
 package com.quadmlabs.saphikuna.collab;
 
 import com.quadmlabs.saphikuna.service.ColorService;
+import com.quadmlabs.saphikuna.service.StorageService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,12 @@ public class CollaborationController {
 
     private final CollaborationService service;
     private final ColorService colorService;
+    private final StorageService storage;
 
-    public CollaborationController(CollaborationService service, ColorService colorService) {
+    public CollaborationController(CollaborationService service, ColorService colorService, StorageService storage) {
         this.service = service;
         this.colorService = colorService;
+        this.storage = storage;
     }
 
     // ------------------------------------------------------------------
@@ -206,6 +209,12 @@ public class CollaborationController {
                 result.rejectValue("newImages", "collab.piece.validation.images.type");
                 break;
             }
+        }
+
+        try {
+            storage.validateVideo(form.getNewVideo());
+        } catch (IllegalArgumentException e) {
+            result.rejectValue("newVideo", "collab.video.invalid", e.getMessage());
         }
     }
 }

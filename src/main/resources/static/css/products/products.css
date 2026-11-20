@@ -1137,3 +1137,33 @@ button.photo-btn:hover {
     color: var(--primary-dark);
     font-weight: 600;
 }
+
+/* ---------- Video corto del producto o de la prenda ---------- */
+.video-current {
+    margin-bottom: 12px;
+}
+
+.video-current video {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    max-height: 340px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: #000;
+}
+
+.video-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.video-remove input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}

@@ -233,6 +233,8 @@ public class ProductServiceImpl implements ProductService {
         form.setActive(p.isActive());
         form.setAvailability(p.getAvailability());
         form.setNewUntil(p.getNewUntil());
+        form.setVideoUrl(storageService.getPublicUrl(p.getVideoPath()));
+        form.setVideoHasSound(p.isVideoHasSound());
         form.setCategoryId(p.getCategory() != null ? p.getCategory().getCategoryId() : null);
 
         p.getProductCollections().stream().findFirst()
@@ -282,6 +284,7 @@ public class ProductServiceImpl implements ProductService {
         if (productId != null) {
             Product p = findById(productId);
             form.setCode(p.getCode()); // el campo es de solo lectura y no se envía en el POST
+            form.setVideoUrl(storageService.getPublicUrl(p.getVideoPath()));
             Map<UUID, String> paths = new HashMap<>();
             p.getProductImages().forEach(i -> paths.put(i.getProductImageId(), i.getStoragePath()));
 
@@ -343,6 +346,7 @@ public class ProductServiceImpl implements ProductService {
         syncSizes(product, form);
         syncSpecs(product, form);
         syncImages(product, form, now);
+        syncVideo(product, form);
 
         // Código secuencial: se pide al final para no gastar números si algo falla antes.
         // Los productos que ya tienen código (por ejemplo los de la tienda) lo conservan.
@@ -533,6 +537,35 @@ public class ProductServiceImpl implements ProductService {
         deleteAfterCommit(removedPaths);
     }
 
+    /** Video corto: se sube tal cual, reemplaza al anterior y se puede quitar. Va con la misma transacción que las fotos. */
+    private void syncVideo(Product product, ProductForm form) {
+        MultipartFile upload = form.getNewVideo();
+        boolean hasUpload = upload != null && !upload.isEmpty();
+        boolean remove = !hasUpload && form.isRemoveVideo() && product.getVideoPath() != null;
+        // El sonido solo cuenta si queda un video
+        boolean keepsVideo = hasUpload || (product.getVideoPath() != null && !remove);
+        product.setVideoHasSound(keepsVideo && form.isVideoHasSound());
+        if (!hasUpload && !remove) {
+            return;
+        }
+        List<String> uploaded = new ArrayList<>();
+        List<String> removed = new ArrayList<>();
+        cleanupOnRollback(uploaded);
+        if (hasUpload) {
+            String path = "products/" + product.getProductId() + "/video-" + UUID.randomUUID() + ".mp4";
+            storageService.uploadVideo(upload, path);
+            uploaded.add(path);
+            if (product.getVideoPath() != null) {
+                removed.add(product.getVideoPath());
+            }
+            product.setVideoPath(path);
+        } else {
+            removed.add(product.getVideoPath());
+            product.setVideoPath(null);
+        }
+        deleteAfterCommit(removed);
+    }
+
     /** Interpreta "existing:<id>" / "new:<n>"; devuelve la ruta o null si no es válida. */
     private String resolvePrimary(Product product, String choice, List<String> uploadedPaths) {
         if (choice == null) {
@@ -584,7 +617,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void delete(UUID productId) {
         Product product = findById(productId);
-        List<String> paths = product.getProductImages().stream().map(ProductImage::getStoragePath).toList();
+        List<String> paths = new ArrayList<>(product.getProductImages().stream().map(ProductImage::getStoragePath).toList());
+        if (product.getVideoPath() != null) {
+            paths.add(product.getVideoPath());
+        }
         productRepository.delete(product);
         deleteAfterCommit(paths);
     }

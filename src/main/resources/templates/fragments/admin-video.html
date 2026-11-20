@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <!-- Video corto opcional. Va dentro de un formulario con th:object que tenga newVideo, removeVideo y videoUrl. -->
+    <div th:fragment="video-field" class="general-card card-video">
+        <div class="general-card-header">
+            <h3 th:text="#{video.section}"></h3>
+        </div>
+        <div class="general-card-body">
+            <p class="field-hint" th:text="#{video.hint}"></p>
+
+            <div class="video-current" th:if="*{videoUrl != null}">
+                <video controls playsinline preload="metadata" th:src="*{videoUrl}"></video>
+                <label class="video-remove">
+                    <input type="checkbox" name="removeVideo" value="true">
+                    <span th:text="#{video.remove}"></span>
+                </label>
+                <p class="field-hint" th:text="#{video.replace}"></p>
+            </div>
+
+            <label class="video-remove">
+                <input type="checkbox" name="videoHasSound" value="true" th:checked="*{videoHasSound}">
+                <span th:text="#{video.sound}"></span>
+            </label>
+            <p class="field-hint" th:text="#{video.sound.hint}"></p>
+
+            <input type="file" id="newVideo" name="newVideo" class="form-input" accept="video/mp4"
+                th:attr="data-max-mb=${15},data-too-big=#{video.toobig},data-not-mp4=#{video.notmp4}">
+            <p class="field-hint" id="videoMessage" role="status"></p>
+            <p class="form-field-error" th:if="${#fields.hasErrors('newVideo')}" th:errors="*{newVideo}"></p>
+        </div>
+    </div>
+</body>
+
+</html>

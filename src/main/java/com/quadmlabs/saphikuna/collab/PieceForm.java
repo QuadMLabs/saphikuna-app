@@ -36,6 +36,18 @@ public class PieceForm {
     /** Fotos nuevas a subir. */
     private List<MultipartFile> newImages = new ArrayList<>();
 
+    /** Video corto nuevo (MP4); vacío = no cambiar. Reemplaza al anterior si ya había uno. */
+    private MultipartFile newVideo;
+
+    /** Quitar el video que ya tiene (se ignora si se sube uno nuevo). */
+    private boolean removeVideo;
+
+    /** El audio del video es útil (en la tienda se podrá activar el sonido); si no, el video va mudo. */
+    private boolean videoHasSound;
+
+    /** Solo para mostrar el video actual; nunca se usa al guardar. */
+    private String videoUrl;
+
     @Getter
     @Setter
     public static class ImageRow {
