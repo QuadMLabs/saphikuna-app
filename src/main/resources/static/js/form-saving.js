@@ -51,4 +51,43 @@
             document.querySelectorAll('form[data-saving]').forEach(reset);
         }
     });
+
+    // Latido: mientras la página está abierta se avisa al servidor cada pocos minutos.
+    // El plan gratis lo duerme tras 15 minutos sin visitas, y un formulario que tardaba en llenarse
+    // se perdía al guardar. Si el servidor se reinició, la respuesta trae el token de seguridad
+    // nuevo y se pone en los formularios abiertos para que guardar siga funcionando.
+    var BEAT_EVERY = 4 * 60 * 1000;
+    var lastBeat = Date.now();
+
+    function beat() {
+        lastBeat = Date.now();
+        fetch('/admin/ping', {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+        }).then(function (response) {
+            var type = response.headers.get('content-type') || '';
+            return response.ok && type.indexOf('json') !== -1 ? response.json() : null;
+        }).then(function (data) {
+            if (!data || !data.token || !data.parameter) {
+                return;
+            }
+            document.querySelectorAll('input[type="hidden"][name="' + data.parameter + '"]').forEach(function (input) {
+                input.value = data.token;
+            });
+        }).catch(function () { /* sin conexión: se intenta en el siguiente latido */ });
+    }
+
+    setInterval(function () {
+        if (!document.hidden) {
+            beat();
+        }
+    }, BEAT_EVERY);
+
+    // Al volver a la pestaña (por ejemplo en el celular) se avisa de una vez si pasó un rato
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && Date.now() - lastBeat > 2 * 60 * 1000) {
+            beat();
+        }
+    });
 }());
